@@ -57,3 +57,5 @@ A segunda imagem de referência não estava disponível nesta tarefa. A paleta e
 - Capturas executadas em **1440 × 960**. Para repetir: `QT_QPA_PLATFORM=offscreen .venv/bin/python tools/capture_visual.py`.
 
 A primeira execução de empacotamento foi interrompida para incluir a correção de atualização dos filtros após alternar a lixeira. O pacote usa o nome neutro `DrHeekLab-Windows-2.9.0`; o resultado do workflow estabelece sua validação automatizada.
+
+- Correção específica para Windows: cartões com altura mínima de 100 pixels, independentemente da métrica da fonte. Após a correção, 19 testes locais de interface/validação passaram; o teste existente de tamanho mínimo foi preservado.

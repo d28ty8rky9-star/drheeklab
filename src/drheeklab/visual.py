@@ -38,7 +38,7 @@ def stylesheet(dark=True):
 
 class MetricCard(QFrame):
     def __init__(self, title, value='—', detail='', accent='purple'):
-        super().__init__(); self.setObjectName('card'); box=QVBoxLayout(self)
+        super().__init__(); self.setObjectName('card'); self.setMinimumHeight(100); box=QVBoxLayout(self)
         label=QLabel(title);label.setObjectName('muted');box.addWidget(label)
         self.value=QLabel(str(value));self.value.setObjectName('metric');self.value.setStyleSheet('color:'+COLORS[accent]);box.addWidget(self.value)
         self.detail=QLabel(detail);self.detail.setWordWrap(True);self.detail.setObjectName('muted');box.addWidget(self.detail)
