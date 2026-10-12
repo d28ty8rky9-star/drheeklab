@@ -18,6 +18,7 @@ def stylesheet(dark=True):
     QLabel#alert {{color:#fbbf24;padding:10px;border:1px solid #745a2b;border-radius:7px;}}
     QLabel#muted {{color:{muted};}} QLabel#metric {{font-size:23px;font-weight:700;}}
     QPushButton {{background:{panel};border:1px solid {edge};border-radius:7px;padding:7px 11px;min-height:20px;}}
+    QPushButton[nav="expanded"] {{text-align:left;}}
     QPushButton:hover {{border-color:#9565fa;background:#293b58;color:white;}}
     QPushButton:checked,QPushButton[role="primary"] {{background:#7044cf;color:white;border-color:#9565fa;}}
     QPushButton[role="danger"] {{color:#fb7185;}} QPushButton[role="export"] {{color:#38bdf8;}}

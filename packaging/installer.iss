@@ -1,4 +1,4 @@
-#define AppVersion "2.9.0"
+#define AppVersion "2.9.1"
 [Setup]
 AppId={{485013A4-F44F-47DF-9C89-9CECB56946A0}
 AppName=Dr. Heek Lab 2.0
@@ -6,7 +6,7 @@ AppVersion={#AppVersion}
 DefaultDirName={autopf}\DrHeekLab
 DefaultGroupName=Dr. Heek Lab
 OutputDir=..\dist\installer
-OutputBaseFilename=DrHeekLab-2.9.0-Fase8-Setup
+OutputBaseFilename=DrHeekLab-2.9.1-Fase8-Setup
 UninstallDisplayIcon={app}\DrHeekLab.exe
 #ifdef OfficialIcon
 SetupIconFile={#OfficialIcon}
@@ -48,7 +48,7 @@ var
 begin
   Result := '';
   if GetVersionNumbers(ExpandConstant('{app}\DrHeekLab.exe'), InstalledMS, InstalledLS) then
-    if (InstalledMS > 131081) or ((InstalledMS = 131081) and (InstalledLS > 0)) then
+    if (InstalledMS > 131081) or ((InstalledMS = 131081) and (InstalledLS > 65536)) then
     begin
       Result := 'Há uma versão mais recente instalada. Não é permitido rebaixar automaticamente.';
       Exit;

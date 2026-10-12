@@ -138,7 +138,11 @@ class Window(QMainWindow):
         side.addStretch()
         self.phase_label = QLabel("FASE 8\nValidação e finalização")
         self.phase_label.hide()
-        outer.addWidget(self.sidebar)
+        self.sidebar_scroll = QScrollArea()
+        self.sidebar_scroll.setWidgetResizable(True)
+        self.sidebar_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.sidebar_scroll.setWidget(self.sidebar)
+        outer.addWidget(self.sidebar_scroll)
         content = QVBoxLayout()
         content.setContentsMargins(28, 24, 28, 20)
         header = QHBoxLayout()
@@ -376,7 +380,7 @@ class Window(QMainWindow):
         self.sales_page.order_new()
 
     def render_sidebar(self):
-        self.sidebar.setFixedWidth(76 if self.collapsed else 216)
+        self.sidebar_scroll.setFixedWidth(76 if self.collapsed else 216)
         self.brand.setText("HL" if self.collapsed else "DR. HEEK\nLAB 2.0")
         self.phase_label.hide()
         self.brand_version.setVisible(not self.collapsed)
@@ -384,12 +388,14 @@ class Window(QMainWindow):
         from .menu_icons import menu_icons
         icons = menu_icons()
         for i, button in enumerate(self.buttons):
+            button.setProperty("nav", "collapsed" if self.collapsed else "expanded")
             button.setIcon(icons[i])
             button.setIconSize(QSize(28, 28))
             if icons[i].isNull():
                 button.setText(SYMBOLS[i] if self.collapsed else SYMBOLS[i] + "   " + AREAS[i])
             else:
                 button.setText("" if self.collapsed else AREAS[i])
+            button.style().unpolish(button); button.style().polish(button)
 
     def toggle_sidebar(self):
         self.collapsed = not self.collapsed

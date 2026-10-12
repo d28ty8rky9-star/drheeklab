@@ -1,3 +1,10 @@
+# 2.9.1 — Marca oficial e revisão do Início
+
+- Logotipo oficial no canto superior esquerdo, com nome e versão abaixo.
+- Ícones do menu retirados da referência fornecida; ícone do executável e instalador baseado no logotipo oficial.
+- Início somente com dashboard/atalhos; informações, histórico e anotações em Configurações → Sobre.
+- Menu com rolagem em janelas menores; dados e rascunhos preservados.
+
 # 2.9.0 — Modernização visual das oito áreas
 
 - Temas e componentes visuais compartilhados; tabelas, formulários e ícones padronizados.

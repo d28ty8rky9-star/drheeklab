@@ -61,3 +61,22 @@ def test_original_signal_refresh_keeps_text_filter_applied(tmp_path):
     assert page.client_table.isRowHidden(0)
     assert not page.client_table.isRowHidden(1)
     window.close()
+
+def test_official_branding_icons_and_scrollable_sidebar(tmp_path):
+    from drheeklab import __version__
+    from drheeklab.menu_icons import menu_icons
+    window=Window(Storage(tmp_path));window.show();window.resize(780,560);APP.processEvents()
+    assert not window.logo.pixmap().isNull()
+    assert not window.windowIcon().isNull()
+    assert window.logo.parentWidget() is window.sidebar
+    assert __version__ in window.brand_version.text()
+    assert all(not icon.isNull() for icon in menu_icons())
+    assert all(not button.icon().isNull() for button in window.buttons)
+    window.sidebar_scroll.ensureWidgetVisible(window.buttons[-1]);APP.processEvents()
+    window.buttons[-1].click()
+    assert window.pages.currentIndex()==7
+    window.toggle_sidebar();APP.processEvents()
+    assert not window.brand_version.isVisible()
+    assert all(button.text()=='' for button in window.buttons)
+    window.buttons[0].click();assert window.pages.currentIndex()==0
+    window.close()
