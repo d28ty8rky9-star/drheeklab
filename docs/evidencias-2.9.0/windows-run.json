@@ -1,0 +1,9 @@
+{
+  "run_id": 38306782123,
+  "status": "success",
+  "head_sha": "c37b967a04fd227771a74cd86dcee5aec31659f3",
+  "artifact_id": 11772568668,
+  "artifact_name": "DrHeekLab-Windows-2.9.0",
+  "tests": 254,
+  "manual_homologation": "pending"
+}

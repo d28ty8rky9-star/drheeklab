@@ -59,3 +59,15 @@ A segunda imagem de referência não estava disponível nesta tarefa. A paleta e
 A primeira execução de empacotamento foi interrompida para incluir a correção de atualização dos filtros após alternar a lixeira. O pacote usa o nome neutro `DrHeekLab-Windows-2.9.0`; o resultado do workflow estabelece sua validação automatizada.
 
 - Correção específica para Windows: cartões com altura mínima de 100 pixels, independentemente da métrica da fonte. Após a correção, 19 testes locais de interface/validação passaram; o teste existente de tamanho mínimo foi preservado.
+
+## Windows — entrega validada
+
+**254 testes aprovados, 0 falhas, 0 erros, 0 pulos** no Windows. O executável empacotado e o instalador passaram pelos testes integrados e por instalação/reinstalação, backup pré-atualização, preservação do banco/arquivos, backup sem interface, criação/remoção da tarefa agendada e desinstalação. SHA-256 do instalador, aplicativo e auxiliar de atualização conferidos após o download.
+
+- Código compilado: `c37b967a04fd227771a74cd86dcee5aec31659f3`.
+- Execução aprovada: https://github.com/d28ty8rky9-star/drheeklab/actions/runs/38306782123 .
+- Pacote: https://github.com/d28ty8rky9-star/drheeklab/actions/runs/38306782123/artifacts/11772568668 .
+- Após extrair o ZIP, execute `installer/DrHeekLab-2.9.0-Fase8-Setup.exe`.
+- Cópia local verificada: `dist/windows-2.9.0/installer/DrHeekLab-2.9.0-Fase8-Setup.exe`.
+
+A avaliação prática no computador do proprietário, incluindo DPI/monitor, usuário comum e máquina sem Python, permanece pendente. A aprovação acima é automatizada em runner Windows; não substitui essa avaliação.

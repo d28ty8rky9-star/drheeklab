@@ -1,3 +1,11 @@
+# Estado atual — modernização visual 2.9.0
+
+As oito áreas foram modernizadas com tema compartilhado, cartões, botões/ícones/tabelas/formulários padronizados, filtros, gráficos sobre dados reais, galeria/tabela sincronizada, progresso por peças aprovadas e configurações por assunto. Nenhuma fórmula, migração ou regra de negócio foi alterada.
+
+Linux: 254 testes aprovados. Windows: 254 testes aprovados, pacote e instalação/reinstalação/backup/preservação/agendamento/desinstalação aprovados. Run 38306782123, código compilado c37b967a04fd227771a74cd86dcee5aec31659f3, artifact 11772568668 (DrHeekLab-Windows-2.9.0). Installer local dist/windows-2.9.0/installer/DrHeekLab-2.9.0-Fase8-Setup.exe; hashes verificados. Avaliação manual do proprietário e importação do logotipo oficial permanecem pendentes. As capturas usam somente dados demonstrativos temporários.
+
+Veja docs/modernizacao-visual-2.9.0.md e docs/evidencias-2.9.0/. Os registros seguintes são históricos.
+
 ## Atualização mais recente — Windows 2.8.1
 
 Instalador gerado e validação automatizada Windows aprovada no run 38299222677 / commit74ae16b: 250 testes, zero falhas/erros/ignorados. Artefatos e hashes conferidos em dist/windows-2.8.1. Correções SQLite e QtPdf implementadas. Push e execução para homologação foram autorizados; release/mudança de visibilidade não. Avaliação prática do proprietário e marca oficial permanecem pendentes. Leia resultados-windows-2.8.1.md; estados anteriores abaixo são históricos.
