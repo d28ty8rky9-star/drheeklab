@@ -44,7 +44,14 @@ def main():
         parser.error("--self-test usa somente dados temporários; não aceita --environment/--data-dir")
     if args.self_test:
         os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
+    if os.name == 'nt':
+        import ctypes
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('DrHeekLab.Desktop')
     app = QApplication.instance() or QApplication(sys.argv[:1])
+    from importlib.resources import files
+    from PySide6.QtGui import QIcon
+    icon_path = Path(str(files('drheeklab').joinpath('assets/drheeklab.ico')))
+    if icon_path.is_file(): app.setWindowIcon(QIcon(str(icon_path)))
     if args.self_test:
         try:
             from .smoke import run

@@ -111,15 +111,21 @@ def test_about_contains_packaged_history_and_current_version(tmp_path):
     assert files('drheeklab').joinpath('CHANGELOG.md').read_text(encoding='utf-8')
     window.close()
 
-def test_home_scroll_preserves_content_at_small_resolution(tmp_path):
+def test_home_is_clean_and_notes_preserved_in_about(tmp_path):
     from drheeklab.ui import Window
-    from PySide6.QtWidgets import QScrollArea,QFrame
+    from PySide6.QtWidgets import QScrollArea,QTabWidget,QLabel
     window=Window(Storage(tmp_path));window.resize(1100,700);window.show();QApplication.processEvents()
     home=window.pages.widget(0)
     assert isinstance(home,QScrollArea)
-    assert home.verticalScrollBar().maximum()>0
-    assert window.logo.height()>=120 and window.notes.height()>=110
-    assert all(card.height()>=100 for card in home.findChildren(QFrame) if card.objectName()=='card' and card is not window.logo)
-    home.ensureWidgetVisible(window.notes);QApplication.processEvents()
-    assert window.notes.isVisible() and len(window.buttons)==8
+    assert window.notes not in home.findChildren(type(window.notes))
+    assert window.logo.parentWidget() is window.sidebar
+    assert not window.low_alert.isVisible()
+    window.navigate(7)
+    tabs=next(t for t in window.pages.widget(7).findChildren(QTabWidget) if any(t.tabText(i)=='Sobre' for i in range(t.count())))
+    tabs.setCurrentIndex(next(i for i in range(tabs.count()) if tabs.tabText(i)=='Sobre'))
+    QApplication.processEvents()
+    assert window.notes.isVisible()
+    window.notes.setPlainText('Histórico preservado em Sobre');window.save_draft()
+    assert window.storage.load_draft('home_notes')=='Histórico preservado em Sobre'
+    assert len(window.buttons)==8
     window.close()

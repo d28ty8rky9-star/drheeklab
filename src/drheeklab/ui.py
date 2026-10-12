@@ -2,7 +2,7 @@ from pathlib import Path
 import os
 import shutil
 from PySide6.QtCore import Qt, QTimer, QUrl
-from PySide6.QtGui import QDesktopServices, QPixmap
+from PySide6.QtGui import QDesktopServices, QPixmap, QIcon
 from PySide6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel,
     QPushButton, QStackedWidget, QFrame, QLineEdit, QDialog, QFormLayout, QMessageBox,
     QTextEdit, QFileDialog, QTableWidget, QTableWidgetItem, QHeaderView, QApplication, QScrollArea, QTabWidget)
@@ -111,6 +111,11 @@ class Window(QMainWindow):
         self.sidebar = QFrame()
         self.sidebar.setObjectName("sidebar")
         side = QVBoxLayout(self.sidebar)
+        self.logo = QLabel()
+        self.logo.setAlignment(Qt.AlignCenter)
+        self.logo.setAccessibleName('Logotipo oficial do Dr. Heek Lab')
+        side.addWidget(self.logo)
+        self.update_logo()
         self.brand = QLabel("DR. HEEK\nLAB 2.0")
         self.brand.setObjectName("brand")
         side.addWidget(self.brand)
@@ -129,7 +134,7 @@ class Window(QMainWindow):
             side.addWidget(button)
         side.addStretch()
         self.phase_label = QLabel("FASE 8\nValidação e finalização")
-        side.addWidget(self.phase_label)
+        self.phase_label.hide()
         outer.addWidget(self.sidebar)
         content = QVBoxLayout()
         content.setContentsMargins(28, 24, 28, 20)
@@ -181,7 +186,7 @@ class Window(QMainWindow):
         settings_scroll.setWidget(self.settings_page())
         self.pages.addWidget(settings_scroll)
         content.addWidget(self.pages)
-        content.addWidget(QLabel("Offline • Dados locais • v" + __version__ + " • Fase 8"))
+
         outer.addLayout(content, 1)
         from .presentation import ModernPresentation
         self.presentation = ModernPresentation(self)
@@ -215,7 +220,7 @@ class Window(QMainWindow):
         box.addWidget(intro)
         self.low_alert = QLabel()
         self.low_alert.setWordWrap(True)
-        box.addWidget(self.low_alert)
+        self.low_alert.hide()
         self.business_summary = QLabel()
         self.business_summary.setWordWrap(True)
         box.addWidget(self.business_summary)
@@ -228,43 +233,51 @@ class Window(QMainWindow):
         price_button = QPushButton('Calcular preço')
         price_button.clicked.connect(self.open_calculator)
         box.addWidget(price_button)
-        cards = QHBoxLayout()
-        for title, detail in (("ACESSO PROTEGIDO", "Senha local com hash seguro"), ("DADOS ISOLADOS", ENVIRONMENTS[self.storage.environment]), ("BACKUP LOCAL", "Banco e arquivos vinculados")):
-            card = QFrame()
-            card.setMinimumHeight(100)
-            card.setObjectName("card")
-            layout = QVBoxLayout(card)
-            layout.addWidget(QLabel(title))
-            text = QLabel(detail)
-            text.setWordWrap(True)
-            layout.addWidget(text)
-            cards.addWidget(card)
-        box.addLayout(cards)
-        self.logo = QLabel()
-        self.logo.setAlignment(Qt.AlignCenter)
-        self.logo.setMinimumHeight(120)
-        self.update_logo()
-        box.addWidget(self.logo)
-        box.addWidget(QLabel("Anotações do laboratório • rascunho recuperado automaticamente"))
+        # Keep the existing draft; its editor now lives in Settings > About.
         self.notes = QTextEdit()
         self.notes.setMinimumHeight(110)
         self.notes.setPlaceholderText("Anote aqui suas informações. Salvamento automático após 0,6 segundo e ao fechar.")
         self.notes.setPlainText(self.storage.load_draft("home_notes"))
-        box.addWidget(self.notes, 1)
+
         self.draft_status = QLabel("Rascunho carregado do ambiente ativo.")
-        box.addWidget(self.draft_status)
+        box.addStretch(1)
+
         from .phase2_ui import scroll
         return scroll(page)
 
     def update_logo(self):
         path = self.storage.get("logo")
         full = self.storage.home / path if path else None
-        pixmap = QPixmap(str(full)) if full and full.is_file() else QPixmap()
+        if not full or not full.is_file():
+            from importlib.resources import files
+            full = Path(str(files('drheeklab').joinpath('assets/logo-oficial.png')))
+        pixmap = QPixmap(str(full)) if full.is_file() else QPixmap()
+        self._logo_pixmap = pixmap
+        self.logo.setVisible(not pixmap.isNull())
         if not pixmap.isNull():
-            self.logo.setPixmap(pixmap.scaled(220, 160, Qt.KeepAspectRatio, Qt.SmoothTransformation))
-        else:
-            self.logo.setText("LOGOTIPO OFICIAL\nImporte a imagem original em Configurações → Marca.")
-            self.logo.setObjectName("card")
+            width = 48 if getattr(self, 'collapsed', False) else 170
+            self.logo.setPixmap(pixmap.scaled(width, width, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+            icon = QIcon(str(full))
+            self.setWindowIcon(icon)
+            QApplication.instance().setWindowIcon(icon)
+
+    def about_page(self):
+        from importlib.resources import files
+        page = QWidget(); box = QVBoxLayout(page)
+        info = QLabel('Dr. Heek Lab 2.0 • versão ' + __version__ +
+            '\nGestão offline de impressão 3D. Dados armazenados localmente.' +
+            '\nAmbiente ativo: ' + ENVIRONMENTS[self.storage.environment] +
+            '\nAcesso protegido por senha local. Testes e Produção possuem bancos, arquivos e preferências próprios.' +
+            '\nBackups incluem o banco e arquivos vinculados; configure e verifique em Backups e restauração.' +
+            '\nAplicativo gerencial; não é sistema fiscal nem certificação ISO.' +
+            '\nArmazenamento: ' + str(self.storage.home))
+        info.setWordWrap(True); box.addWidget(info)
+        history = QTextEdit(); history.setReadOnly(True)
+        history.setMarkdown(files('drheeklab').joinpath('CHANGELOG.md').read_text(encoding='utf-8'))
+        box.addWidget(history)
+        box.addWidget(QLabel('Anotações do laboratório • rascunho salvo automaticamente'))
+        box.addWidget(self.notes); box.addWidget(self.draft_status)
+        return page
 
     def pending_page(self, area):
         page = QWidget()
@@ -298,11 +311,10 @@ class Window(QMainWindow):
                                ("Agendar backup diário no Windows", self.backup_schedule),
                                ("Restaurar backup deste ambiente", self.restore),
                                ("Documentos, catálogo, auditoria e lixeira", lambda: DocumentCenter(self.storage,self).exec()),
-                               ("Consultar auditoria", self.show_audit),
-                               ("Sobre o programa", self.about)):
+                               ("Consultar auditoria", self.show_audit)):
             button = QPushButton(label)
             button.clicked.connect(handler)
-            section = ('Segurança' if 'senha' in label else 'Parâmetros de precificação' if 'Precificação' in label else 'Backups e restauração' if any(t in label for t in ('backup','Restaurar')) else 'Auditoria' if 'auditoria' in label and 'Documentos' not in label else 'Documentos' if 'Documentos' in label else 'Aparência e integrações' if any(t in label for t in ('Marca','Bambu','tema')) else 'Informações do programa')
+            section = ('Segurança' if 'senha' in label else 'Parâmetros de precificação' if 'Precificação' in label else 'Backups e restauração' if any(t in label for t in ('backup','Restaurar')) else 'Auditoria' if 'auditoria' in label and 'Documentos' not in label else 'Documentos' if 'Documentos' in label else 'Aparência e integrações' if any(t in label for t in ('Marca','Bambu','tema')) else 'Armazenamento')
             if section not in sections:
                 panel = QWidget(); section_box = QVBoxLayout(panel); sections[section] = section_box
                 settings_tabs.addTab(panel, section)
@@ -312,6 +324,7 @@ class Window(QMainWindow):
         from .phase2_ui import table,fill_table
         self.supplier_table=table(['Fornecedor','Origem']);supplier_box.addWidget(self.supplier_table)
         settings_tabs.addTab(suppliers,'Fornecedores')
+        settings_tabs.addTab(self.about_page(),'Sobre')
         settings_tabs.setCurrentIndex(1)
         for section_box in sections.values(): section_box.addStretch()
         label = QLabel("Para trocar de ambiente, encerre o aplicativo e selecione Testes ou Produção na próxima abertura. Cada ambiente possui senha, banco, arquivos e preferências próprios.")
@@ -362,7 +375,8 @@ class Window(QMainWindow):
     def render_sidebar(self):
         self.sidebar.setFixedWidth(76 if self.collapsed else 216)
         self.brand.setText("HL" if self.collapsed else "DR. HEEK\nLAB 2.0")
-        self.phase_label.setVisible(not self.collapsed)
+        self.phase_label.hide()
+        self.update_logo()
         for i, button in enumerate(self.buttons):
             button.setText(SYMBOLS[i] if self.collapsed else SYMBOLS[i] + "   " + AREAS[i])
 
@@ -476,7 +490,7 @@ class Window(QMainWindow):
         from importlib.resources import files
         dialog=QDialog(self);dialog.setWindowTitle('Sobre Dr. Heek Lab');dialog.resize(800,600)
         box=QVBoxLayout(dialog)
-        box.addWidget(QLabel('Dr. Heek Lab '+__version__+' • Fases 1–8\nAplicativo offline; não é sistema fiscal nem certificação ISO.\nCandidato à homologação: instalador Windows e ícone oficial pendentes.'))
+        box.addWidget(QLabel('Dr. Heek Lab '+__version__+' • Fases 1–8\nAplicativo offline; não é sistema fiscal nem certificação ISO.\nValidação automatizada Windows aprovada; avaliação prática no computador do proprietário pendente.'))
         history=QTextEdit();history.setReadOnly(True);history.setMarkdown(files('drheeklab').joinpath('CHANGELOG.md').read_text(encoding='utf-8'));box.addWidget(history)
         close=QPushButton('Fechar');close.clicked.connect(dialog.accept);box.addWidget(close);dialog.exec()
 

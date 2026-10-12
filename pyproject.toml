@@ -23,4 +23,4 @@ pythonpath = ["src"]
 testpaths = ["tests"]
 
 [tool.setuptools.package-data]
-drheeklab = ["CHANGELOG.md"]
+drheeklab = ["CHANGELOG.md", "assets/*.png", "assets/*.ico"]
