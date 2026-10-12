@@ -183,6 +183,8 @@ class Window(QMainWindow):
         content.addWidget(self.pages)
         content.addWidget(QLabel("Offline • Dados locais • v" + __version__ + " • Fase 8"))
         outer.addLayout(content, 1)
+        from .presentation import ModernPresentation
+        self.presentation = ModernPresentation(self)
         self.render_sidebar()
         self.apply_theme()
         self.navigate(0)
@@ -284,11 +286,14 @@ class Window(QMainWindow):
         text = QLabel("Configurações do ambiente " + ENVIRONMENTS[self.storage.environment] + "\n" + str(self.storage.home))
         text.setWordWrap(True)
         box.addWidget(text)
+        settings_tabs = QTabWidget(); box.addWidget(settings_tabs)
+        sections = {}
         for label, handler in (("Abrir pasta de armazenamento", self.open_folder),
                                ("Alterar senha", lambda: PasswordDialog(self.storage, self).exec()),
                                ("Precificação e alerta de filamento", lambda: PricingDefaults(self.storage, self).exec()),
                                ("Configurar Bambu Studio (opcional)", self.configure_bambu),
                                ("Marca • importar logotipo oficial", self.import_logo),
+                               ("Alternar tema claro / escuro", self.toggle_theme),
                                ("Criar backup completo (local ou externo)", self.manual_backup),
                                ("Agendar backup diário no Windows", self.backup_schedule),
                                ("Restaurar backup deste ambiente", self.restore),
@@ -297,7 +302,18 @@ class Window(QMainWindow):
                                ("Sobre o programa", self.about)):
             button = QPushButton(label)
             button.clicked.connect(handler)
-            box.addWidget(button)
+            section = ('Segurança' if 'senha' in label else 'Parâmetros de precificação' if 'Precificação' in label else 'Backups e restauração' if any(t in label for t in ('backup','Restaurar')) else 'Auditoria' if 'auditoria' in label and 'Documentos' not in label else 'Documentos' if 'Documentos' in label else 'Aparência e integrações' if any(t in label for t in ('Marca','Bambu','tema')) else 'Informações do programa')
+            if section not in sections:
+                panel = QWidget(); section_box = QVBoxLayout(panel); sections[section] = section_box
+                settings_tabs.addTab(panel, section)
+            sections[section].addWidget(button)
+        suppliers=QWidget();supplier_box=QVBoxLayout(suppliers)
+        supplier_box.addWidget(QLabel('Fornecedores registrados nas compras e nos filamentos. Edite nos registros de origem.'))
+        from .phase2_ui import table,fill_table
+        self.supplier_table=table(['Fornecedor','Origem']);supplier_box.addWidget(self.supplier_table)
+        settings_tabs.addTab(suppliers,'Fornecedores')
+        settings_tabs.setCurrentIndex(1)
+        for section_box in sections.values(): section_box.addStretch()
         label = QLabel("Para trocar de ambiente, encerre o aplicativo e selecione Testes ou Produção na próxima abertura. Cada ambiente possui senha, banco, arquivos e preferências próprios.")
         label.setWordWrap(True)
         box.addWidget(label)
@@ -324,6 +340,11 @@ class Window(QMainWindow):
             self.finance_page.refresh()
         elif index == 6:
             self.printers_page.refresh()
+        if index == 7:
+            from .phase2_ui import fill_table
+            rows = self.storage.db.execute("SELECT DISTINCT supplier, 'Filamentos' FROM filaments WHERE trim(supplier) != '' UNION SELECT DISTINCT supplier, 'Contas a pagar' FROM payables WHERE trim(supplier) != '' ORDER BY 1").fetchall()
+            fill_table(self.supplier_table, [tuple(row) for row in rows])
+        self.presentation.refresh(index)
         self.pages.setCurrentIndex(index)
         self.page_title.setText(AREAS[index])
         for i, button in enumerate(self.buttons):
@@ -356,22 +377,8 @@ class Window(QMainWindow):
         self.apply_theme()
 
     def apply_theme(self):
-        dark = self.theme == "dark"
-        bg, panel, fg, border = ("#10131f", "#1b2033", "#edf0fa", "#333c58") if dark else ("#f1f3fa", "#ffffff", "#20243a", "#d2d8e8")
-        QApplication.instance().setStyleSheet(f"""
-            QWidget {{ background:{bg}; color:{fg}; font-family:'Segoe UI'; font-size:14px; }}
-            QFrame#sidebar, QFrame#sidebar QLabel {{ background:{panel}; }}
-            QFrame#card {{ background:{panel}; border:1px solid {border}; border-radius:10px; padding:14px; }}
-            QFrame#card QLabel {{ background:transparent; }}
-            QLabel#brand {{ color:#a880ff; font-size:23px; font-weight:800; padding:16px 0; }}
-            QLabel#title {{ font-size:26px; font-weight:700; }}
-            QLabel#hero {{ font-size:28px; font-weight:700; padding:16px 0; }}
-            QPushButton {{ background:{panel}; border:1px solid {border}; border-radius:7px; padding:11px; text-align:left; }}
-            QPushButton:hover {{ border:1px solid #8e5ded; }}
-            QPushButton:checked {{ background:#6d41c7; color:white; border-color:#a780f3; }}
-            QLineEdit, QTextEdit, QTableWidget, QComboBox {{ background:{panel}; border:1px solid {border}; border-radius:6px; padding:8px; }}
-            QHeaderView::section {{ background:{panel}; color:{fg}; padding:8px; }}
-        """)
+        from .visual import stylesheet
+        QApplication.instance().setStyleSheet(stylesheet(self.theme == 'dark'))
 
     def save_draft(self):
         self.storage.save_draft("home_notes", self.notes.toPlainText())

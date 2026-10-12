@@ -39,6 +39,8 @@ def minutes_label(value):
 
 def button(label, handler, layout):
     item = QPushButton(label)
+    from .visual import action_style
+    action_style(item)
     item.clicked.connect(handler)
     layout.addWidget(item)
     return item
@@ -52,6 +54,8 @@ def table(headers):
     widget.setSelectionMode(QTableWidget.SingleSelection)
     widget.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
     widget.horizontalHeader().setStretchLastSection(True)
+    from .visual import modern_table
+    modern_table(widget)
     return widget
 
 
@@ -59,7 +63,12 @@ def fill_table(widget, rows):
     widget.setRowCount(len(rows))
     for i, values in enumerate(rows):
         for j, value in enumerate(values):
-            widget.setItem(i, j, QTableWidgetItem(str(value)))
+            item = QTableWidgetItem(str(value))
+            from .visual import status_color
+            from PySide6.QtGui import QColor
+            color = status_color(str(value))
+            if color: item.setForeground(QColor(color))
+            widget.setItem(i, j, item)
 
 
 def scroll(widget):
@@ -77,6 +86,9 @@ class FormDialog(QDialog):
         box = QVBoxLayout(self)
         content = QWidget()
         self.form = QFormLayout(content)
+        self.form.setHorizontalSpacing(18)
+        self.form.setVerticalSpacing(12)
+        self.form.setFieldGrowthPolicy(QFormLayout.AllNonFixedFieldsGrow)
         box.addWidget(scroll(content))
         self.fields = {}
         self.error = QLabel()

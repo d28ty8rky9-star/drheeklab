@@ -25,11 +25,11 @@ jobs:
         run: ./packaging/build-windows.ps1
       - name: Instalar, reinstalar, verificar e desinstalar em runner descartável
         shell: pwsh
-        run: ./packaging/test-windows-installer.ps1 -DisposableRunner -SetupPath dist/installer/DrHeekLab-2.8.1-Fase8-Setup.exe
+        run: ./packaging/test-windows-installer.ps1 -DisposableRunner -SetupPath dist/installer/DrHeekLab-2.9.0-Fase8-Setup.exe
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: DrHeekLab-Fase8-Windows-nao-homologado
+          name: DrHeekLab-Windows-2.9.0
           path: |
             dist/DrHeekLab/
             dist/installer/*.exe

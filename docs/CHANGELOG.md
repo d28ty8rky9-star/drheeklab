@@ -1,3 +1,10 @@
+# 2.9.0 — Modernização visual das oito áreas
+
+- Temas e componentes visuais compartilhados; tabelas, formulários e ícones padronizados.
+- Indicadores e gráficos sobre relatórios existentes, galeria/tabela de produtos com seleção sincronizada e cartões de impressoras.
+- Configurações organizadas por assunto, filtros locais e rolagem para janelas menores.
+- Fórmulas, banco de dados, regras financeiras, produção, estoque e segurança preservados.
+
 # Histórico
 
 ## 2.8.1 — correção de compatibilidade Windows (em validação)

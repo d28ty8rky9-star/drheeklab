@@ -426,7 +426,7 @@ class SalesPage(QWidget):
         self.client_table=table(['ID','Nome','Telefone','E-mail','Crédito disponível']); cb.addWidget(self.client_table); self.tabs.addTab(clients,'Clientes')
         quotes=QWidget(); qb=QVBoxLayout(quotes); self.quote_table=table(['ID','Código','Cliente','Total','Validade','Situação']); qb.addWidget(self.quote_table)
         controls=QHBoxLayout(); button('Novo orçamento',self.quote_new,controls); button('Aprovar → pedido',self.quote_approve,controls); button('Rejeitar',self.quote_reject,controls); button('Abrir PDF',self.quote_pdf,controls); button('Nova versão PDF',self.quote_emit,controls); qb.addLayout(controls); self.tabs.addTab(quotes,'Orçamentos')
-        orders=QWidget(); ob=QVBoxLayout(orders); self.order_table=table(['ID','Pedido','Cliente','Total','Recebido bruto','Crédito aplicado','Saldo','Entrega','Situação']); ob.addWidget(self.order_table)
+        orders=QWidget(); ob=QVBoxLayout(orders); self.order_table=table(['ID','Pedido','Cliente','Total','Recebido bruto','Crédito aplicado','Saldo','Entrega','Situação','Pagamento']); ob.addWidget(self.order_table)
         controls=QHBoxLayout(); button('Novo pedido',self.order_new,controls); button('Detalhes / pagamentos / entrega',self.order_details,controls); ob.addLayout(controls); self.tabs.addTab(orders,'Pedidos')
         self.order_table.doubleClicked.connect(lambda index:self.order_details())
         self.receivables_table=table(['Pedido','Cliente','Vencimento','Previsto','Aplicado','Saldo','Situação']); self.tabs.addTab(self.receivables_table,'Contas a receber')
@@ -439,7 +439,7 @@ class SalesPage(QWidget):
         self.order_rows=self.sales.orders(); order_values=[]; receivables=[]
         for row in self.order_rows:
             customer=json.loads(row['client_snapshot'])['name']; f=self.sales.financial(row['id']); delivery=self.sales.delivery(row['id'])
-            order_values.append([row['id'],row['code'],customer,currency(row['total_cents']),currency(f['cash_received']),currency(f['credit_applied']),currency(f['balance']),DELIVERY_STATES[delivery['state']],'Cancelado' if row['state']=='cancelled' else 'Aprovado'])
+            order_values.append([row['id'],row['code'],customer,currency(row['total_cents']),currency(f['cash_received']),currency(f['credit_applied']),currency(f['balance']),DELIVERY_STATES[delivery['state']],'Cancelado' if row['state']=='cancelled' else 'Aprovado','Cancelado' if row['state']=='cancelled' else 'Quitado' if f['balance']==0 else 'Parcial' if f['paid'] else 'Pendente'])
             for item in self.sales.installment_status(row['id']):
                 receivables.append([row['code'],customer,date_br(item['due_on']) or 'Sem vencimento',currency(item['amount_cents']),currency(item['received_cents']),currency(item['balance_cents']),INSTALLMENT_STATES[item['status']]])
         fill_table(self.order_table,order_values); fill_table(self.receivables_table,receivables)

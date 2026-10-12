@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 from PySide6.QtCore import QTimer, QUrl
 from PySide6.QtGui import QDesktopServices
-from PySide6.QtWidgets import QWidget,QVBoxLayout,QHBoxLayout,QLabel,QComboBox,QLineEdit,QPushButton,QFileDialog,QMessageBox,QTabWidget,QDialog,QTextEdit
+from PySide6.QtWidgets import QWidget,QVBoxLayout,QHBoxLayout,QLabel,QComboBox,QLineEdit,QPushButton,QFileDialog,QMessageBox,QTabWidget,QDialog,QTextEdit,QProgressBar
 from .phase2_ui import FormDialog, table, fill_table, button, scroll
 from .production import Production, STATES, PRIORITIES, CHECKS, CHECK_LABELS, VIEWS
 from .pricing import brl
@@ -148,6 +148,7 @@ class ProductionPage(QWidget):
         self.priority_box=QComboBox()
         for key,label in PRIORITIES.items():self.priority_box.addItem(label,key)
         bar2.addWidget(self.priority_box);button('Alterar prioridade',self.set_priority,bar2);button('↑',lambda:self.move(-1),bar2);button('↓',lambda:self.move(1),bar2);button('Parâmetros / revalidação',self.revalidate,bar2);button('Registrar problema',self.problem,bar2)
+        self.inspection_progress=QProgressBar();self.inspection_progress.setFormat("Peças aprovadas / planejadas: %v / %m");q.addWidget(self.inspection_progress)
         self.summary_label=QLabel();self.summary_label.setWordWrap(True);q.addWidget(self.summary_label)
         self.piece_table=table(['Peça','Variante','Estado','Inspeção','Custo alocado']);q.addWidget(self.piece_table)
         self.history=QTextEdit();self.history.setReadOnly(True);q.addWidget(self.history)
@@ -186,6 +187,7 @@ class ProductionPage(QWidget):
         try:identifier=self.selected()
         except ValueError:return
         self.parts=self.production.pieces(identifier);s=self.production.summary(identifier);op=self.production.get(identifier)
+        self.inspection_progress.setRange(0,max(s['planned'],s['good'],1));self.inspection_progress.setValue(s['good'])
         effective=brl(s['effective_unit']) if s['effective_unit'] else 'sem aprovadas'
         self.summary_label.setText(f'Planejadas {s["planned"]} • Produzidas {s["produced"]} • Perdidas {s["failed"]} • Reprovadas {s["rejected"]} • Boas {s["good"]} • Tentativas {s["attempts"]}\nCusto existente {brl(Decimal(s["total_cents"])/100)} • Efetivo por boa {effective} • Perda incluída {brl(Decimal(s["loss_included_cents"])/100)}\nPrevisto por referência {brl(Decimal(s["planned_reference_cents"])/100)} • Real por referência {brl(Decimal(s["reference_cents"])/100)} • Cronômetro sugerido {self.production.elapsed_minutes(identifier)} min (exige confirmação)')
         selected_piece=self.piece_table.currentRow()
