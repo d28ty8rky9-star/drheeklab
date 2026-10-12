@@ -443,6 +443,7 @@ class SalesPage(QWidget):
             for item in self.sales.installment_status(row['id']):
                 receivables.append([row['code'],customer,date_br(item['due_on']) or 'Sem vencimento',currency(item['amount_cents']),currency(item['received_cents']),currency(item['balance_cents']),INSTALLMENT_STATES[item['status']]])
         fill_table(self.order_table,order_values); fill_table(self.receivables_table,receivables)
+        if getattr(self, '_after_refresh', None): self._after_refresh()
     def selected(self,listing,rows):
         index=listing.currentRow()
         if index<0: QMessageBox.information(self,'Selecione um registro','Selecione uma linha.'); return None

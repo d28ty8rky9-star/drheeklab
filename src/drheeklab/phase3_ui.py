@@ -167,6 +167,7 @@ class ProductsPage(QWidget):
                 self.gallery.setCurrentItem(item)
         self.gallery.blockSignals(False)
         self.show_selection()
+        if getattr(self, '_after_refresh', None): self._after_refresh()
 
     def select_product(self, identifier):
         for index in range(self.gallery.count()):
@@ -485,6 +486,7 @@ class StockPage(QWidget):
         kinds = {'opening':'Saldo inicial','adjustment':'Ajuste','consumption':'Consumo','receipt':'Entrada','reservation':'Reserva','release':'Liberação','issue':'Baixa','discard':'Descarte','review':'Verificação','return':'Retorno físico'}
         fill_table(self.movements_table, [self.movement_values(r, kinds) for r in moves])
         fill_table(self.losses_table, [[r['id'],date_br(r['occurred_on']),{'piece':'Peças','filament':'Filamento','material':'Material'}[r['entity_kind']],grams(r['quantity_milli'])+' '+r['unit'],brl(Decimal(r['cost_cents'])/100),{'acquisition':'Aquisição','reference':'Referência','existing_piece_cost':'Custo já atribuído'}.get(r['cost_basis'],r['cost_basis']),r['reason'],r['notes']] for r in self.inventory.losses()])
+        if getattr(self, '_after_refresh', None): self._after_refresh()
 
     def movement_values(self, row, kinds):
         if row['piece_id'] is not None:

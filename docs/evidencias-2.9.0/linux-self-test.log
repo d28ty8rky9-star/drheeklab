@@ -1,0 +1,2 @@
+Fontconfig error: No writable cache directories
+{"status": "passed", "version": "2.9.0", "checks": ["auth", "PNG/logo", "quote/order", "partial payments/fees", "versioned PDFs", "OP batch/time/consumption", "3-photo individual inspection", "stock delivery", "payables/capital/cash/CPV reconciliation", "CSV/Excel export", "branded reports/catalog PDFs", "notifications/trash", "restart persistence", "verified backup/transfer", "encrypted backup/restore"], "data": "temporary only"}

@@ -49,3 +49,15 @@ def test_order_payment_status_uses_existing_financial_balances(tmp_path):
     assert [statuses[order] for order in orders]==['Pendente','Parcial','Quitado']
     assert [sales.financial(order)['balance'] for order in orders]==[5000,3000,0]
     window.close()
+
+def test_original_signal_refresh_keeps_text_filter_applied(tmp_path):
+    store=Storage(tmp_path);sales=Sales(store)
+    first=sales.save_client({'name':'Aurora'});second=sales.save_client({'name':'Prisma'})
+    sales.archive_client(first,True,'Teste');sales.archive_client(second,True,'Teste')
+    window=Window(store);page=window.sales_page
+    search=next(search for search,table in window.presentation.filters if table is page.client_table)
+    search.setText('Prisma');page.trash.setChecked(True)
+    assert page.client_table.rowCount()==2
+    assert page.client_table.isRowHidden(0)
+    assert not page.client_table.isRowHidden(1)
+    window.close()

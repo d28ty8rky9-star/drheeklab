@@ -14,10 +14,7 @@ class ModernPresentation:
         titles={1:['Vendido no mês','Recebido líquido no mês','A receber • total','Pedidos em andamento'],2:list(STATES.values()),4:['Carretéis cadastrados','Filamento baixo','Peças reservadas','Peças disponíveis'],5:['Vendido','Recebido líquido','A receber','Resultado gerencial']}
         for index,page in pages.items():
             strip=MetricStrip(titles[index]);page.layout().insertWidget(0,strip);self.strips[index]=strip
-            old=page.refresh
-            def refresh(*args,i=index,original=old):
-                result=original(*args);self.refresh(i);return result
-            page.refresh=refresh
+            page._after_refresh=lambda i=index:self.refresh(i)
         home=window.pages.widget(0).widget();layout=home.layout()
         # Keep notes, imported official logo and all shortcuts.
         layout.itemAt(1).widget().setText('Visão financeira do mês e acompanhamento da produção. Valores do ambiente ativo.')
@@ -41,13 +38,7 @@ class ModernPresentation:
         self.product_table=table(['Código','Peça','Categoria','Preço'])
         self.product_table.hide();products.layout().insertWidget(3,self.product_table)
         self.product_table.itemSelectionChanged.connect(lambda:self.select_table_product(products))
-        original_products_refresh=products.refresh
-        def products_refresh(*args):
-            result=original_products_refresh(*args);self.sync_product_table(products);return result
-        products.refresh=products_refresh
-        products.search.textChanged.connect(lambda:self.sync_product_table(products))
-        products.category.currentIndexChanged.connect(lambda:self.sync_product_table(products))
-        products.trash.toggled.connect(lambda:self.sync_product_table(products))
+        products._after_refresh=lambda:self.sync_product_table(products)
         self.sync_product_table(products)
         switch=QPushButton('Alternar cartões / tabela');switch.clicked.connect(lambda:self.toggle_products(products));products.layout().insertWidget(1,switch)
         for button in products.findChildren(QPushButton):
@@ -56,10 +47,7 @@ class ModernPresentation:
         self.printer_cards=QWidget();self.printer_cards.setLayout(QHBoxLayout())
         wrapper=QScrollArea();wrapper.setWidgetResizable(True);wrapper.setWidget(self.printer_cards);wrapper.setMaximumHeight(195)
         window.printers_page.layout().insertWidget(0,wrapper)
-        old=window.printers_page.refresh
-        def printers_refresh(*args):
-            result=old(*args);self.refresh(6);return result
-        window.printers_page.refresh=printers_refresh
+        window.printers_page._after_refresh=lambda:self.refresh(6)
         # Filter hides only display rows: domain row indices and selections remain intact.
         self.filters=[]
         for page in (window.sales_page,window.production_page,window.stock_page,window.finance_page,window.printers_page):

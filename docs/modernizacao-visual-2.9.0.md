@@ -47,3 +47,13 @@ Os arquivos abaixo mostram a aplicação Qt executada, não mockups.
 ## Limitações de referência
 
 A segunda imagem de referência não estava disponível nesta tarefa. A paleta e a hierarquia seguem a descrição textual. O logotipo oficial permanece importável; não foi substituído por uma imagem inventada. As peças de demonstração das capturas não possuem fotos importadas; a importação de fotos é coberta pelos testes existentes. A avaliação no computador do proprietário continua necessária para conferir DPI, monitor e uso prático.
+
+## Validação local
+
+- Suíte completa final: **254 testes aprovados**, sem falhas, erros ou pulos (71,63 s).
+- Após a coluna de pagamento: **8 testes aprovados**, incluindo pendente/parcial/quitado, identidade dos registros após filtro e alternância galeria/tabela.
+- Teste integrado 2.9.0: **passed**, cobrindo autenticação, pedidos, pagamentos, PDFs, produção/inspeção, estoque, caixa/CPV, CSV/Excel, persistência e backup criptografado.
+- Navegação nas oito áreas em **780 × 560**, mantendo acesso por rolagem. Temas claro/escuro e menu recolhível preservados.
+- Capturas executadas em **1440 × 960**. Para repetir: `QT_QPA_PLATFORM=offscreen .venv/bin/python tools/capture_visual.py`.
+
+A primeira execução de empacotamento foi interrompida para incluir a correção de atualização dos filtros após alternar a lixeira. O pacote usa o nome neutro `DrHeekLab-Windows-2.9.0`; o resultado do workflow estabelece sua validação automatizada.

@@ -295,6 +295,7 @@ class CatalogPage(QWidget):
             self.alert.setText('Alerta de saldo baixo (até ' + str(self.catalog.storage.get('low_filament_grams', '100')) + ' g): ' +
                                (', '.join(row['name'] for row in low) if low else 'nenhum carretel conhecido abaixo do limite.') +
                                '\nSaldos desconhecidos não são estimados nem incluídos neste alerta.')
+        if getattr(self, '_after_refresh', None): self._after_refresh()
 
     def selected(self):
         index = self.table.currentRow()

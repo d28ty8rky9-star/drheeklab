@@ -152,6 +152,7 @@ class FinancePage(QWidget):
         for key in ('products','printers'):fill_table(self.tables[key],[(x['id'] or 'Sem identificação',x['quantity'],currency(x['sales_cents']),currency(x['cost_cents']),currency(x['gross_result_cents']),x['pending_quantity']) for x in r[key]])
         self.category_rows=self.finance.categories()+self.finance.categories(True);fill_table(self.categories_table,[(x['id'],x['name'],TREATMENTS[x['treatment']],'Sim' if x['archived'] else 'Não') for x in self.category_rows])
         self.details.setPlainText('RECONCILIAÇÃO: '+('Sem divergências detectadas' if r['reconciliation']['status']=='ok' else '\n'.join(r['reconciliation']['issues']))+'\n\n'+'\n\n'.join(r['notes']))
+        if getattr(self, '_after_refresh', None): self._after_refresh()
 
     def pay(self):self.act(lambda:self.dialog(PayDialog(self.finance,self.select('payables'),self)))
     def cancel(self):

@@ -182,6 +182,7 @@ class ProductionPage(QWidget):
         self.queue_table.blockSignals(False)
         if self.rows:self.queue_table.selectRow(next((i for i,r in enumerate(self.rows) if r['id']==selected),0))
         self.details()
+        if getattr(self, '_after_refresh', None): self._after_refresh()
 
     def details(self):
         try:identifier=self.selected()
