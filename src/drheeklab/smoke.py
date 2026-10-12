@@ -15,6 +15,19 @@ from .backup import create_backup,verify_backup
 from .recovery import RecoverySession
 from . import __version__
 
+def check_pdf(path):
+    from PySide6.QtPdf import QPdfDocument
+    from shiboken6 import delete
+    reader=QPdfDocument(None)
+    try:
+        if reader.load(str(path))!=QPdfDocument.Error.None_ or reader.pageCount()<1:
+            raise RuntimeError('PDF de relatório/catálogo inválido')
+    finally:
+        reader.close()
+        # close() alone can leave native resources alive until object destruction.
+        # Release before a Windows temporary directory tries to remove the file.
+        delete(reader)
+
 
 def run():
     with tempfile.TemporaryDirectory(prefix='drheeklab-qa-') as directory:
@@ -77,11 +90,8 @@ def run():
             documents=Documents(storage)
             production.products.import_media(product,Path(directory)/'front.png','photo')
             generated=[documents.emit_finance(),documents.emit_production(op),documents.emit_catalog([{'variant_id':variant,'price':'30'}])]
-            from PySide6.QtPdf import QPdfDocument
             for identifier in generated:
-                reader=QPdfDocument(None)
-                if reader.load(str(documents.path(identifier)))!=QPdfDocument.Error.None_ or reader.pageCount()<1:raise RuntimeError('PDF de relatório/catálogo inválido')
-                reader.close()
+                check_pdf(documents.path(identifier))
             original=documents.path(generated[-1]).read_bytes()
             Lifecycle(storage).archive('generated_documents',generated[-1],True,'QA de recuperação')
             Lifecycle(storage).archive('generated_documents',generated[-1],False,'QA de recuperação')

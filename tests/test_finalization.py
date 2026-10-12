@@ -34,6 +34,21 @@ def test_backup_closes_every_temporary_sqlite_connection_even_with_live_referenc
     assert verify_backup(path,'test')
     assert connections and all(c.explicitly_closed for c in connections)
 
+def test_pdf_check_releases_native_document_before_removing_file(system,monkeypatch):
+    from PySide6 import QtPdf
+    from shiboken6 import isValid
+    from drheeklab.smoke import check_pdf
+    store,documents,products,product,variant,*_=system
+    path=documents.path(documents.emit_catalog([{'variant_id':variant,'price':'25'}]))
+    original=QtPdf.QPdfDocument;readers=[]
+    def tracked(parent):
+        reader=original(parent);readers.append(reader);return reader
+    tracked.Error=original.Error
+    monkeypatch.setattr(QtPdf,'QPdfDocument',tracked)
+    check_pdf(path)
+    path.unlink()
+    assert not path.exists() and readers and all(not isValid(r) for r in readers)
+
 def test_encrypted_transfer_includes_media_documents_and_original_login(system,tmp_path):
     store,documents,products,product,variant,photo,project,photos=system
     Auth(store).create('Senha de login preservada');store.save_draft('home_notes','anotação protegida')

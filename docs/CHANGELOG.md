@@ -4,6 +4,7 @@
 
 - Conexões SQLite de snapshots, validação de backups e migração agora são fechadas explicitamente, liberando arquivos temporários no Windows antes da limpeza. O contexto transacional sozinho não fecha conexão.
 - Regressão mantém referências vivas às conexões para exigir fechamento explícito.
+- Verificação de PDF destrói o documento Qt nativo antes de remover arquivos temporários no Windows; close sozinho não liberava o último PDF enquanto a referência permanecia viva.
 - CI Windows registra cada teste, interrompe na primeira falha, mantém logs e limita duração; falha bloqueia instalador.
 - Regras financeiras e esquema 7 preservados. Homologação Windows segue em execução.
 
