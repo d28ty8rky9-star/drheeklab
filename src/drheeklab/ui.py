@@ -1,7 +1,7 @@
 from pathlib import Path
 import os
 import shutil
-from PySide6.QtCore import Qt, QTimer, QUrl
+from PySide6.QtCore import Qt, QTimer, QUrl, QSize
 from PySide6.QtGui import QDesktopServices, QPixmap, QIcon
 from PySide6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel,
     QPushButton, QStackedWidget, QFrame, QLineEdit, QDialog, QFormLayout, QMessageBox,
@@ -119,6 +119,9 @@ class Window(QMainWindow):
         self.brand = QLabel("DR. HEEK\nLAB 2.0")
         self.brand.setObjectName("brand")
         side.addWidget(self.brand)
+        self.brand_version = QLabel("Versão " + __version__)
+        self.brand_version.setObjectName("muted")
+        side.addWidget(self.brand_version)
         collapse = QPushButton("☰")
         collapse.setAccessibleName("Recolher ou expandir menu")
         collapse.clicked.connect(self.toggle_sidebar)
@@ -376,9 +379,17 @@ class Window(QMainWindow):
         self.sidebar.setFixedWidth(76 if self.collapsed else 216)
         self.brand.setText("HL" if self.collapsed else "DR. HEEK\nLAB 2.0")
         self.phase_label.hide()
+        self.brand_version.setVisible(not self.collapsed)
         self.update_logo()
+        from .menu_icons import menu_icons
+        icons = menu_icons()
         for i, button in enumerate(self.buttons):
-            button.setText(SYMBOLS[i] if self.collapsed else SYMBOLS[i] + "   " + AREAS[i])
+            button.setIcon(icons[i])
+            button.setIconSize(QSize(28, 28))
+            if icons[i].isNull():
+                button.setText(SYMBOLS[i] if self.collapsed else SYMBOLS[i] + "   " + AREAS[i])
+            else:
+                button.setText("" if self.collapsed else AREAS[i])
 
     def toggle_sidebar(self):
         self.collapsed = not self.collapsed
