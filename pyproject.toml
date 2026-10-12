@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "drheeklab"
+version = "2.8.0"
+description = "Gestão offline de impressão 3D — Fases 1–8"
+requires-python = ">=3.11"
+dependencies = ["PySide6==6.8.3", "reportlab==4.4.4", "openpyxl==3.1.5", "cryptography==46.0.3"]
+
+[project.optional-dependencies]
+dev = ["pytest==8.3.5", "pyinstaller==6.12.0", "pypdf==6.1.1"]
+
+[project.gui-scripts]
+drheeklab = "drheeklab.app:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.setuptools.package-data]
+drheeklab = ["CHANGELOG.md"]

@@ -1,0 +1,14 @@
+# Planejamento aprovado — oito fases
+
+Cada fase requer implementação real, testes, entrega executável de testes e limitações declaradas. O proprietário autorizou continuidade técnica autônoma em `solicitacao-finalizacao-autonoma.md`; aprovação intermediária por fase não é mais necessária. Push, release e alterações externas continuam sujeitos a autorização específica. A especificação mestre está em `docs/especificacao-mestre.md`.
+
+1. **Estrutura inicial — implementada, avanço para Fase 2 autorizado; homologação Windows pendente.** Login, senha, oito áreas, temas, menu, SQLite, ambientes isolados, configuração, pastas, erros, logs, versão, Sobre, backups e auditoria.
+2. **Impressoras, filamentos e precificação — implementada; avanço para Fase 3 autorizado; homologação Windows pendente.** A1 Mini com R$ 1,10/h (0,75 + 0,10 + 0,25); investimento R$ 2.400; saldo desconhecido não inventado; referência independente da aquisição; acréscimo padrão 200% (custo × 3); preço final sem desconto duplicado; históricos e testes Decimal.
+3. **Produtos, estoque e arquivos — implementada; avanço para Fase 4 autorizado; homologação Windows pendente.** MOD-0001, variantes, fotos, versões STL/3MF, movimentos justificados, reservas, físico/disponível, perdas sem duplicação.
+4. **Clientes e vendas — implementada; avanço para Fase 5 autorizado; homologação Windows pendente.** Orçamentos com validade padrão sete dias, aprovação/conversão, PED-AAAA-NNNN, pagamentos parciais e parcelados, alocação rastreável, cancelamentos/reembolsos/crédito, entregas e comprovantes versionados.
+5. **Produção e qualidade — implementada; avanço para Fase 6 autorizado; homologação Windows pendente.** OP-AAAA-NNNN, fila, quatro estados, tempo confirmado, lotes/rateio, falhas/reimpressões, inspeção individual com três fotos, PO-001–012 e FR-001.
+6. **Financeiro — implementado; avanço para Fase 7 autorizado; homologação Windows pendente.** Distinção entre venda, recebimento, custo, caixa e aportes; contas a pagar/receber, taxas, indicadores, CSV/Excel, reconciliação sem dupla contabilização.
+7. **Documentos e recuperação — implementados; avanço para Fase 8 autorizado; homologação Windows pendente.** PDFs oficiais, catálogo, notificações, expansão de auditoria e lixeira. A infraestrutura de backup completo já existe na Fase 1.
+8. **Finalização — autorizada e implementada no ambiente Linux; conclusão Windows pendente de geração/homologação e ícone oficial.** Testes financeiros/de estoque/de produção/de atualização, instalador homologado Windows, documentação final e lançamento.
+
+Exclusões mantidas: cobrança de modelagem, pausas detalhadas, versionamento de pedidos aprovados, pequenos retrabalhos financeiros, QR/etiquetas, integração obrigatória com impressoras, serviços online e migração do programa antigo.

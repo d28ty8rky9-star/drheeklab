@@ -1,0 +1,40 @@
+name: Validar e empacotar Windows
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  phase8:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Garantir compilador do instalador
+        shell: pwsh
+        run: |
+          if (-not (Test-Path "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe")) {
+            choco install innosetup --yes --no-progress
+            if ($LASTEXITCODE -ne 0) { throw 'Falha na instalação do Inno Setup' }
+          }
+      - name: Compilar e executar testes críticos
+        shell: pwsh
+        run: ./packaging/build-windows.ps1
+      - name: Instalar, reinstalar, verificar e desinstalar em runner descartável
+        shell: pwsh
+        run: ./packaging/test-windows-installer.ps1 -DisposableRunner -SetupPath dist/installer/DrHeekLab-2.8.0-Fase8-Setup.exe
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: DrHeekLab-Fase8-Windows-nao-homologado
+          path: |
+            dist/DrHeekLab/
+            dist/installer/*.exe
+            dist/installer/SHA256.txt
+            dist/windows-package-qa.json
+            dist/installer-qa/
+            dist/test-results.xml
+            dist/windows-SHA256.txt
+            dist/DrHeekLabUpdate.exe
