@@ -17,3 +17,15 @@ Validação local: 255 testes aprovados, zero falhas/erros/pulos, em 66,52 s. In
 ![Menu recolhido](capturas-2.9.1/menu-recolhido.png)
 
 Para repetir: `QT_QPA_PLATFORM=offscreen .venv/bin/python tools/capture_branding.py`.
+
+## Entrega Windows aprovada
+
+255 testes passaram no Windows, sem falhas, erros ou pulos. Executável empacotado e instalador aprovados; instalação, reinstalação, backup antes da atualização, preservação do banco/arquivos, backup sem interface, tarefa agendada e desinstalação aprovados. Após o download, hashes de Setup/GUI/helper e dos três assets empacotados conferidos. Os sete frames do ICO oficial foram encontrados tanto no executável principal quanto no instalador.
+
+- Build: https://github.com/d28ty8rky9-star/drheeklab/actions/runs/38319542522 .
+- Código compilado: `09423e0ea372a16911a2c766348d688b9ec08dfc`.
+- Pacote: https://github.com/d28ty8rky9-star/drheeklab/actions/runs/38319542522/artifacts/11779025415 .
+- Extraia o ZIP e execute `installer/DrHeekLab-2.9.1-Fase8-Setup.exe`.
+- Cópia local: `dist/windows-2.9.1/installer/DrHeekLab-2.9.1-Fase8-Setup.exe`.
+
+A validação é automatizada em runner Windows; avaliação prática no computador do proprietário permanece pendente. Nenhum dado real do usuário foi usado nas capturas/testes.

@@ -1,0 +1,12 @@
+{
+  "run_id": 38319542522,
+  "artifact_id": 11779025415,
+  "head_sha": "09423e0ea372a16911a2c766348d688b9ec08dfc",
+  "status": "passed",
+  "version": "2.9.1",
+  "tests": 255,
+  "sha256_installer": "895480b5dae219fb7a6b8577eab9a658e7cfbd78dc477cf8b909399339b46276",
+  "official_icon_frames": 7,
+  "bundled_assets": "hashes matched",
+  "manual_homologation": "pending"
+}

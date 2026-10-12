@@ -1,3 +1,11 @@
+# Estado atual — marca oficial e revisão final 2.9.1
+
+Logotipo fornecido no ZIP incorporado no canto superior esquerdo, nome e versão abaixo; oito ícones da folha original no menu. Início sem os blocos inferiores/alerta amarelo; informações e anotações preservadas em Configurações → Sobre. Ícone oficial incorporado no executável, instalador e janela. Menu com rolagem em janelas menores. Nenhuma regra, fórmula ou migração alterada.
+
+Linux 255 testes aprovados; Windows 255 aprovados e instalação/reinstalação/backup/preservação/agendamento/desinstalação aprovados. Run 38319542522, commit compilado 09423e0ea372a16911a2c766348d688b9ec08dfc, artifact 11779025415 (DrHeekLab-Windows-2.9.1). Hashes verificados, sete frames do ICO presentes no GUI e Setup e três assets com hashes iguais aos do source. Installer local dist/windows-2.9.1/installer/DrHeekLab-2.9.1-Fase8-Setup.exe. A pendência de arquivo oficial foi resolvida. Avaliação prática do proprietário continua pendente.
+
+Veja docs/ajustes-marca-2.9.1.md, docs/capturas-2.9.1/ e docs/evidencias-2.9.1/. Notas seguintes são históricas.
+
 # Estado atual — modernização visual 2.9.0
 
 As oito áreas foram modernizadas com tema compartilhado, cartões, botões/ícones/tabelas/formulários padronizados, filtros, gráficos sobre dados reais, galeria/tabela sincronizada, progresso por peças aprovadas e configurações por assunto. Nenhuma fórmula, migração ou regra de negócio foi alterada.

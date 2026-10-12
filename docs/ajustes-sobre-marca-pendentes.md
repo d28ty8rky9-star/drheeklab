@@ -1,3 +1,7 @@
+# Pendência resolvida na versão 2.9.1
+
+O ZIP do usuário foi recebido, a marca e os ícones incorporados, e o novo instalador passou pela validação Windows com 255 testes. Veja docs/ajustes-marca-2.9.1.md. As notas abaixo são históricas.
+
 # Ajustes posteriores à versão 2.9.0
 
 Implementados localmente: Início somente com dashboard e atalhos; remoção do alerta amarelo e informações inferiores dessa tela; aba Configurações → Sobre com informações do programa, histórico e anotações preservadas; remoção de fase/rodapé; logotipo na barra lateral acima do nome; ícone de janela/aplicativo e identificação de tarefa Windows; empacotamento de assets e ícone obrigatório no build Windows.
