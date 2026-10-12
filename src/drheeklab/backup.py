@@ -7,6 +7,7 @@ import shutil
 import sqlite3
 import tempfile
 import zipfile
+from contextlib import closing
 from datetime import datetime
 from .storage import SCHEMA_VERSION
 
@@ -24,7 +25,7 @@ def digest(path):
     return h.hexdigest()
 
 def check_db(path):
-    with sqlite3.connect(path) as db:
+    with closing(sqlite3.connect(path)) as db, db:
         if db.execute("PRAGMA integrity_check").fetchone()[0] != "ok":
             raise ValueError("Integridade do banco inválida.")
         if db.execute("PRAGMA foreign_key_check").fetchall():
@@ -56,7 +57,7 @@ def check_db(path):
 
 def check_linked_files(db_path):
     root = Path(db_path).parent.parent.resolve()
-    with sqlite3.connect(db_path) as db:
+    with closing(sqlite3.connect(db_path)) as db, db:
         version = db.execute('PRAGMA user_version').fetchone()[0]
         if version < 3:
             return
@@ -91,7 +92,7 @@ def create_backup(storage, destination=None, *, password=None):
             stage = Path(temporary)/'data';stage.mkdir()
             db_file = stage / DB_PATH
             db_file.parent.mkdir(parents=True)
-            with sqlite3.connect(db_file) as copy:storage.db.backup(copy)
+            with closing(sqlite3.connect(db_file)) as copy, copy:storage.db.backup(copy)
             version = check_db(db_file)
             for name in ("Projetos STL e 3MF", "Fotos dos Produtos", "Orçamentos", "Pedidos e Comprovantes", "Catálogos", "Relatórios", "Marca"):
                 source=storage.home/name
@@ -185,7 +186,7 @@ def restore_backup(storage, path, *, password=None):
                 previous_database_integrity = False
             if previous_database_integrity:
                 preservation = storage.home / 'Backups' / ('pre-restore-' + datetime.now().strftime('%Y%m%d%H%M%S%f') + '.sqlite3')
-                with sqlite3.connect(preservation) as copy:
+                with closing(sqlite3.connect(preservation)) as copy, copy:
                     storage.db.backup(copy)
                 check_db(preservation)
                 with storage.db:
@@ -209,7 +210,7 @@ def restore_backup(storage, path, *, password=None):
             rollback.rename(storage.home)
             raise
     # Record restoration in the restored database without logging private data.
-    with sqlite3.connect(storage.path) as restored:
+    with closing(sqlite3.connect(storage.path)) as restored, restored:
         from .storage import now
         restored.execute("INSERT INTO audit(created_at,operation,record,previous,current,reason) VALUES(?,?,?,?,?,?)",
                          (now(), "restauração", "backup", json.dumps({"linked_files_complete": previous_linked_files_complete, "database_integrity": previous_database_integrity, "rollback_folder": rollback.name}), "null", "Restauração confirmada pelo usuário; estado anterior preservado em rollback"))

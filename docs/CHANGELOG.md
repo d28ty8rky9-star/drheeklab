@@ -1,5 +1,12 @@
 # Histórico
 
+## 2.8.1 — correção de compatibilidade Windows (em validação)
+
+- Conexões SQLite de snapshots, validação de backups e migração agora são fechadas explicitamente, liberando arquivos temporários no Windows antes da limpeza. O contexto transacional sozinho não fecha conexão.
+- Regressão mantém referências vivas às conexões para exigir fechamento explícito.
+- CI Windows registra cada teste, interrompe na primeira falha, mantém logs e limita duração; falha bloqueia instalador.
+- Regras financeiras e esquema 7 preservados. Homologação Windows segue em execução.
+
 ## 2.8.0 — finalização autônoma (candidato à homologação Windows)
 
 - Backup opcional criptografado com AES-256-GCM/scrypt; senha não persistida, integridade autenticada antes da restauração e suporte .hbk na interface/recuperação.

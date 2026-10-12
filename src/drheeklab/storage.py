@@ -3,6 +3,7 @@ from pathlib import Path
 import os
 import sqlite3
 import json
+from contextlib import closing
 from datetime import datetime, timezone
 from .migration3 import STATEMENTS
 from .migration4 import STATEMENTS as SALES_STATEMENTS
@@ -72,7 +73,7 @@ class Storage:
                 raise
             # Keep original consistent database before any upgrade.
             target = self.home / "Backups" / ("pre-migration-" + datetime.now().strftime("%Y%m%d%H%M%S%f") + ".sqlite3")
-            with sqlite3.connect(target) as copy:
+            with closing(sqlite3.connect(target)) as copy, copy:
                 self.db.backup(copy)
                 if copy.execute("PRAGMA integrity_check").fetchone()[0] != "ok":
                     raise RuntimeError("Backup anterior à migração inválido")

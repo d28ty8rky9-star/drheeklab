@@ -3,6 +3,7 @@ from pathlib import Path
 import json
 import subprocess
 import sys
+import sqlite3
 import xml.etree.ElementTree as ET
 from types import SimpleNamespace
 import pytest
@@ -18,6 +19,20 @@ from drheeklab.scheduler import task_xml,task_name,NS
 from test_phase7 import system
 
 PASSWORD='Senha independente de backup 2026'
+
+def test_backup_closes_every_temporary_sqlite_connection_even_with_live_references(system,monkeypatch):
+    store,*_=system;connections=[];connect=sqlite3.connect
+    class TrackedConnection(sqlite3.Connection):
+        explicitly_closed=False
+        def close(self):
+            super().close();self.explicitly_closed=True
+    def tracked(*args,**kwargs):
+        kwargs['factory']=TrackedConnection
+        connection=connect(*args,**kwargs);connections.append(connection);return connection
+    monkeypatch.setattr(sqlite3,'connect',tracked)
+    path=create_backup(store)
+    assert verify_backup(path,'test')
+    assert connections and all(c.explicitly_closed for c in connections)
 
 def test_encrypted_transfer_includes_media_documents_and_original_login(system,tmp_path):
     store,documents,products,product,variant,photo,project,photos=system
