@@ -7,6 +7,7 @@ on:
 jobs:
   phase8:
     runs-on: windows-latest
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -38,3 +39,4 @@ jobs:
             dist/test-results.xml
             dist/windows-SHA256.txt
             dist/DrHeekLabUpdate.exe
+            dist/windows-pytest*.log

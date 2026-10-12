@@ -10,8 +10,18 @@ if ($LASTEXITCODE -ne 0) { throw 'Falha na instalação' }
 & $python -m pip check
 if ($LASTEXITCODE -ne 0) { throw 'Dependências incompatíveis; empacotamento bloqueado' }
 $env:QT_QPA_PLATFORM = 'offscreen'
-& $python -m pytest -q -o faulthandler_timeout=20 --junitxml=dist/test-results.xml
-if ($LASTEXITCODE -ne 0) { throw 'Testes falharam: empacotamento bloqueado' }
+New-Item -ItemType Directory -Path 'dist' -Force | Out-Null
+$tests = Start-Process -FilePath (Resolve-Path $python).Path -ArgumentList @('-m','pytest','-vv','--durations=20','-o','faulthandler_timeout=20','--junitxml=dist/test-results.xml') -NoNewWindow -PassThru -RedirectStandardOutput 'dist\windows-pytest.log' -RedirectStandardError 'dist\windows-pytest-errors.log'
+if (-not $tests.WaitForExit(600000)) {
+    Stop-Process -Id $tests.Id -Force -ErrorAction SilentlyContinue
+    Get-Content 'dist\windows-pytest.log' -Tail 80
+    Get-Content 'dist\windows-pytest-errors.log' -Tail 80
+    throw 'Testes excederam 10 minutos; logs preservados, empacotamento bloqueado'
+}
+$tests.WaitForExit()
+Get-Content 'dist\windows-pytest.log'
+Get-Content 'dist\windows-pytest-errors.log'
+if ($tests.ExitCode -ne 0) { throw 'Testes falharam: empacotamento bloqueado' }
 Remove-Item Env:QT_QPA_PLATFORM
 $argsList = @('-m','PyInstaller','--noconfirm','--clean','--windowed','--onedir','--name','DrHeekLab','--paths','src','--collect-all','drheeklab','--version-file','packaging/version_info.txt')
 if ($IconPath) {
