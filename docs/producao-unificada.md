@@ -23,3 +23,10 @@ Capturas com dados fictícios temporários. Reproduzir: `QT_QPA_PLATFORM=offscre
 Atualizações e pull requests executam testes Windows. O job de empacotamento somente é habilitado por workflow_dispatch com gerar_pacote=true, após pedido explícito. Não foi gerado ZIP ou instalador para esta alteração. O último instalador entregue ainda corresponde à interface anterior; esta revisão é do código-fonte no GitHub.
 
 Validação Windows final aprovada: https://github.com/d28ty8rky9-star/drheeklab/actions/runs/38483313429 . Código 2ebc0b40cf40b7bc29eaa166dc0bfa8e932a823a. Job de testes aprovado; job de pacote ignorado e zero artefatos gerados, conforme a preferência do usuário.
+
+## ZIP solicitado e entregue
+
+Após pedido explícito do usuário, gerado pacote completo da Produção unificada. Windows run 38483874439 aprovado, código 4486ad5795891813f7b066d0b65ab9b3dcf71074, artifact 11858064343. JUnit confirma 258 testes aprovados, sem falhas/erros/pulos; pacote e instalação/reinstalação aprovados. Hashes Setup/GUI/helper conferidos após download, módulo drheeklab.workshop_ui presente no executável e integridade do ZIP completo verificada.
+
+Download: https://github.com/d28ty8rky9-star/drheeklab/actions/runs/38483874439/artifacts/11858064343 .
+Cópia local: dist/DrHeekLab-2.9.1-ProducaoUnificada-Windows.zip. Extraia e execute installer/DrHeekLab-2.9.1-Fase8-Setup.exe. Preservar C:\DrHeekLab e fazer backup antes de reinstalar. Avaliação prática no PC do proprietário segue pendente.

@@ -1,3 +1,9 @@
+# Última entrega — ZIP solicitado da Produção unificada
+
+Usuário pediu explicitamente ZIP após a união de Produtos/Produção. Pacote completo gerado e verificado: dist/DrHeekLab-2.9.1-ProducaoUnificada-Windows.zip; run 38483874439, artifact 11858064343, código compilado 4486ad5795891813f7b066d0b65ab9b3dcf71074. Windows 258 testes aprovados, 0 falhas/erros/pulos; executáveis e instalação/reinstalação/backup/preservação/agendamento/desinstalação aprovados. Hashes e integridade do ZIP conferidos; módulo workshop_ui dentro do executável. Esta entrega já contém a tela unificada e sete áreas. Nome Dr. Heek Lab, versão 2.9.1.
+
+Regra continua: ZIP/instalador somente mediante pedido explícito. Este pedido autorizou somente esta entrega. Futuras alterações: implementar/testar/GitHub; não empacotar automaticamente. Preservar C:\DrHeekLab. Avaliação manual do proprietário continua pendente. Notas seguintes históricas.
+
 # Estado atual — Produção unificada; pacotes somente a pedido
 
 Produtos e Produção agora são uma área única Produção, em uma tela com catálogo à esquerda e fila/inspeção à direita. Selecionar peça → Produzir esta peça abre formulário preenchido com variante, arquivo preferencial e recomendações; ficha de variantes/fotos/STL/3MF permanece acessível. Dados, schema, custos, estoque e inspeção preservados. Variante arquivada selecionada é bloqueada, sem substituir por outra. Menu com sete áreas e busca/navegação ajustadas.

@@ -1,0 +1,11 @@
+{
+  "run_id": 38483874439,
+  "artifact_id": 11858064343,
+  "code_sha": "4486ad5795891813f7b066d0b65ab9b3dcf71074",
+  "status": "passed",
+  "tests": 258,
+  "zip": "dist/DrHeekLab-2.9.1-ProducaoUnificada-Windows.zip",
+  "zip_sha256": "fab15599926e6e9aca5a8066324b5cf5d48b0f665232f5af475ad018aa20c547",
+  "installer_sha256": "11d0866d6709b4f1e37953cccbaaa01bec2e068d9bcfde65e179bc43bff3f837",
+  "manual_homologation": "pending"
+}
