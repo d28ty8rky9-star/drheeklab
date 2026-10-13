@@ -1,3 +1,9 @@
+# 2.9.1 — Atualização do nome do programa
+
+- Nome atual: Dr. Heek Lab; versão 2.9.1 exibida separadamente.
+- Removido “2.0” da interface, metadata do executável, instalador e novos documentos.
+- Dados e PDFs históricos preservados.
+
 # 2.9.1 — Marca oficial e revisão do Início
 
 - Logotipo oficial no canto superior esquerdo, com nome e versão abaixo.

@@ -83,7 +83,7 @@ def render_pdf(storage, path, data):
             story.append(paragraph('Logotipo oficial não configurado'))
     else:
         story.append(paragraph('Logotipo oficial não configurado'))
-    story.extend([paragraph('Dr. Heek Lab 2.0','Title'),paragraph(data['title'],'Heading2'),paragraph('Versão '+str(data['version'])+' • '+data['emitted_date']),Spacer(1,12)])
+    story.extend([paragraph('Dr. Heek Lab','Title'),paragraph(data['title'],'Heading2'),paragraph('Versão '+str(data['version'])+' • '+data['emitted_date']),Spacer(1,12)])
     customer=data['client']
     story.append(paragraph('Cliente: '+customer['name']))
     for key,label in (('phone','Telefone'),('email','E-mail')):

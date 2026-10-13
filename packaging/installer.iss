@@ -1,7 +1,7 @@
 #define AppVersion "2.9.1"
 [Setup]
 AppId={{485013A4-F44F-47DF-9C89-9CECB56946A0}
-AppName=Dr. Heek Lab 2.0
+AppName=Dr. Heek Lab
 AppVersion={#AppVersion}
 DefaultDirName={autopf}\DrHeekLab
 DefaultGroupName=Dr. Heek Lab

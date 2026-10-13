@@ -1,6 +1,6 @@
-# Dr. Heek Lab 2.0 — versão 2.8.0, Fases 1–8 (candidato à homologação)
+# Dr. Heek Lab — versão 2.9.1
 
-Aplicativo **desktop offline**, Python + PySide6 + SQLite, para Windows. As Fases 1–7 e a finalização integrada da Fase 8 estão implementadas e testadas em Linux. A geração e a homologação do instalador Windows permanecem pendentes; a Fase 8 ainda não é considerada concluída para uso real no Windows.
+Aplicativo **desktop offline**, Python + PySide6 + SQLite, para Windows. As oito áreas estão implementadas. O instalador e os fluxos de instalação/reinstalação, backup e preservação de dados passaram pela validação automatizada Windows; a avaliação prática no computador do proprietário permanece pendente.
 
 Disponível: login, ambientes separados, temas, menu recolhível, configurações, rascunhos, auditoria, backups, cadastro de impressoras/manutenções e filamentos, precificação com vários materiais, comparação previsto/confirmado e atualização única de consumo e tempo.
 

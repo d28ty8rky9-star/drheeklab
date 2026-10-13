@@ -29,7 +29,7 @@ class Login(QDialog):
         self.setWindowTitle("Dr. Heek Lab • Acesso")
         self.setMinimumWidth(390)
         box = QVBoxLayout(self)
-        title = QLabel("DR. HEEK LAB 2.0")
+        title = QLabel("DR. HEEK LAB")
         title.setStyleSheet("font-size:24px; font-weight:bold; color:#8757ef")
         box.addWidget(title)
         box.addWidget(QLabel("Ambiente: " + ENVIRONMENTS[storage.environment]))
@@ -100,7 +100,7 @@ class Window(QMainWindow):
         self._closed = False
         self.theme = storage.get("theme", "dark")
         self.collapsed = storage.get("sidebar_collapsed", False)
-        self.setWindowTitle(f"Dr. Heek Lab 2.0 • {ENVIRONMENTS[storage.environment]}")
+        self.setWindowTitle(f"Dr. Heek Lab • versão {__version__} • {ENVIRONMENTS[storage.environment]}")
         self.resize(1180, 800)
         self.setMinimumSize(780, 560)
         root = QWidget()
@@ -116,7 +116,7 @@ class Window(QMainWindow):
         self.logo.setAccessibleName('Logotipo oficial do Dr. Heek Lab')
         side.addWidget(self.logo)
         self.update_logo()
-        self.brand = QLabel("DR. HEEK\nLAB 2.0")
+        self.brand = QLabel("DR. HEEK\nLAB")
         self.brand.setObjectName("brand")
         side.addWidget(self.brand)
         self.brand_version = QLabel("Versão " + __version__)
@@ -271,7 +271,7 @@ class Window(QMainWindow):
     def about_page(self):
         from importlib.resources import files
         page = QWidget(); box = QVBoxLayout(page)
-        info = QLabel('Dr. Heek Lab 2.0 • versão ' + __version__ +
+        info = QLabel('Dr. Heek Lab • versão ' + __version__ +
             '\nGestão offline de impressão 3D. Dados armazenados localmente.' +
             '\nAmbiente ativo: ' + ENVIRONMENTS[self.storage.environment] +
             '\nAcesso protegido por senha local. Testes e Produção possuem bancos, arquivos e preferências próprios.' +
@@ -381,7 +381,7 @@ class Window(QMainWindow):
 
     def render_sidebar(self):
         self.sidebar_scroll.setFixedWidth(76 if self.collapsed else 216)
-        self.brand.setText("HL" if self.collapsed else "DR. HEEK\nLAB 2.0")
+        self.brand.setText("HL" if self.collapsed else "DR. HEEK\nLAB")
         self.phase_label.hide()
         self.brand_version.setVisible(not self.collapsed)
         self.update_logo()

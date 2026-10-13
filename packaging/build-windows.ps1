@@ -54,3 +54,20 @@ if (-not $setup) { throw 'Instalador esperado ausente' }
 Get-FileHash $setup.FullName -Algorithm SHA256 | Format-List | Out-File 'dist\installer\SHA256.txt'
 Get-FileHash 'dist\DrHeekLab\DrHeekLab.exe','dist\DrHeekLabUpdate.exe' -Algorithm SHA256 | Format-List | Out-File 'dist\windows-SHA256.txt'
 Write-Host 'Pacote gerado. Execute o checklist Windows antes de liberar. Sem ícone oficial fornecido, a identidade final está pendente.'
+
+@"
+DR. HEEK LAB - VERSAO $expected
+
+Pacote completo para Windows.
+1. Extraia todo este ZIP em uma pasta nova.
+2. Execute installer\DrHeekLab-$expected-Fase8-Setup.exe.
+3. Abra o programa pelo atalho Dr. Heek Lab.
+
+Voce pode excluir a pasta extraida da entrega anterior.
+PRESERVE C:\DrHeekLab: essa pasta contem bancos, fotos e documentos.
+Antes de reinstalar, faca um backup pelo aplicativo.
+O instalador preserva os dados e verifica um backup antes da atualizacao.
+
+Alternativa portatil: execute DrHeekLab\DrHeekLab.exe mantendo toda a
+pasta DrHeekLab e seu conteudo juntos.
+"@ | Set-Content -Encoding UTF8 'dist\LEIA-ME.txt'

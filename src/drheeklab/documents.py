@@ -47,12 +47,12 @@ class Documents:
 
     def brand(self):
         rel=self.storage.get('logo')
-        if not rel:return {'logo':None,'name':'Dr. Heek Lab 2.0','primary':'#6d41c7','secondary':'#087eaa','status':'Logotipo oficial não configurado — documento de revisão'}
+        if not rel:return {'logo':None,'name':'Dr. Heek Lab','primary':'#6d41c7','secondary':'#087eaa','status':'Logotipo oficial não configurado — documento de revisão'}
         root=self.storage.home.resolve();relative=Path(rel);path=(root/relative).resolve()
         if relative.is_absolute() or len(relative.parts)!=2 or relative.parts[0]!='Marca' or not path.is_relative_to(root) or not path.is_file():raise ValueError('Logo configurado não foi encontrado. Importe o original em Configurações ou restaure backup.')
         from PySide6.QtGui import QImageReader
         if QImageReader(str(path)).read().isNull():raise ValueError('Logo configurado não é uma imagem válida.')
-        return {'logo':rel,'sha256':digest(path),'name':'Dr. Heek Lab 2.0','primary':'#6d41c7','secondary':'#087eaa','status':'Marca configurada'}
+        return {'logo':rel,'sha256':digest(path),'name':'Dr. Heek Lab','primary':'#6d41c7','secondary':'#087eaa','status':'Marca configurada'}
 
     def emit_finance(self,start=None,end=None,**filters):
         with transaction(self.db):
