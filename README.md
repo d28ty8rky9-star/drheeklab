@@ -1,6 +1,6 @@
 # Dr. Heek Lab — versão 2.9.1
 
-Aplicativo **desktop offline**, Python + PySide6 + SQLite, para Windows. As oito áreas estão implementadas. O instalador e os fluxos de instalação/reinstalação, backup e preservação de dados passaram pela validação automatizada Windows; a avaliação prática no computador do proprietário permanece pendente.
+Aplicativo **desktop offline**, Python + PySide6 + SQLite, para Windows. As sete áreas estão implementadas; peças/modelos e ordens ficam juntos em Produção. O instalador e os fluxos de instalação/reinstalação, backup e preservação de dados passaram pela validação automatizada Windows; a avaliação prática no computador do proprietário permanece pendente.
 
 Disponível: login, ambientes separados, temas, menu recolhível, configurações, rascunhos, auditoria, backups, cadastro de impressoras/manutenções e filamentos, precificação com vários materiais, comparação previsto/confirmado e atualização única de consumo e tempo.
 

@@ -10,8 +10,8 @@ from .production import STATES
 class ModernPresentation:
     def __init__(self,window):
         self.window=window;self.strips={}
-        pages={1:window.sales_page,2:window.production_page,4:window.stock_page,5:window.finance_page}
-        titles={1:['Vendido no mês','Recebido líquido no mês','A receber • total','Pedidos em andamento'],2:list(STATES.values()),4:['Carretéis cadastrados','Filamento baixo','Peças reservadas','Peças disponíveis'],5:['Vendido','Recebido líquido','A receber','Resultado gerencial']}
+        pages={1:window.sales_page,2:window.production_page,3:window.stock_page,4:window.finance_page}
+        titles={1:['Vendido no mês','Recebido líquido no mês','A receber • total','Pedidos em andamento'],2:list(STATES.values()),3:['Carretéis cadastrados','Filamento baixo','Peças reservadas','Peças disponíveis'],4:['Vendido','Recebido líquido','A receber','Resultado gerencial']}
         for index,page in pages.items():
             strip=MetricStrip(titles[index]);page.layout().insertWidget(0,strip);self.strips[index]=strip
             page._after_refresh=lambda i=index:self.refresh(i)
@@ -47,7 +47,7 @@ class ModernPresentation:
         self.printer_cards=QWidget();self.printer_cards.setLayout(QHBoxLayout())
         wrapper=QScrollArea();wrapper.setWidgetResizable(True);wrapper.setWidget(self.printer_cards);wrapper.setMaximumHeight(195)
         window.printers_page.layout().insertWidget(0,wrapper)
-        window.printers_page._after_refresh=lambda:self.refresh(6)
+        window.printers_page._after_refresh=lambda:self.refresh(5)
         # Filter hides only display rows: domain row indices and selections remain intact.
         self.filters=[]
         for page in (window.sales_page,window.production_page,window.stock_page,window.finance_page,window.printers_page):
@@ -62,7 +62,7 @@ class ModernPresentation:
         window.low_alert.setObjectName('alert')
         for button in window.findChildren(QPushButton):action_style(button)
         for table in window.findChildren(QTableWidget):modern_table(table)
-        self.refresh(6)
+        self.refresh(5)
         # Scroll the content at smaller window sizes without clipping actions.
         for page in (window.sales_page,window.production_page,window.products_page,window.stock_page,window.finance_page,window.printers_page):
             body=QWidget();body.setLayout(page.layout())
@@ -105,13 +105,13 @@ class ModernPresentation:
         if index in (0,2):
             rows=w.production_page.production.queue();values=[sum(r['state']==state for r in rows) for state in STATES]
             self.strips[2].set_values(values);self.production_strip.set_values(values)
-        if index==4:
+        if index==3:
             rows=w.stock_page.inventory.summary()
-            self.strips[4].set_values([len(w.filaments_page.catalog.rows('filaments')),len(w.filaments_page.catalog.low_filaments()),sum(r['reserved'] for r in rows),sum(r['available'] for r in rows)])
-        if index==5:
-            m=w.finance_page.report_data['metrics'];self.finance_extra.set_values([currency(m[k]) for k in ('expenses_paid_cents','payable_cents','cash_flow_cents','cash_closing_cents')]);self.strips[5].set_values([currency(m[k]) for k in ('sold_cents','received_net_cents','receivable_cents','commercial_result_cents')])
+            self.strips[3].set_values([len(w.filaments_page.catalog.rows('filaments')),len(w.filaments_page.catalog.low_filaments()),sum(r['reserved'] for r in rows),sum(r['available'] for r in rows)])
+        if index==3:
+            m=w.finance_page.report_data['metrics'];self.finance_extra.set_values([currency(m[k]) for k in ('expenses_paid_cents','payable_cents','cash_flow_cents','cash_closing_cents')]);self.strips[4].set_values([currency(m[k]) for k in ('sold_cents','received_net_cents','receivable_cents','commercial_result_cents')])
             self.finance_chart.set_values([(label,m[key],currency(m[key])) for label,key in [('Vendido','sold_cents'),('Recebido líquido','received_net_cents'),('Despesas pagas','expenses_paid_cents')]])
-        if index==6:
+        if index==4:
             box=self.printer_cards.layout()
             while box.count():
                 widget=box.takeAt(0).widget();widget.hide();widget.deleteLater()

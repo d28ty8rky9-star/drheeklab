@@ -19,7 +19,7 @@ def test_finance_forms_partial_payment_owner_funding_and_navigation(tmp_path):
     assert form.result()==QDialog.Accepted,form.error.text()
     row=f.payables()[0];pay=PayDialog(f,row);pay.fields['amount'].setText('1');pay.fields['fee'].setText('0.10');pay.submit();assert pay.result()==QDialog.Accepted,pay.error.text()
     owner=OwnerDialog(f);owner.fields['amount'].setText('100');owner.fields['description'].setText('Capital');owner.fields['responsible'].setText('Titular');owner.submit();assert owner.result()==QDialog.Accepted,owner.error.text()
-    window=Window(store);window.show();window.navigate(5);APP.processEvents()
+    window=Window(store);window.show();window.navigate(4);APP.processEvents()
     page=window.finance_page;assert window.pages.currentWidget()==page and page.tables['payables'].rowCount()==3
     assert 'R$ 98,90' in page.metrics_label.text() and 'Sem divergências' in page.details.toPlainText()
     window.resize(1100,700);APP.processEvents();assert window.grab().save(str(tmp_path/'finance.png'))
@@ -38,7 +38,7 @@ def test_purchase_and_category_forms_atomic_stock(tmp_path):
 
 def test_real_ui_excel_and_csv_exports(tmp_path,monkeypatch):
     store=Storage(tmp_path/'data');f=Finance(store);f.entry('capital_in','10','Aporte','Titular')
-    window=Window(store);page=window.finance_page;window.navigate(5)
+    window=Window(store);page=window.finance_page;window.navigate(4)
     monkeypatch.setattr(QMessageBox,'information',lambda *args:QMessageBox.Ok)
     xlsx=tmp_path/'finance.xlsx';monkeypatch.setattr(QFileDialog,'getSaveFileName',lambda *args:(str(xlsx),''));page.excel()
     wb=load_workbook(xlsx)

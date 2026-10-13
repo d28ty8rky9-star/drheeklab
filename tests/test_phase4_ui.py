@@ -102,7 +102,7 @@ def test_eight_navigation_areas_and_sales_summary_are_integrated(tmp_path):
     store=Storage(tmp_path);sales=Sales(store);client=sales.save_client({'name':'Cliente'})
     order=sales.create_order(client,[{'description':'Peça','unit_price':'100'}]);sales.receive_payment(order,'30')
     window=Window(store);window.show();APP.processEvents()
-    assert window.pages.count()==8
+    assert window.pages.count()==7
     assert 'R$ 100,00' in window.business_summary.text() and 'R$ 70,00' in window.business_summary.text()
     window.navigate(1)
     assert window.sales_page.client_table.rowCount()==1

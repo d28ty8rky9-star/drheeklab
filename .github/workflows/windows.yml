@@ -1,11 +1,43 @@
-name: Validar e empacotar Windows
+name: Validar Windows e empacotar sob solicitação
 on:
   workflow_dispatch:
+    inputs:
+      gerar_pacote:
+        description: Gerar pacote completo e instalador (somente quando solicitado)
+        type: boolean
+        required: false
+        default: false
   push:
     branches: [main]
   pull_request:
 jobs:
-  phase8:
+  tests:
+    name: Testes Windows
+    runs-on: windows-latest
+    timeout-minutes: 15
+    env:
+      QT_QPA_PLATFORM: offscreen
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Preparar ambiente de testes
+        shell: pwsh
+        run: |
+          python -m pip install -r requirements-dev.lock
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -m pip install --no-build-isolation --no-deps -e .
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -m pip check
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Executar testes
+        shell: pwsh
+        run: python -m pytest -q -o faulthandler_timeout=30
+  package:
+    name: Pacote Windows solicitado
+    needs: tests
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.gerar_pacote == true }}
     runs-on: windows-latest
     timeout-minutes: 25
     steps:
@@ -20,16 +52,15 @@ jobs:
             choco install innosetup --yes --no-progress
             if ($LASTEXITCODE -ne 0) { throw 'Falha na instalação do Inno Setup' }
           }
-      - name: Compilar e executar testes críticos
+      - name: Compilar e verificar pacote
         shell: pwsh
         run: ./packaging/build-windows.ps1
-      - name: Instalar, reinstalar, verificar e desinstalar em runner descartável
+      - name: Verificar instalação e preservação de dados
         shell: pwsh
         run: ./packaging/test-windows-installer.ps1 -DisposableRunner -SetupPath dist/installer/DrHeekLab-2.9.1-Fase8-Setup.exe
       - uses: actions/upload-artifact@v4
-        if: always()
         with:
-          name: DrHeekLab-Windows-2.9.1-NomeAtualizado
+          name: DrHeekLab-Windows-2.9.1
           path: |
             dist/LEIA-ME.txt
             dist/DrHeekLab/

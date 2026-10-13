@@ -33,7 +33,7 @@ def test_production_ui_create_confirm_checklist_photos_and_complete(tmp_path):
         inspect.submit();assert inspect.result()==QDialog.Accepted,inspect.error.text()
     p.complete(op)
     window=Window(store);window.show();window.navigate(2);APP.processEvents()
-    assert window.pages.currentWidget()==window.production_page
+    assert window.pages.currentWidget()==window.workshop
     assert window.production_page.queue_table.rowCount()==1
     assert window.production_page.piece_table.rowCount()==2
     assert 'Concluída' in window.production_page.queue_table.item(0,2).text()

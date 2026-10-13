@@ -19,8 +19,8 @@ from .phase7_ui import DocumentCenter,NotificationDialog
 from .notifications import Notifications
 from .sales import Sales
 
-AREAS = ("Início", "Vendas", "Produção", "Produtos", "Estoque", "Financeiro", "Impressoras", "Configurações")
-SYMBOLS = ("⌂", "$", "⚙", "◇", "▤", "↗", "▣", "☷")
+AREAS = ("Início", "Vendas", "Produção", "Estoque", "Financeiro", "Impressoras", "Configurações")
+SYMBOLS = ("⌂", "$", "⚙", "▤", "↗", "▣", "☷")
 
 class Login(QDialog):
     def __init__(self, storage):
@@ -173,15 +173,15 @@ class Window(QMainWindow):
         self.sales_page = SalesPage(storage, self.calculator)
         self.production_page = ProductionPage(storage)
         self.finance_page = FinancePage(storage)
+        from .workshop_ui import WorkshopPage
+        self.workshop = WorkshopPage(self.products_page,self.production_page)
         for area in AREAS[1:-1]:
             if area == 'Vendas':
                 self.pages.addWidget(self.sales_page)
             elif area == 'Produção':
-                self.pages.addWidget(self.production_page)
+                self.pages.addWidget(self.workshop)
             elif area == 'Estoque':
                 self.pages.addWidget(self.stock_page)
-            elif area == 'Produtos':
-                self.pages.addWidget(self.products_page)
             elif area == 'Financeiro':
                 self.pages.addWidget(self.finance_page)
             elif area == 'Impressoras':
@@ -351,16 +351,14 @@ class Window(QMainWindow):
             self.calculator.refresh()
             self.sales_page.refresh()
         elif index == 2:
-            self.production_page.refresh()
+            self.workshop.refresh()
         elif index == 3:
-            self.products_page.refresh()
-        elif index == 4:
             self.stock_page.refresh()
-        elif index == 5:
+        elif index == 4:
             self.finance_page.refresh()
-        elif index == 6:
+        elif index == 5:
             self.printers_page.refresh()
-        if index == 7:
+        if index == 6:
             from .phase2_ui import fill_table
             rows = self.storage.db.execute("SELECT DISTINCT supplier, 'Filamentos' FROM filaments WHERE trim(supplier) != '' UNION SELECT DISTINCT supplier, 'Contas a pagar' FROM payables WHERE trim(supplier) != '' ORDER BY 1").fetchall()
             fill_table(self.supplier_table, [tuple(row) for row in rows])
@@ -386,7 +384,8 @@ class Window(QMainWindow):
         self.brand_version.setVisible(not self.collapsed)
         self.update_logo()
         from .menu_icons import menu_icons
-        icons = menu_icons()
+        original_icons = menu_icons()
+        icons = [original_icons[i] for i in (0,1,2,4,5,6,7)]
         for i, button in enumerate(self.buttons):
             button.setProperty("nav", "collapsed" if self.collapsed else "expanded")
             button.setIcon(icons[i])

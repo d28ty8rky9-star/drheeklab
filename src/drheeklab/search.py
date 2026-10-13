@@ -6,9 +6,9 @@ SOURCES = (
     ('Cliente',1,"SELECT id,name AS title,phone||' '||email||' '||notes AS detail,CASE archived WHEN 1 THEN 'Arquivado' ELSE 'Ativo' END AS state FROM clients"),
     ('Pedido',1,"SELECT id,code AS title,client_snapshot||' '||notes AS detail,state FROM orders"),
     ('Orçamento',1,"SELECT id,code AS title,client_snapshot||' '||notes AS detail,state FROM quotes"),
-    ('Produto',3,"SELECT id,code||' — '||name AS title,description AS detail,CASE archived WHEN 1 THEN 'Arquivado' ELSE 'Ativo' END AS state FROM products"),
-    ('Projeto',3,"SELECT v.id,p.code||' — '||v.original_name AS title,p.name||' / versão '||v.version||' / '||v.notes AS detail,CASE v.archived WHEN 1 THEN 'Arquivado' ELSE 'Ativo' END AS state FROM project_versions v JOIN products p ON p.id=v.product_id"),
-    ('Filamento',4,"SELECT id,brand||' / '||name AS title,material||' '||color AS detail,CASE archived WHEN 1 THEN 'Arquivado' ELSE state END AS state FROM filaments"),
+    ('Produto',2,"SELECT id,code||' — '||name AS title,description AS detail,CASE archived WHEN 1 THEN 'Arquivado' ELSE 'Ativo' END AS state FROM products"),
+    ('Projeto',2,"SELECT v.id,p.code||' — '||v.original_name AS title,p.name||' / versão '||v.version||' / '||v.notes AS detail,CASE v.archived WHEN 1 THEN 'Arquivado' ELSE 'Ativo' END AS state FROM project_versions v JOIN products p ON p.id=v.product_id"),
+    ('Filamento',3,"SELECT id,brand||' / '||name AS title,material||' '||color AS detail,CASE archived WHEN 1 THEN 'Arquivado' ELSE state END AS state FROM filaments"),
     ('Produção',2,"SELECT o.id,o.code AS title,o.responsible||' '||o.parameters||' '||COALESCE((SELECT group_concat(p.name,' ') FROM production_entries e JOIN variants v ON v.id=e.variant_id JOIN products p ON p.id=v.product_id WHERE e.op_id=o.id),'') AS detail,o.state FROM production_orders o"),
 )
 

@@ -53,7 +53,7 @@ def test_restore_flow_requires_confirmation_no_data_change_on_no(tmp_path,monkey
 
 
 def test_finance_page_pdf_preserves_selected_filter(tmp_path,monkeypatch):
-    store,variant=setup(tmp_path);window=Window(store);window.navigate(5)
+    store,variant=setup(tmp_path);window=Window(store);window.navigate(4)
     monkeypatch.setattr('drheeklab.phase6_ui.open_local',lambda *args:None)
     page=window.finance_page;product=Products(store).search()[0]['id'];page.product.setCurrentIndex(page.product.findData(product));page.pdf()
     import json

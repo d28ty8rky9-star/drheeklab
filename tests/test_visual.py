@@ -74,7 +74,7 @@ def test_official_branding_icons_and_scrollable_sidebar(tmp_path):
     assert all(not button.icon().isNull() for button in window.buttons)
     window.sidebar_scroll.ensureWidgetVisible(window.buttons[-1]);APP.processEvents()
     window.buttons[-1].click()
-    assert window.pages.currentIndex()==7
+    assert window.pages.currentIndex()==6
     window.toggle_sidebar();APP.processEvents()
     assert not window.brand_version.isVisible()
     assert all(button.text()=='' for button in window.buttons)

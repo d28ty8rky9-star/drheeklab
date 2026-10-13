@@ -28,7 +28,7 @@ def selection_combo(dialog, key, label, rows, value, display):
 
 class ProductDialog(FormDialog):
     def __init__(self, products, identifier=None, parent=None):
-        super().__init__('Editar produto' if identifier else 'Novo produto • código automático', parent)
+        super().__init__('Editar peça' if identifier else 'Nova peça • código automático', parent)
         self.products, self.identifier = products, identifier
         row = products.get('products', identifier) if identifier is not None else {}
         self.line('name', 'Nome *', row.get('name', ''))
@@ -96,7 +96,7 @@ class ProductsPage(QWidget):
         box.addLayout(controls)
         actions = QHBoxLayout()
         button('Novo produto', self.new, actions)
-        button('Editar produto', self.edit, actions)
+        button('Editar peça', self.edit, actions)
         button('Arquivar / restaurar', self.archive, actions)
         box.addLayout(actions)
         self.gallery = QListWidget()
@@ -196,6 +196,7 @@ class ProductsPage(QWidget):
             self.variant_money(r, 'suggested_price_cents'), r['calculation_id'] or '—'] for r in self.variant_rows])
         fill_table(self.photo_table, [[r['id'], r['original_name'], 'Sim' if r['is_primary'] else 'Não', datetime.fromisoformat(r['created_at']).astimezone().strftime('%d/%m/%Y')] for r in self.photo_rows])
         fill_table(self.project_table, [[r['id'], r['version'], r['original_name'], 'Sim' if r['is_preferred'] else 'Não', r['notes']] for r in self.project_rows])
+        if getattr(self, '_selection_changed', None): self._selection_changed()
 
     def variant_money(self, row, key):
         if row[key] is not None:

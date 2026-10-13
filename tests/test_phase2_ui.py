@@ -86,7 +86,7 @@ def test_calculator_ui_saves_exact_example_then_confirms_real_cost(tmp_path, mon
     assert actual.result() == QDialog.Accepted
     assert catalog.get('filaments', spool_id)['remaining_mg'] == 690000
     assert catalog.get('printers', 1)['accumulated_minutes'] == 60
-    window.navigate(4)
+    window.navigate(3)
     assert window.filaments_page.table.item(0, 5).text() == '690 g'
     window.close()
     reopened = Storage(tmp_path)

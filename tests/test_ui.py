@@ -31,7 +31,7 @@ def test_navigation_theme_sidebar_and_draft_recovery(tmp_path):
     window.show()
     APP.processEvents()
     assert window.isVisible()
-    assert window.pages.count() == 8
+    assert window.pages.count() == 7
     for index, name in enumerate(AREAS):
         window.buttons[index].click()
         assert window.pages.currentIndex() == index

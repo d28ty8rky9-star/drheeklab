@@ -1,3 +1,10 @@
+# 2.9.1 — Simplificação de Produção (código em desenvolvimento)
+
+- Uma tela para selecionar a peça e produzir, com catálogo e fila lado a lado.
+- Formulário preenchido com variante, arquivo e parâmetros cadastrados; ficha completa preservada.
+- Menu com sete áreas; navegação e busca ajustadas.
+- Atualizações no GitHub executam testes; ZIP e instalador somente quando solicitados.
+
 # 2.9.1 — Atualização do nome do programa
 
 - Nome atual: Dr. Heek Lab; versão 2.9.1 exibida separadamente.

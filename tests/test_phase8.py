@@ -96,7 +96,7 @@ def test_search_archived_history_and_ui_navigation(system):
     window=Window(store);dialog=SearchDialog(store,window);dialog.term.setText('Suporte');dialog.refresh()
     assert dialog.listing.rowCount()>0
     dialog.listing.selectRow(0);dialog.open_area()
-    assert window.pages.currentIndex()==3
+    assert window.pages.currentIndex()==2
     window.close()
 
 def test_about_contains_packaged_history_and_current_version(tmp_path):
@@ -120,12 +120,12 @@ def test_home_is_clean_and_notes_preserved_in_about(tmp_path):
     assert window.notes not in home.findChildren(type(window.notes))
     assert window.logo.parentWidget() is window.sidebar
     assert not window.low_alert.isVisible()
-    window.navigate(7)
-    tabs=next(t for t in window.pages.widget(7).findChildren(QTabWidget) if any(t.tabText(i)=='Sobre' for i in range(t.count())))
+    window.navigate(6)
+    tabs=next(t for t in window.pages.widget(6).findChildren(QTabWidget) if any(t.tabText(i)=='Sobre' for i in range(t.count())))
     tabs.setCurrentIndex(next(i for i in range(tabs.count()) if tabs.tabText(i)=='Sobre'))
     QApplication.processEvents()
     assert window.notes.isVisible()
     window.notes.setPlainText('Histórico preservado em Sobre');window.save_draft()
     assert window.storage.load_draft('home_notes')=='Histórico preservado em Sobre'
-    assert len(window.buttons)==8
+    assert len(window.buttons)==7
     window.close()

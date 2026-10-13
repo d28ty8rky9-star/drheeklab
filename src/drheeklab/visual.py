@@ -71,7 +71,7 @@ class BarChart(QWidget):
 
 def action_style(button):
     text=button.text().lower()
-    role='primary' if text.startswith(('nov','criar','iniciar','confirmar','registrar recebimento')) else 'danger' if text.startswith(('descartar','cancelar','estornar','rejeitar')) else 'export' if any(x in text for x in ('exportar','pdf','backup')) else 'secondary'
+    role='primary' if text.startswith(('nov','criar','produzir','iniciar','confirmar','registrar recebimento')) else 'danger' if text.startswith(('descartar','cancelar','estornar','rejeitar')) else 'export' if any(x in text for x in ('exportar','pdf','backup')) else 'secondary'
     button.setProperty('role',role)
     icon=QStyle.SP_FileDialogNewFolder if role=='primary' else QStyle.SP_DialogSaveButton if role=='export' else QStyle.SP_DialogCancelButton if role=='danger' else QStyle.SP_ArrowRight
     # Draw a consistent small line icon instead of platform-dependent clip art.

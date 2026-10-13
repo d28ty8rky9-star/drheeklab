@@ -19,7 +19,7 @@ def fields(dialog, data):
 def test_real_product_forms_gallery_search_media_import_and_variants(tmp_path,monkeypatch):
     store=Storage(tmp_path/'data')
     products=Products(store)
-    window=Window(store); window.show(); window.navigate(3)
+    window=Window(store); window.show(); window.navigate(2)
     product=ProductDialog(products,parent=window)
     product.submit()
     assert product.result()!=QDialog.Accepted
@@ -55,7 +55,7 @@ def test_stock_ui_receipt_personal_reinspection_reservation_release_and_loss(tmp
     products=Products(store); inventory=Inventory(store)
     product=products.save({'name':'Suporte','category':'functional'})
     variant=products.variants(product)[0]['id']
-    window=Window(store); window.show(); window.navigate(4)
+    window=Window(store); window.show(); window.navigate(3)
     dialog=ReceiptDialog(inventory,window)
     fields(dialog,{'quantity':'3','total_cost':'10,01','source':'Cadastro das peças existentes','condition':'Uso pessoal, marcas superficiais'})
     dialog.fields['state'].setCurrentIndex(dialog.fields['state'].findData('personal'))
