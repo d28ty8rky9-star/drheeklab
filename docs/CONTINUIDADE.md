@@ -1,3 +1,9 @@
+# Nome atual — Dr. Heek Lab, versão 2.9.1
+
+Pedido de 13/10/2026: nome do produto Dr. Heek Lab, sem “2.0”; versão continua 2.9.1. Nome atualizado em interface, instalador, propriedades do executável e novos documentos. PDFs e dados históricos preservados. A cada alteração, o usuário exige ZIP completo para reinstalar, sem copiar modificações para uma pasta antiga. Preservar C:\DrHeekLab (dados), excluir somente a pasta extraída da entrega anterior. LEIA-ME.txt incluído no pacote.
+
+Validação: 65 testes locais relacionados aprovados; 255 testes Windows aprovados, zero falhas/erros/pulos. Instalação/reinstalação/backup/preservação/agendamento/desinstalação aprovados. Run 38403682558; build a36711e0d22e9a743695cdc3bb2e1e8a73b1fa51; artifact 11817081703 (DrHeekLab-Windows-2.9.1-NomeAtualizado). Nome no metadata do GUI e hashes verificados. ZIP completo local: dist/DrHeekLab-2.9.1-NomeAtualizado-Windows.zip. Notas seguintes históricas.
+
 # Estado atual — marca oficial e revisão final 2.9.1
 
 Logotipo fornecido no ZIP incorporado no canto superior esquerdo, nome e versão abaixo; oito ícones da folha original no menu. Início sem os blocos inferiores/alerta amarelo; informações e anotações preservadas em Configurações → Sobre. Ícone oficial incorporado no executável, instalador e janela. Menu com rolagem em janelas menores. Nenhuma regra, fórmula ou migração alterada.

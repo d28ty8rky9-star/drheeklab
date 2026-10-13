@@ -1,0 +1,11 @@
+{
+  "run_id": 38403682558,
+  "artifact_id": 11817081703,
+  "head_sha": "a36711e0d22e9a743695cdc3bb2e1e8a73b1fa51",
+  "status": "passed",
+  "name": "Dr. Heek Lab",
+  "version": "2.9.1",
+  "tests_windows": 255,
+  "tests_local_focused": 65,
+  "sha256_installer": "a73dde7efae38504641fcf0cfc714777e629f61b1a3f903919fce6dc419cd0bd"
+}

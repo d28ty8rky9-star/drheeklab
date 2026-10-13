@@ -1,0 +1,14 @@
+{
+  "checks": [
+    "install",
+    "reinstall",
+    "installed self-test",
+    "pre-update verified backup",
+    "database/media preserved",
+    "headless daily backup",
+    "task create/delete",
+    "uninstall"
+  ],
+  "manual_homologation": "pending",
+  "status": "passed"
+}
