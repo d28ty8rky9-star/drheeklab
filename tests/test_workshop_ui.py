@@ -50,3 +50,15 @@ def test_missing_file_and_archived_piece_do_not_create_order(tmp_path):
     window.workshop.details_button.setChecked(True)
     assert not window.products_page.tabs.isHidden()
     window.close()
+
+def test_archived_selected_variant_is_not_replaced_by_another(tmp_path):
+    store=Storage(tmp_path/'data');products=Products(store)
+    product=products.save({'name':'Suporte','category':'functional'})
+    archived=products.save_variant(product,{'name':'Antiga'})
+    products.archive('variants',archived,True,'Fora de linha')
+    window=Window(store);window.navigate(2);window.products_page.select_product(product)
+    window.products_page.variant_trash.setChecked(True);window.products_page.variants_table.selectRow(0)
+    assert not window.workshop.produce_button.isEnabled()
+    with pytest.raises(ValueError,match='variante ativa'):window.workshop.prepare_order()
+    assert not window.production_page.production.queue()
+    window.close()

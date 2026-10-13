@@ -25,7 +25,10 @@ class WorkshopPage(QWidget):
         if identifier is None:
             self.selection.setText('Selecione uma peça no catálogo para produzir.');self.produce_button.setEnabled(False);return
         product=self.products_page.products.get('products',identifier)
-        self.selection.setText(product['code']+' • '+product['name']);self.produce_button.setEnabled(not product['archived'])
+        self.selection.setText(product['code']+' • '+product['name'])
+        row=self.products_page.variants_table.currentRow()
+        selected_archived=0<=row<len(self.products_page.variant_rows) and self.products_page.variant_rows[row]['archived']
+        self.produce_button.setEnabled(not product['archived'] and not selected_archived)
 
     def prepare_order(self):
         """Prefill a form only; nothing is persisted until its normal validation succeeds."""
@@ -37,6 +40,8 @@ class WorkshopPage(QWidget):
         if not variants:raise ValueError('Cadastre ou restaure uma variante na ficha da peça.')
         row=p.variants_table.currentRow()
         selected=p.variant_rows[row]['id'] if 0<=row<len(p.variant_rows) else None
+        if selected is not None and not any(v['id']==selected for v in variants):
+            raise ValueError('Selecione uma variante ativa para produzir.')
         variant=next((v for v in variants if v['id']==selected),variants[0])
         projects=[r for r in p.products.media(identifier,'project') if not r['archived']]
         if not projects:raise ValueError('Esta peça não tem STL/3MF ativo. Importe o arquivo na ficha da peça antes de produzir.')

@@ -11,7 +11,7 @@ A ficha da peça, com variantes/fotos/STL/3MF, fica recolhida e pode ser aberta 
 
 Preparar o formulário não grava dados nem consome filamento. A criação da OP utiliza as validações originais; não confirma automaticamente consumo ou qualidade.
 
-Validação local: 257 testes completos aprovados. Dois testes adicionais do fluxo foram executados novamente após destacar o botão principal e cobrir seu clique real. Testes de navegação/busca foram ajustados às sete áreas, conservando as verificações dos dados e fluxos.
+Validação local: 257 testes completos aprovados. Três testes do fluxo passaram na revisão final: clique real do botão, ausência de arquivo e variante arquivada. Uma variante arquivada selecionada é bloqueada, sem substituição silenciosa por outra variante. Testes de navegação/busca foram ajustados às sete áreas, conservando as verificações dos dados e fluxos.
 
 ![Produção](capturas-producao-unificada/producao.png)
 ![Ficha da peça](capturas-producao-unificada/ficha.png)
