@@ -1,3 +1,13 @@
+# Estado atual — Produção unificada; pacotes somente a pedido
+
+Produtos e Produção agora são uma área única Produção, em uma tela com catálogo à esquerda e fila/inspeção à direita. Selecionar peça → Produzir esta peça abre formulário preenchido com variante, arquivo preferencial e recomendações; ficha de variantes/fotos/STL/3MF permanece acessível. Dados, schema, custos, estoque e inspeção preservados. Variante arquivada selecionada é bloqueada, sem substituir por outra. Menu com sete áreas e busca/navegação ajustadas.
+
+257 testes locais completos e três testes finais de fluxo aprovados. Windows run 38483313429: testes aprovados sobre 2ebc0b40cf40b7bc29eaa166dc0bfa8e932a823a. Pacote ignorado e zero artefatos criados. Nenhum ZIP/instalador gerado. Relatório docs/producao-unificada.md e capturas docs/capturas-producao-unificada/. Código no GitHub; o último instalador entregue mantém a interface anterior.
+
+PREFERÊNCIA ATUAL, que substitui a antiga: implementar/testar/enviar alterações ao GitHub, mas somente gerar ZIP ou instalador quando o usuário pedir explicitamente. Workflow push/PR apenas testa; pacote só via workflow_dispatch com gerar_pacote=true e pedido explícito. Não disparar esse input sem autorização. Usar checkout existente; preservar C:\DrHeekLab e dados, versões e documentos históricos. Versão do código continua 2.9.1 em desenvolvimento.
+
+Notas seguintes são históricas.
+
 # Nome atual — Dr. Heek Lab, versão 2.9.1
 
 Pedido de 13/10/2026: nome do produto Dr. Heek Lab, sem “2.0”; versão continua 2.9.1. Nome atualizado em interface, instalador, propriedades do executável e novos documentos. PDFs e dados históricos preservados. A cada alteração, o usuário exige ZIP completo para reinstalar, sem copiar modificações para uma pasta antiga. Preservar C:\DrHeekLab (dados), excluir somente a pasta extraída da entrega anterior. LEIA-ME.txt incluído no pacote.

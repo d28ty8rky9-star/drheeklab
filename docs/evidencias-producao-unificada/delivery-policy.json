@@ -1,0 +1,11 @@
+{
+  "run_id": 38483313429,
+  "code_sha": "2ebc0b40cf40b7bc29eaa166dc0bfa8e932a823a",
+  "tests_windows": "passed",
+  "package_job": "skipped",
+  "artifacts_created": 0,
+  "zip_generated": false,
+  "installer_generated": false,
+  "linux_full_tests_passed": 257,
+  "final_flow_tests_passed": 3
+}

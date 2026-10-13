@@ -21,3 +21,5 @@ Capturas com dados fictícios temporários. Reproduzir: `QT_QPA_PLATFORM=offscre
 ## Entrega sob solicitação
 
 Atualizações e pull requests executam testes Windows. O job de empacotamento somente é habilitado por workflow_dispatch com gerar_pacote=true, após pedido explícito. Não foi gerado ZIP ou instalador para esta alteração. O último instalador entregue ainda corresponde à interface anterior; esta revisão é do código-fonte no GitHub.
+
+Validação Windows final aprovada: https://github.com/d28ty8rky9-star/drheeklab/actions/runs/38483313429 . Código 2ebc0b40cf40b7bc29eaa166dc0bfa8e932a823a. Job de testes aprovado; job de pacote ignorado e zero artefatos gerados, conforme a preferência do usuário.
