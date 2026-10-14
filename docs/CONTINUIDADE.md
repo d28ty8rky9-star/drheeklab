@@ -2,6 +2,8 @@
 
 Implementada aba Extras • argolas e acessórios na ficha de Produção. Nome, quantidade por peça, custo unitário; soma por linha e total. Prévia automática ao mudar filamentos, horas, adicionais ou extras, inclusive antes de escolher STL. Não há botão obrigatório de cálculo. Salvar continua validando arquivo/parâmetros. Extras persistidos no JSON versionado da receita, auxiliary_base separado do total; ficha antiga mantém auxiliares anteriores. OP copia ficha/extras imutáveis e multiplica o custo pela quantidade, sem solicitar os itens de novo. Cadastro de extras não movimenta materiais auxiliares/caixa. Custo reconhecido somente após conclusão e publicação no estoque.
 
+Validação: 289 testes locais aprovados, zero falhas/erros/pulos; suíte completa Windows aprovada no run 38504392901 sobre fa06628883476f8547982ac9ed31c73fc8486605. Pacote ignorado, zero artefatos.
+
 Sem mudança de schema (continua 9) ou versão (2.9.1). Código/GitHub, testes e capturas; ZIP/instalador somente se solicitado. Preservar dados, OPs e receitas anteriores. Veja docs/extras-producao.md, tests/test_production_extras.py e docs/evidencias-extras-producao/. Notas seguintes históricas.
 
 # Estado atual — valor demonstrativo, peça comprada no Estoque e horas

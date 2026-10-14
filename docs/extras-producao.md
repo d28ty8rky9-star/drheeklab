@@ -15,4 +15,4 @@ Capturas Qt com dados descartáveis:
 - [Filamentos, horas e valor automático](capturas-extras-producao/filamentos-horas.png)
 - [Extras com quantidade e custo](capturas-extras-producao/extras.png)
 
-Evidências de testes em `evidencias-extras-producao/`. Avaliação prática do proprietário no Windows permanece pendente.
+289 testes locais aprovados, zero falhas/erros/pulos. Suíte completa [Windows aprovada](https://github.com/d28ty8rky9-star/drheeklab/actions/runs/38504392901); pacote ignorado e zero artefatos. Evidências de testes em `evidencias-extras-producao/`. Avaliação prática do proprietário no Windows permanece pendente.
