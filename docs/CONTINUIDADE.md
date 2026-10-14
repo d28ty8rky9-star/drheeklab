@@ -6,6 +6,8 @@ Tempo nos formulários da peça (cadastro, ficha, OP antiga, ajuste de confirma�
 
 Schema 9: tabela purchased_products, migração/backup transacional; preservadas tabelas/dados existentes e snapshots de OPs. Não cadastrar peça comprada no catálogo visível da Produção. Detalhes docs/valor-producao-estoque-horas.md; evidências docs/evidencias-estoque-horas/ e capturas docs/capturas-estoque-horas/.
 
+Validação: 284 testes locais aprovados, zero falhas/erros/pulos; 20 testes UI/fluxo repetidos após ajustes finais e aprovados. Windows suíte completa aprovada no run 38503428577 sobre 2357b31c27adb91823980836dc3870f72d3fe8f1, pacote ignorado, zero artefatos.
+
 Somente código/testes/GitHub. Nenhum pacote solicitado nesta alteração. ZIP/instalador apenas mediante pedido explícito; os pacotes antigos não incluem alterações recentes. Preservar C:\DrHeekLab. Sem worktree. Avaliação manual do proprietário pendente. Notas seguintes históricas.
 
 # Estado atual — ficha de Produção → OP simples → Estoque → custo no Financeiro

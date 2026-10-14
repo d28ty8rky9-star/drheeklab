@@ -32,4 +32,4 @@ Capturas reais do Qt com dados temporários:
 - [Estoque da peça comprada](capturas-estoque-horas/estoque.png)
 - [Financeiro separado do planejamento](capturas-estoque-horas/financeiro.png)
 
-Testes: `evidencias-estoque-horas/`. Avaliação prática no Windows pelo proprietário permanece pendente. Código atualizado no GitHub; nenhum ZIP/instalador nesta alteração. O pacote entregue anteriormente não contém as mudanças de código posteriores.
+284 testes locais aprovados (zero falhas/erros/pulos); 20 testes de interface/fluxo repetidos após os ajustes visuais finais, aprovados. Suíte completa [Windows aprovada](https://github.com/d28ty8rky9-star/drheeklab/actions/runs/38503428577); pacote ignorado e zero artefatos. Evidências: `evidencias-estoque-horas/`. Avaliação prática no Windows pelo proprietário permanece pendente. Código atualizado no GitHub; nenhum ZIP/instalador nesta alteração. O pacote entregue anteriormente não contém as mudanças de código posteriores.
