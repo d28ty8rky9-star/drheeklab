@@ -6,7 +6,7 @@ Banco schema 8, migração com backup/transação. OPs históricas preservam dat
 
 Regra vigente: código/testes/GitHub; ZIP e instalador somente quando explicitamente pedidos. Nenhum pacote novo para esta alteração. O ZIP anterior indicado abaixo continua sendo a entrega anterior e não contém este fluxo. Não apagar dados de C:\DrHeekLab. Usar checkout existente, sem worktree. Avaliação prática do proprietário segue pendente.
 
-Validação desta alteração: docs/evidencias-fluxo-producao/. Capturas reais com dados temporários: docs/capturas-fluxo-producao/. As notas seguintes são históricas.
+Validação desta alteração: 266 testes locais aprovados, 0 falhas/erros/pulos; suíte completa Windows aprovada no run 38502081384, código b4799b2c94470531d454c3913853b4ce1a4b6328. Pacote ignorado, zero artefatos. Evidências em docs/evidencias-fluxo-producao/. Capturas reais com dados temporários: docs/capturas-fluxo-producao/. As notas seguintes são históricas.
 
 # Última entrega — ZIP solicitado da Produção unificada
 

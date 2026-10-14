@@ -36,4 +36,4 @@ Capturas reais do Qt com dados descartáveis:
 - [Estoque único](capturas-fluxo-producao/estoque.png)
 - [Financeiro após conclusão, sem caixa](capturas-fluxo-producao/financeiro.png)
 
-Testes e execução Windows: `evidencias-fluxo-producao/`. Avaliação manual do proprietário no Windows permanece necessária; testes automatizados não substituem a avaliação prática.
+266 testes locais aprovados (0 falhas/erros/pulos); suíte completa Windows aprovada no [run 38502081384](https://github.com/d28ty8rky9-star/drheeklab/actions/runs/38502081384). Empacotamento ignorado; zero artefatos. Evidências: `evidencias-fluxo-producao/`. Avaliação manual do proprietário no Windows permanece necessária; testes automatizados não substituem a avaliação prática.
