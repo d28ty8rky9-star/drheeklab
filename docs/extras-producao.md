@@ -1,3 +1,9 @@
+# Pacote completo solicitado e entregue
+
+[Download do ZIP no GitHub](https://github.com/d28ty8rky9-star/drheeklab/actions/runs/38506019047/artifacts/11868460181). Cópia local: `dist/DrHeekLab-2.9.1-Extras-Producao-Windows.zip`.
+
+Inclui as alterações de Produção, Extras, Estoque de peças compradas e tempo em horas. Extrair em pasta nova e executar `installer/DrHeekLab-2.9.1-Fase8-Setup.exe`. Preservar `C:\DrHeekLab` e fazer backup antes de reinstalar. 289 testes Windows aprovados e instalação/reinstalação/preservação de dados verificadas; hashes/CRC do ZIP conferidos. Avaliação prática do proprietário permanece pendente. Novos pacotes somente sob pedido explícito.
+
 # Produção com extras e cálculo automático — 2.9.1
 
 Em **Produção → Ficha de produção / custos**, o custo muda automaticamente ao escolher filamentos, alterar gramas, horas ou outros custos adicionais. Não precisa clicar em Calcular nem selecionar um STL para visualizar a prévia; o arquivo continua obrigatório para salvar a ficha e gerar uma OP.

@@ -1,0 +1,32 @@
+{
+  "run_id": 38506019047,
+  "artifact_id": 11868460181,
+  "code_sha": "5fd331ce9a834d79cef6b56021fc35a11e628d76",
+  "status": "passed",
+  "tests": 289,
+  "zip": "dist/DrHeekLab-2.9.1-Extras-Producao-Windows.zip",
+  "zip_sha256": "4d3abd460a0778e26a8bf30bea641976c66e2c6fe08a77428106200f94d79357",
+  "zip_digest_matches_github": true,
+  "installer_sha256": "11ea48974b04eeec93b4c4a27e490708bca3eaee8f0c07780f5a2909797de6d5",
+  "gui_sha256": "01871a39c787df8e511b493189818d41fb13e4aca258e4f2cda0f35fd5c02cc9",
+  "helper_sha256": "02003599975f10ba0ddff1bbb53cdd7a33e91479dfa99b8192b059c9c9a7dee2",
+  "frozen_modules": [
+    "drheeklab.extras_ui",
+    "drheeklab.production_extras",
+    "drheeklab.production_recipe",
+    "drheeklab.time_input",
+    "drheeklab.migration9",
+    "drheeklab.workshop_ui"
+  ],
+  "installation_checks": [
+    "install",
+    "reinstall",
+    "installed self-test",
+    "pre-update verified backup",
+    "database/media preserved",
+    "headless daily backup",
+    "task create/delete",
+    "uninstall"
+  ],
+  "manual_homologation": "pending"
+}

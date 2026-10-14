@@ -1,3 +1,13 @@
+# Última entrega — ZIP completo solicitado, extras e estoque em horas
+
+Usuário pediu ZIP explicitamente. Gerado pacote Windows completo com TODAS as alterações atuais (Produção unificada/ficha, cálculo automático, aba Extras, OP simples, reconhecimento na conclusão, Estoque único/peça comprada, horas e marca oficial). ZIP local dist/DrHeekLab-2.9.1-Extras-Producao-Windows.zip; run 38506019047; artifact 11868460181; código compilado 5fd331ce9a834d79cef6b56021fc35a11e628d76; versão 2.9.1/schema 9.
+
+289 testes Windows aprovados, zero falhas/erros/pulos; executável empacotado e instalação/reinstalação/backup/preservação de banco e mídia/agendamento/desinstalação aprovados. ZIP CRC e SHA256 iguais ao digest do GitHub; hashes GUI/helper/Setup conferidos; extras_ui, production_extras, production_recipe, time_input, migration9 e workshop_ui presentes no executável. SHA256 do ZIP 4d3abd460a0778e26a8bf30bea641976c66e2c6fe08a77428106200f94d79357. Evidências docs/evidencias-extras-producao/requested-package*.json.
+
+Instalar: extrair ZIP em pasta nova, executar installer/DrHeekLab-2.9.1-Fase8-Setup.exe. Preservar C:\DrHeekLab (banco/fotos/documentos); excluir apenas pasta extraída da entrega anterior. Avaliação manual do proprietário continua pendente.
+
+A autorização deste pedido vale para ESTA entrega. Próximas alterações: código/testes/GitHub; ZIP e instalador somente quando explicitamente pedidos. Não disparar gerar_pacote=true sem pedido. Notas seguintes históricas.
+
 # Estado atual — extras detalhados em Produção, OP somente fluxo
 
 Implementada aba Extras • argolas e acessórios na ficha de Produção. Nome, quantidade por peça, custo unitário; soma por linha e total. Prévia automática ao mudar filamentos, horas, adicionais ou extras, inclusive antes de escolher STL. Não há botão obrigatório de cálculo. Salvar continua validando arquivo/parâmetros. Extras persistidos no JSON versionado da receita, auxiliary_base separado do total; ficha antiga mantém auxiliares anteriores. OP copia ficha/extras imutáveis e multiplica o custo pela quantidade, sem solicitar os itens de novo. Cadastro de extras não movimenta materiais auxiliares/caixa. Custo reconhecido somente após conclusão e publicação no estoque.
