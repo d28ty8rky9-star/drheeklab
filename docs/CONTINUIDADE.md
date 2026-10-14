@@ -1,3 +1,13 @@
+# Estado atual — ficha de Produção → OP simples → Estoque → custo no Financeiro
+
+Usuário confirmou custo sem pagamento automático. Implementado em 2.9.1: ficha de produção por variante (arquivo, filamentos/gramas por peça, tempo por peça, auxiliares, parâmetros, custos congelados); OP mínima (quantidade, responsável, prioridade, pedido opcional); consumo confirmado sem reconhecer custo/unidades públicas antes da conclusão; inspeção com três fotos distintas e observações; reconhecimento único na primeira conclusão; Estoque único por unidade; valor atual do estoque no Financeiro. Ajuste excepcional de consumo/tempo preservado. Entrada manual de peça comprada e vendas/CPV/caixa preservados.
+
+Banco schema 8, migração com backup/transação. OPs históricas preservam datas/tratamento anterior. OPs geradas da nova ficha, inclusive reimpressões, usam reconhecimento na conclusão. Reinspeção não duplica custo. Editar cadastro/ficha não reescreve a receita congelada de uma OP existente. Veja docs/fluxo-producao-estoque.md, tests/test_recipe_flow.py e tests/test_recipe_ui.py.
+
+Regra vigente: código/testes/GitHub; ZIP e instalador somente quando explicitamente pedidos. Nenhum pacote novo para esta alteração. O ZIP anterior indicado abaixo continua sendo a entrega anterior e não contém este fluxo. Não apagar dados de C:\DrHeekLab. Usar checkout existente, sem worktree. Avaliação prática do proprietário segue pendente.
+
+Validação desta alteração: docs/evidencias-fluxo-producao/. Capturas reais com dados temporários: docs/capturas-fluxo-producao/. As notas seguintes são históricas.
+
 # Última entrega — ZIP solicitado da Produção unificada
 
 Usuário pediu explicitamente ZIP após a união de Produtos/Produção. Pacote completo gerado e verificado: dist/DrHeekLab-2.9.1-ProducaoUnificada-Windows.zip; run 38483874439, artifact 11858064343, código compilado 4486ad5795891813f7b066d0b65ab9b3dcf71074. Windows 258 testes aprovados, 0 falhas/erros/pulos; executáveis e instalação/reinstalação/backup/preservação/agendamento/desinstalação aprovados. Hashes e integridade do ZIP conferidos; módulo workshop_ui dentro do executável. Esta entrega já contém a tela unificada e sete áreas. Nome Dr. Heek Lab, versão 2.9.1.

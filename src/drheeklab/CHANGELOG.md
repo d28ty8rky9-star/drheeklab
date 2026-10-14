@@ -1,3 +1,13 @@
+# 2.9.1 — Ficha de produção, OP simples e estoque único
+
+- Ficha por variante com arquivo, filamentos, gramas, tempo, auxiliares e parâmetros; sem movimentação no cadastro.
+- OP copia ficha e custos; solicita apenas quantidade, responsável, prioridade e vínculo opcional.
+- Unidades entram no Estoque e custos no Financeiro somente após inspeção com três fotos, observações e conclusão.
+- Sem pagamento automático; CPV na venda preservado e reconhecimento único.
+- Aba Estoque substitui Peças prontas/Peças físicas; entrada manual e reservas preservadas.
+- Banco atualizado para schema 8 com backup automático; OPs e relatórios históricos mantidos.
+- Código atualizado no GitHub; ZIP/instalador somente sob solicitação.
+
 # 2.9.1 — Simplificação de Produção (código em desenvolvimento)
 
 - Uma tela para selecionar a peça e produzir, com catálogo e fila lado a lado.

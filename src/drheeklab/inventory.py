@@ -79,13 +79,17 @@ class Inventory:
             self.storage.audit('material:consumo', f'materials:{identifier}', row['balance_milli'], remaining, reason)
         return cost
 
+    def published_piece(self, piece_id):
+        return not self.db.execute('SELECT 1 FROM production_pieces pp JOIN production_entries e ON e.id=pp.entry_id JOIN recipe_orders ro ON ro.op_id=e.op_id LEFT JOIN production_completions c ON c.op_id=e.op_id WHERE pp.piece_id=? AND c.op_id IS NULL',(piece_id,)).fetchone()
+
     def summary(self):
         result = []
         # Archived entries remain visible with stock: physical goods never disappear.
         rows = self.db.execute('SELECT v.*,p.code,p.name AS product_name,p.archived AS product_archived FROM variants v JOIN products p ON p.id=v.product_id ORDER BY p.id,v.id').fetchall()
         for variant in rows:
             row = dict(variant)
-            states = {item['state']: item['n'] for item in self.db.execute('SELECT state,count(*) AS n FROM pieces WHERE variant_id=? GROUP BY state', (row['id'],))}
+            states = {}
+            for piece in self.pieces(row['id']):states[piece['state']]=states.get(piece['state'],0)+1
             row.update({state: states.get(state, 0) for state in PIECE_STATES})
             row['physical'] = sum(row[state] for state in ('available', 'reserved', 'personal', 'quarantine'))
             result.append(row)
@@ -93,7 +97,8 @@ class Inventory:
 
     def pieces(self, variant_id=None):
         sql = 'SELECT p.*,v.name AS variant_name,m.code,m.name AS product_name FROM pieces p JOIN variants v ON v.id=p.variant_id JOIN products m ON m.id=v.product_id'
-        return [dict(row) for row in self.db.execute(sql + (' WHERE p.variant_id=?' if variant_id is not None else '') + ' ORDER BY p.id', (variant_id,) if variant_id is not None else ())]
+        visible='NOT EXISTS(SELECT 1 FROM production_pieces pp JOIN production_entries e ON e.id=pp.entry_id JOIN recipe_orders ro ON ro.op_id=e.op_id LEFT JOIN production_completions c ON c.op_id=e.op_id WHERE pp.piece_id=p.id AND c.op_id IS NULL)'
+        return [dict(row) for row in self.db.execute(sql+' WHERE '+visible+(' AND p.variant_id=?' if variant_id is not None else '')+' ORDER BY p.id',(variant_id,) if variant_id is not None else ())]
 
     def receive(self, variant_id, quantity, source, state, condition, operation_key, total_cost='0', calculation_id=None, reviewer=''):
         quantity = integer(quantity, 'Quantidade', minimum=1)
@@ -276,7 +281,7 @@ class Inventory:
         return loss_id
 
     def movements(self):
-        return [dict(row) for row in self.db.execute('SELECT * FROM stock_movements ORDER BY id DESC')]
+        return [dict(row) for row in self.db.execute('SELECT * FROM stock_movements ORDER BY id DESC') if row['piece_id'] is None or self.published_piece(row['piece_id'])]
 
     def losses(self):
         return [dict(row) for row in self.db.execute('SELECT * FROM losses ORDER BY id DESC')]

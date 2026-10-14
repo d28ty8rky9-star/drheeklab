@@ -11,11 +11,12 @@ from .pricing import brl
 
 
 class EntryEditor(QWidget):
-    def __init__(self, production, parent=None):
-        super().__init__(parent); self.production=production
+    def __init__(self, production, parent=None, *, recipe=False):
+        super().__init__(parent); self.production=production;self.recipe_editor=recipe
         layout=QVBoxLayout(self); row=QHBoxLayout(); layout.addLayout(row)
         self.variant=QComboBox(); self.project=QComboBox(); self.quantity=QLineEdit('1');self.quantity.setMaximumWidth(70)
-        row.addWidget(QLabel('Modelo/variante'));row.addWidget(self.variant,1);row.addWidget(QLabel('Quantidade'));row.addWidget(self.quantity)
+        if not recipe:
+            row.addWidget(QLabel('Modelo/variante'));row.addWidget(self.variant,1);row.addWidget(QLabel('Quantidade'));row.addWidget(self.quantity)
         for p in production.products.search():
             for v in production.products.variants(p['id']):
                 if not v['archived']: self.variant.addItem(p['name']+' / '+v['name'],(v['id'],p['id']))
@@ -24,7 +25,9 @@ class EntryEditor(QWidget):
         self.filaments=[];self.filament_layout=QVBoxLayout();layout.addLayout(self.filament_layout)
         button('Adicionar carretel deste modelo',self.add_spool,layout);self.add_spool()
         aux=QHBoxLayout();layout.addLayout(aux);aux.addWidget(QLabel('Auxiliares (R$)'));self.aux=QLineEdit('0');aux.addWidget(self.aux)
-        aux.addWidget(QLabel('Peso manual de rateio (opcional)'));self.weight=QLineEdit();aux.addWidget(self.weight)
+        self.weight=QLineEdit()
+        if not recipe:
+            aux.addWidget(QLabel('Peso manual de rateio (opcional)'));aux.addWidget(self.weight)
 
     def projects(self):
         self.project.clear(); choice=self.variant.currentData()
@@ -36,14 +39,15 @@ class EntryEditor(QWidget):
         row=QHBoxLayout();combo=QComboBox();grams=QLineEdit('10');grams.setMaximumWidth(100)
         for f in self.production.catalog.rows('filaments'):
             if f['state']!='finished':combo.addItem(f'{f["id"]} • {f["name"]} / {f["color"]}',f['id'])
-        row.addWidget(combo,1);row.addWidget(QLabel('g totais'));row.addWidget(grams)
+        row.addWidget(combo,1);row.addWidget(QLabel('g por peça' if self.recipe_editor else 'g totais'));row.addWidget(grams)
         remove=QPushButton('Remover');row.addWidget(remove);self.filament_layout.addLayout(row)
         data=(combo,grams,row);self.filaments.append(data)
         remove.clicked.connect(lambda:self.remove_spool(data))
 
     def remove_spool(self,data):
         self.filaments.remove(data)
-        while data[2].count():data[2].takeAt(0).widget().deleteLater()
+        while data[2].count():
+            widget=data[2].takeAt(0).widget();widget.hide();widget.deleteLater()
         self.filament_layout.removeItem(data[2])
 
     def value(self):
@@ -138,12 +142,12 @@ class ProductionPage(QWidget):
     def __init__(self,storage,parent=None):
         super().__init__(parent);self.production=Production(storage)
         layout=QVBoxLayout(self);bar=QHBoxLayout();layout.addLayout(bar)
-        button('Nova OP / lote',lambda:self.dialog(OrderDialog(self.production,self)),bar)
+        self.new_order_button=button('Nova OP da peça selecionada',lambda:self.dialog(OrderDialog(self.production,self)),bar)
         button('Atualizar',self.refresh,bar)
         self.tabs=QTabWidget();layout.addWidget(self.tabs)
         queue=QWidget();q=QVBoxLayout(queue);self.queue_table=table(['OP','Prioridade','Estado','Criada','Responsável','Pedido/item']);q.addWidget(self.queue_table)
         actions=QHBoxLayout();q.addLayout(actions)
-        for label,handler in [('Iniciar',self.start),('Confirmar tentativa',self.confirm),('Inspecionar',self.inspect),('Concluir OP',self.complete),('Reimprimir',self.reprint)]:button(label,handler,actions)
+        for label,handler in [('Iniciar',self.start),('Impressão terminada',self.confirm),('Inspecionar',self.inspect),('Concluir OP',self.complete),('Reimprimir',self.reprint)]:button(label,handler,actions)
         bar2=QHBoxLayout();q.addLayout(bar2)
         self.priority_box=QComboBox()
         for key,label in PRIORITIES.items():self.priority_box.addItem(label,key)
@@ -190,7 +194,8 @@ class ProductionPage(QWidget):
         self.parts=self.production.pieces(identifier);s=self.production.summary(identifier);op=self.production.get(identifier)
         self.inspection_progress.setRange(0,max(s['planned'],s['good'],1));self.inspection_progress.setValue(s['good'])
         effective=brl(s['effective_unit']) if s['effective_unit'] else 'sem aprovadas'
-        self.summary_label.setText(f'Planejadas {s["planned"]} • Produzidas {s["produced"]} • Perdidas {s["failed"]} • Reprovadas {s["rejected"]} • Boas {s["good"]} • Tentativas {s["attempts"]}\nCusto existente {brl(Decimal(s["total_cents"])/100)} • Efetivo por boa {effective} • Perda incluída {brl(Decimal(s["loss_included_cents"])/100)}\nPrevisto por referência {brl(Decimal(s["planned_reference_cents"])/100)} • Real por referência {brl(Decimal(s["reference_cents"])/100)} • Cronômetro sugerido {self.production.elapsed_minutes(identifier)} min (exige confirmação)')
+        self.summary_label.setText(f'Planejadas {s["planned"]} • Produzidas {s["produced"]} • Perdidas {s["failed"]} • Reprovadas {s["rejected"]} • Boas {s["good"]} • Tentativas {s["attempts"]}')
+        self.piece_table.setColumnHidden(4,True)
         selected_piece=self.piece_table.currentRow()
         fill_table(self.piece_table,[(p['id'],p['variant_id'],p['state'],p['inspection_result'] or 'Pendente',brl(Decimal(p['unit_cost_cents'])/100)) for p in self.parts])
         if self.parts:self.piece_table.selectRow(min(max(selected_piece,0),len(self.parts)-1))
@@ -202,7 +207,13 @@ class ProductionPage(QWidget):
         self.history.setPlainText('\n'.join(lines))
 
     def start(self):self.act(lambda:self.production.start(self.selected()))
-    def confirm(self):self.act(lambda:self.dialog(ConfirmDialog(self.production,self.selected(),self)))
+    def confirm(self):
+        def run():
+            from .recipe_ui import RecipeConfirmDialog
+            identifier=self.selected()
+            dialog=RecipeConfirmDialog if self.production.recipe_order(identifier) else ConfirmDialog
+            self.dialog(dialog(self.production,identifier,self))
+        self.act(run)
     def complete(self):self.act(lambda:self.production.complete(self.selected()))
     def inspect(self):
         def run():

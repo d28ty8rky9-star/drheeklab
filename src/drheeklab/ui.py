@@ -515,9 +515,8 @@ class Window(QMainWindow):
         SearchDialog(self.storage,self).exec()
 
     def open_new_production(self):
-        from .phase5_ui import OrderDialog
         self.navigate(2)
-        self.production_page.dialog(OrderDialog(self.production_page.production,self.production_page))
+        self.workshop.produce()
 
     def backup_schedule(self):
         from .backup_ui import ScheduleDialog

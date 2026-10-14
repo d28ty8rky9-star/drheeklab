@@ -40,7 +40,9 @@ def split(total, weights):
     return result
 
 
-class Production:
+from .production_recipe import RecipeProduction
+
+class Production(RecipeProduction):
     def __init__(self, storage):
         self.storage, self.db = storage, storage.db
         self.catalog, self.products, self.inventory = Catalog(storage), Products(storage), Inventory(storage)
@@ -214,14 +216,14 @@ class Production:
     def validate_sources(self, identifier):
         for e in self.entries(identifier):
             snap=json.loads(e['planned'])
-            if self.products.active_product(e['product_id'])!=snap['product'] or self.products.active_variant(e['variant_id'])!=snap['variant']:
+            if not self.recipe_order(identifier) and (self.products.active_product(e['product_id'])!=snap['product'] or self.products.active_variant(e['variant_id'])!=snap['variant']):
                 raise ValueError('Produto ou variante alterado após a criação. Registre a revalidação da OP antes de liberar as peças.')
             self.products.media_path(e['project_id'],'project')
 
     def inspect(self, identifier, piece_id, result, checklist, photos, responsible, notes=''):
         if result not in ('approved','notes','rejected'): raise ValueError('Resultado inválido.')
         required(responsible,'Responsável pela inspeção')
-        if result in ('notes','rejected'): required(notes,'Observações da inspeção')
+        if result in ('notes','rejected') or self.recipe_order(identifier): required(notes,'Observações da inspeção')
         self.validate_sources(identifier)
         op=self.get(identifier); candidates={p['id']:p for p in self.pieces(identifier)}
         if piece_id not in candidates: raise ValueError('Peça não pertence à ordem.')
@@ -268,6 +270,11 @@ class Production:
             if op['state']!='inspection' or not pieces: raise ValueError('A ordem deve estar aguardando inspeção e ter peças produzidas.')
             if any(p['inspection_result'] is None for p in pieces): raise ValueError('Inspecione individualmente todas as peças antes de concluir.')
             for p in pieces:
+                if self.recipe_order(identifier):
+                    inspection=self.db.execute('SELECT * FROM inspections WHERE piece_id=? AND valid=1 ORDER BY id DESC LIMIT 1',(p['id'],)).fetchone()
+                    required(inspection['notes'],'Observações da inspeção')
+                    views={r[0] for r in self.db.execute('SELECT view FROM inspection_photos WHERE inspection_id=?',(inspection['id'],))}
+                    if views!=set(VIEWS):raise ValueError('Três fotos são obrigatórias para concluir a OP.')
                 for row in self.db.execute('SELECT ip.* FROM inspection_photos ip JOIN inspections i ON i.id=ip.inspection_id WHERE i.piece_id=? AND i.valid=1',(p['id'],)):
                     self.photo_path(row['id'])
             if not any(p['inspection_result'] in ('approved','notes') for p in pieces): raise ValueError('Nenhuma peça aprovada. Registre reimpressão antes de concluir a produção.')
@@ -296,6 +303,8 @@ class Production:
                         self.db.execute("UPDATE pieces SET state='available' WHERE id=?",(p['id'],))
                         record(self.storage,'review','piece',p['id'],0,'quarantine','available','Reinspeção aprovada',f'op-reapprove:{identifier}:{op["revision"]}:{p["id"]}:{uuid4().hex}',p['unit_cost_cents'])
             self.db.execute("UPDATE production_orders SET state='completed',cost_consolidated=1 WHERE id=?",(identifier,))
+            if self.recipe_order(identifier) and not op['cost_consolidated']:
+                self.db.execute('INSERT INTO production_completions VALUES(?,?,?)',(identifier,now(),self.summary(identifier)['total_cents']))
             self.storage.audit('produção:concluir',f'OP:{identifier}',op,self.get(identifier))
         return self.summary(identifier)
 
@@ -321,7 +330,11 @@ class Production:
         for e in self.entries(identifier):
             snap=json.loads(e['planned'])
             entries.append({'variant_id':e['variant_id'],'project_id':e['project_id'],'quantity':e['quantity'],'filaments':[((replacements or {}).get(f['id'],f['id']),f['grams']) for f in snap['filaments']], 'auxiliary':snap['auxiliary']})
-        return self.create(op['printer_id'],planned['minutes'],entries,responsible,op['parameters'],op['priority'],op['item_id'],planned['weights'],planned['allocation_reason'] or 'Rateio copiado da ordem de origem',identifier)
+        with transaction(self.db):
+            result=self.create(op['printer_id'],planned['minutes'],entries,responsible,op['parameters'],op['priority'],op['item_id'],planned['weights'],planned['allocation_reason'] or 'Rateio copiado da ordem de origem',identifier)
+            recipe=self.recipe_order(identifier)
+            if recipe:self.db.execute('INSERT INTO recipe_orders VALUES(?,?)',(result,json.dumps(recipe)))
+        return result
 
     def revalidate(self, identifier, parameters, reason):
         required(parameters,'Parâmetros');required(reason,'Justificativa da alteração')

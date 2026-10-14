@@ -255,6 +255,11 @@ class Finance:
             if eligible_orders is not None and (not item or item[0] not in eligible_orders):continue
             first=self.db.execute("SELECT created_at FROM audit WHERE operation='produção:concluir' AND record=? ORDER BY id LIMIT 1",(f'OP:{op["id"]}',)).fetchone()
             completion=first[0] if first else None
+            recipe=self.db.execute('SELECT 1 FROM recipe_orders WHERE op_id=?',(op['id'],)).fetchone()
+            if recipe:
+                event=self.db.execute('SELECT completed_at FROM production_completions WHERE op_id=?',(op['id'],)).fetchone()
+                if not event or event[0][:10]>end:continue
+                completion=event[0]
             entries={r['id']:r['product_id'] for r in self.db.execute('SELECT e.id,v.product_id FROM production_entries e JOIN variants v ON v.id=e.variant_id WHERE e.op_id=?',(op['id'],))}
             absorbed={}
             for attempt in self.db.execute('SELECT * FROM production_attempts WHERE op_id=? AND substr(created_at,1,10)<=?',(op['id'],end)):
@@ -262,8 +267,9 @@ class Finance:
                     entry=actual['entry_id'];product=entries[entry]
                     if product_id is not None and product!=product_id:continue
                     loss=actual['loss_cents']
-                    if loss and start<=attempt['created_at'][:10]<=end:
-                        events.append({'date':attempt['created_at'][:10],'op':op['code'],'attempt_id':attempt['id'],'entry_id':entry,'product_id':product,'printer_id':op['printer_id'],'kind':'loss','amount_cents':loss,'cash_cents':0})
+                    recognition=completion[:10] if recipe else attempt['created_at'][:10]
+                    if loss and start<=recognition<=end:
+                        events.append({'date':recognition,'op':op['code'],'attempt_id':attempt['id'],'entry_id':entry,'product_id':product,'printer_id':op['printer_id'],'kind':'loss','amount_cents':loss,'cash_cents':0})
                     if loss and completion and attempt['created_at']<=completion:
                         approved=self.db.execute("SELECT 1 FROM production_pieces pp JOIN inspections i ON i.id=(SELECT MAX(ii.id) FROM inspections ii WHERE ii.piece_id=pp.piece_id AND ii.created_at<=?) WHERE pp.entry_id=? AND i.result IN('approved','notes') LIMIT 1",(completion,entry)).fetchone()
                         # Approved units absorb all attempts of their model. If a
@@ -361,7 +367,7 @@ class Finance:
                 for column in ('sales_cents','cost_cents','quantity','pending_quantity','discount_cents'):group[column]+=r[column]
         for group in (*grouped_products.values(),*grouped_printers.values()):group['gross_result_cents']=group['sales_cents']-group['cost_cents']
         production=[]
-        for r in self.db.execute('SELECT a.*,o.printer_id,o.code,o.item_id FROM production_attempts a JOIN production_orders o ON o.id=a.op_id WHERE substr(a.created_at,1,10) BETWEEN ? AND ?',(start,end)):
+        for r in self.db.execute('''SELECT a.*,o.printer_id,o.code,o.item_id,CASE WHEN ro.op_id IS NULL THEN a.created_at ELSE c.completed_at END AS recognized_at FROM production_attempts a JOIN production_orders o ON o.id=a.op_id LEFT JOIN recipe_orders ro ON ro.op_id=o.id LEFT JOIN production_completions c ON c.op_id=o.id WHERE substr(CASE WHEN ro.op_id IS NULL THEN a.created_at ELSE c.completed_at END,1,10) BETWEEN ? AND ?''',(start,end)):
             if printer_id is not None and r['printer_id']!=printer_id:continue
             item=self.db.execute('SELECT order_id FROM order_items WHERE id=?',(r['item_id'],)).fetchone() if r['item_id'] else None
             if (client_id is not None or status is not None) and (not item or item[0] not in eligible_orders):continue
@@ -372,7 +378,7 @@ class Finance:
                 loss=a['loss_cents']+(int((Decimal(a['existing_cents']-a['loss_cents'])*rejected/a['produced']).quantize(Decimal('1'),rounding=ROUND_HALF_UP)) if a['produced'] else 0)
                 printer=json.loads(self.db.execute('SELECT planned FROM production_orders WHERE id=?',(r['op_id'],)).fetchone()[0])['printer']
                 components=split(a['machine_cents'],[printer[k] for k in ('investment_hour_cents','energy_hour_cents','maintenance_hour_cents')]) if a['machine_cents'] else [0,0,0]
-                production.append({'source':f'OP {r["code"]} / tentativa {r["id"]} / modelo {a["entry_id"]}','date':r['created_at'][:10],'printer_id':r['printer_id'],'product_id':e['product_id'],'cost_cents':a['existing_cents'],'reference_cents':a['reference_cents'],'loss_cents':loss,'failed':a['failed'],'rejected':rejected,'investment_cents':components[0],'energy_cents':components[1],'maintenance_reserve_cents':components[2]})
+                production.append({'source':f'OP {r["code"]} / tentativa {r["id"]} / modelo {a["entry_id"]}','date':r['recognized_at'][:10],'printer_id':r['printer_id'],'product_id':e['product_id'],'cost_cents':a['existing_cents'],'reference_cents':a['reference_cents'],'loss_cents':loss,'failed':a['failed'],'rejected':rejected,'investment_cents':components[0],'energy_cents':components[1],'maintenance_reserve_cents':components[2]})
         # Independent calculator confirmations also remain visible; never CPV/cash.
         for r in self.db.execute('SELECT * FROM calculations WHERE actual IS NOT NULL AND substr(confirmed_at,1,10) BETWEEN ? AND ?',(start,end)):
             if printer_id is not None and r['printer_id']!=printer_id:continue

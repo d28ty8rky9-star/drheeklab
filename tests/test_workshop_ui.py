@@ -18,14 +18,13 @@ def test_selected_piece_prepares_and_creates_normal_order(tmp_path,monkeypatch):
     project=products.import_media(product,path,'project')
     window=Window(store);window.navigate(2);window.products_page.select_product(product)
     window.products_page.variants_table.selectRow(next(i for i,r in enumerate(window.products_page.variant_rows) if r['id']==variant))
+    from drheeklab.production import Production
+    Production(store).save_recipe(variant,1,project,90,[(spool,'10')],'0','0,2 mm / 15%')
     before=store.db.total_changes;dialog=window.workshop.prepare_order()
     assert store.db.total_changes==before
-    assert tuple(dialog.editors[0].variant.currentData())==(variant,product)
-    assert dialog.editors[0].project.currentData()==project
-    assert dialog.fields['minutes'].text()=='90'
-    assert dialog.fields['parameters'].text()=='0,2 mm / 15%'
-    assert dialog.editors[0].filaments[0][0].currentData()==spool
-    dialog.fields['responsible'].setText('Operador');dialog.editors[0].quantity.setText('2')
+    assert dialog.variant_id==variant
+    assert set(dialog.fields)=={'quantity','responsible','priority','item'}
+    dialog.fields['responsible'].setText('Operador');dialog.fields['quantity'].setText('2')
     monkeypatch.setattr(window.workshop,'prepare_order',lambda:dialog)
     monkeypatch.setattr(dialog,'exec',lambda:(dialog.submit(),dialog.result())[1])
     window.workshop.produce_button.click()

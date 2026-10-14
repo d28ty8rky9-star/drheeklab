@@ -15,7 +15,7 @@ from drheeklab.sales import Sales
 from drheeklab.production import Production
 from test_phase7 import system
 
-@pytest.mark.parametrize('old_version',range(1,7))
+@pytest.mark.parametrize('old_version',range(1,SCHEMA_VERSION))
 def test_update_every_previous_schema_preserves_login_drafts_and_settings(tmp_path,old_version):
     root=tmp_path/'data';database=root/'TESTES'/'Banco de Dados'/'drheeklab.sqlite3';database.parent.mkdir(parents=True)
     with sqlite3.connect(database) as db:

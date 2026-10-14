@@ -1,20 +1,22 @@
 """One workspace: select a catalog piece and create an ordinary production order."""
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QWidget,QVBoxLayout,QHBoxLayout,QSplitter,QScrollArea,QLabel,QPushButton,QMessageBox
-from .phase5_ui import OrderDialog
+from .recipe_ui import RecipeDialog,RecipeOrderDialog
 from .visual import action_style
 
 class WorkshopPage(QWidget):
     def __init__(self,products,production):
         super().__init__();self.products_page=products;self.production_page=production
         box=QVBoxLayout(self);box.setContentsMargins(0,0,0,0)
-        row=QHBoxLayout();self.selection=QLabel('Selecione uma peça no catálogo para produzir.');self.selection.setWordWrap(True);row.addWidget(self.selection,1)
+        row=QHBoxLayout();self.recipe_button=QPushButton('Ficha de produção / custos');self.recipe_button.clicked.connect(self.edit_recipe);row.addWidget(self.recipe_button);self.selection=QLabel('Selecione uma peça no catálogo para produzir.');self.selection.setWordWrap(True);row.addWidget(self.selection,1)
         self.produce_button=QPushButton('Produzir esta peça');action_style(self.produce_button);self.produce_button.clicked.connect(self.produce);row.addWidget(self.produce_button);box.addLayout(row)
         self.details_button=QPushButton('Ficha da peça: variantes, fotos e arquivos');self.details_button.setCheckable(True);self.details_button.toggled.connect(products.tabs.setVisible)
         products.layout().addWidget(self.details_button);products.tabs.hide()
         self.splitter=QSplitter(Qt.Horizontal);self.splitter.addWidget(products);self.splitter.addWidget(production)
         products.setMinimumWidth(320);production.setMinimumWidth(580);self.splitter.setSizes([400,750]);self.splitter.setChildrenCollapsible(False)
         wrapper=QScrollArea();wrapper.setWidgetResizable(True);wrapper.setWidget(self.splitter);box.addWidget(wrapper,1)
+        production.new_order_button.clicked.disconnect()
+        production.new_order_button.clicked.connect(self.produce)
         products._selection_changed=self.update_selection
         products.gallery.itemSelectionChanged.connect(self.update_selection)
         products.variants_table.itemSelectionChanged.connect(self.update_selection)
@@ -28,6 +30,10 @@ class WorkshopPage(QWidget):
         self.selection.setText(product['code']+' • '+product['name'])
         row=self.products_page.variants_table.currentRow()
         selected_archived=0<=row<len(self.products_page.variant_rows) and self.products_page.variant_rows[row]['archived']
+        variants=self.products_page.variant_rows
+        chosen=variants[row] if 0<=row<len(variants) else next((v for v in variants if not v['archived']),None)
+        recipe=self.production_page.production.recipe(chosen['id']) if chosen else None
+        self.selection.setText(product['code']+' • '+product['name']+(' • Ficha de produção salva' if recipe else ' • Preencha a ficha de produção'))
         self.produce_button.setEnabled(not product['archived'] and not selected_archived)
 
     def prepare_order(self):
@@ -45,21 +51,19 @@ class WorkshopPage(QWidget):
         variant=next((v for v in variants if v['id']==selected),variants[0])
         projects=[r for r in p.products.media(identifier,'project') if not r['archived']]
         if not projects:raise ValueError('Esta peça não tem STL/3MF ativo. Importe o arquivo na ficha da peça antes de produzir.')
-        project=next((r for r in projects if r['is_preferred']),max(projects,key=lambda r:r['version']))
-        dialog=OrderDialog(self.production_page.production,self)
-        editor=dialog.editors[0]
-        index=next(i for i in range(editor.variant.count()) if editor.variant.itemData(i)[0]==variant['id'] and editor.variant.itemData(i)[1]==identifier)
-        editor.variant.setCurrentIndex(index)
-        editor.project.setCurrentIndex(editor.project.findData(project['id']))
-        if product['printer_id'] is not None:
-            index=dialog.fields['printer'].findData(product['printer_id'])
-            if index>=0:dialog.fields['printer'].setCurrentIndex(index)
-        if product['filament_id'] is not None and editor.filaments:
-            index=editor.filaments[0][0].findData(product['filament_id'])
-            if index>=0:editor.filaments[0][0].setCurrentIndex(index)
-        dialog.fields['parameters'].setText(product['settings'])
-        if product['estimated_minutes']>0:dialog.fields['minutes'].setText(str(product['estimated_minutes']))
-        return dialog
+        return RecipeOrderDialog(self.production_page.production,variant['id'],self)
+
+    def edit_recipe(self):
+        try:
+            p=self.products_page;identifier=p.selected_product(False)
+            if identifier is None:raise ValueError('Selecione uma peça no catálogo.')
+            variants=[v for v in p.products.variants(identifier) if not v['archived']]
+            row=p.variants_table.currentRow()
+            variant=p.variant_rows[row] if 0<=row<len(p.variant_rows) else (variants[0] if variants else None)
+            if variant is None:raise ValueError('Cadastre uma variante ativa.')
+            dialog=RecipeDialog(self.production_page.production,variant['id'],self)
+            if dialog.exec():self.update_selection()
+        except ValueError as error:QMessageBox.information(self,'Ficha de produção',str(error))
 
     def produce(self):
         try:dialog=self.prepare_order()

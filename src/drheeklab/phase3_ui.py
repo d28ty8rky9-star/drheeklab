@@ -445,20 +445,18 @@ class StockPage(QWidget):
         controls.addWidget(self.material_trash); mb.addLayout(controls)
         self.material_table = table(['ID', 'Material', 'Unidade', 'Saldo', 'Referência R$/unidade']); mb.addWidget(self.material_table)
         self.tabs.addTab(materials, 'Auxiliares')
-        summary = QWidget(); sb = QVBoxLayout(summary)
+        # Retain the aggregate model for existing integrations, without a
+        # second user-facing inventory tab.
         self.stock_table = table(['Variante ID', 'Produto / variante', 'Físico', 'Reservado', 'Disponível', 'Uso pessoal', 'A verificar', 'Descartado'])
-        sb.addWidget(self.stock_table)
-        controls = QHBoxLayout(); button('Entrada manual / produção para estoque', self.receive, controls)
-        button('Reservar disponíveis', self.reserve, controls); sb.addLayout(controls)
-        label = QLabel('Reservar não reduz estoque físico. Baixa de reserva e descarte usam o custo já atribuído; não registram venda ou caixa.')
-        label.setWordWrap(True); sb.addWidget(label)
-        self.tabs.addTab(summary, 'Peças prontas')
+        self.stock_table.setParent(self);self.stock_table.hide()
         physical = QWidget(); pb = QVBoxLayout(physical)
         self.pieces_table = table(['ID peça', 'Produto / variante', 'Estado', 'Condição', 'Custo atribuído', 'Entrada', 'Reserva'])
         self.pieces_table.setSelectionMode(QTableWidget.ExtendedSelection); pb.addWidget(self.pieces_table)
         controls = QHBoxLayout(); button('Verificar / liberar selecionadas', self.review, controls)
         button('Descartar selecionadas', self.piece_loss, controls); pb.addLayout(controls)
-        self.tabs.addTab(physical, 'Peças físicas')
+        controls=QHBoxLayout();button('Entrada manual / peça comprada',self.receive,controls)
+        button('Reservar disponíveis',self.reserve,controls);pb.addLayout(controls)
+        self.tabs.addTab(physical, 'Estoque')
         reservations = QWidget(); rb = QVBoxLayout(reservations)
         self.reservations_table = table(['ID', 'Referência', 'Produto / variante', 'Quantidade', 'Situação']); rb.addWidget(self.reservations_table)
         controls = QHBoxLayout(); button('Liberar reserva', lambda: self.finish_reservation('release'), controls)
@@ -479,7 +477,7 @@ class StockPage(QWidget):
         self.stock_rows = self.inventory.summary()
         fill_table(self.stock_table, [[r['id'],r['code']+' • '+r['product_name']+' / '+r['name']+(' (arquivado)' if r['archived'] or r['product_archived'] else ''),r['physical'],r['reserved'],r['available'],r['personal'],r['quarantine'],r['discarded']] for r in self.stock_rows])
         self.piece_rows = self.inventory.pieces()
-        fill_table(self.pieces_table, [[r['id'],r['code']+' / '+r['variant_name'],PIECE_STATES[r['state']],r['condition'],brl(Decimal(r['unit_cost_cents'])/100),r['receipt_id'],r['reservation_id'] or '—'] for r in self.piece_rows])
+        fill_table(self.pieces_table, [[r['id'],r['code']+' • '+r['product_name']+' / '+r['variant_name'],PIECE_STATES[r['state']],r['condition'],brl(Decimal(r['unit_cost_cents'])/100),r['receipt_id'],r['reservation_id'] or '—'] for r in self.piece_rows])
         self.reservation_rows = self.inventory.reservations()
         names = {'reserved':'Reservada','released':'Liberada','issued':'Baixada'}
         fill_table(self.reservations_table, [[r['id'],r['reference'],r['code']+' / '+r['variant_name'],r['quantity'],names[r['state']]] for r in self.reservation_rows])
@@ -555,14 +553,17 @@ class StockPage(QWidget):
             self.refresh()
 
     def reserve(self):
-        variant = self.selected(self.stock_table, self.stock_rows)
+        index=self.pieces_table.currentRow()
+        if index<0:
+            QMessageBox.information(self,'Selecione uma peça','Selecione uma peça no Estoque.');return
+        variant=self.piece_rows[index]['variant_id']
         if variant is not None and ReserveDialog(self.inventory, variant, self).exec() == QDialog.Accepted:
             self.refresh()
 
     def selected_pieces(self):
         indexes = sorted({item.row() for item in self.pieces_table.selectedItems()})
         if not indexes:
-            QMessageBox.information(self, 'Selecione peças', 'Selecione uma ou várias linhas em Peças físicas.'); return []
+            QMessageBox.information(self, 'Selecione peças', 'Selecione uma ou várias linhas no Estoque.'); return []
         return [self.piece_rows[index]['id'] for index in indexes]
 
     def review(self):

@@ -4,6 +4,8 @@ Aplicativo **desktop offline**, Python + PySide6 + SQLite, para Windows. As sete
 
 Disponível: login, ambientes separados, temas, menu recolhível, configurações, rascunhos, auditoria, backups, cadastro de impressoras/manutenções e filamentos, precificação com vários materiais, comparação previsto/confirmado e atualização única de consumo e tempo.
 
+O novo fluxo salva os dados técnicos na ficha de Produção, cria OPs simples e libera Estoque/custo financeiro na conclusão com fotos e observações, sem pagamento automático. Veja [como usar e limites](docs/fluxo-producao-estoque.md). Código atualizado; o pacote anterior não contém esta alteração.
+
 ## Executar a partir do código
 
 Windows (Python 3.12 para desenvolvimento):
