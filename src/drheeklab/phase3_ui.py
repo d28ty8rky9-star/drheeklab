@@ -8,7 +8,7 @@ from PySide6.QtGui import QIcon, QPixmap, QDesktopServices
 from PySide6.QtCore import QUrl
 from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
     QLineEdit, QComboBox, QCheckBox, QListWidget, QListWidgetItem, QListView, QTabWidget,
-    QFileDialog, QMessageBox, QDialog, QInputDialog, QTableWidget, QTextEdit)
+    QFileDialog, QMessageBox, QDialog, QInputDialog, QTableWidget, QTextEdit, QFormLayout)
 from .catalog import Catalog
 from .products import Products, CATEGORIES
 from .inventory import Inventory, PIECE_STATES
@@ -38,17 +38,58 @@ class ProductDialog(FormDialog):
         catalog = Catalog(products.storage)
         printers = catalog.rows('printers') + [r for r in catalog.rows('printers', True) if r['id'] == row.get('printer_id')]
         filaments = catalog.rows('filaments') + [r for r in catalog.rows('filaments', True) if r['id'] == row.get('filament_id')]
-        selection_combo(self, 'printer_id', 'Impressora recomendada', printers, row.get('printer_id'), lambda r: r['identifier'] + ' • ' + r['model'])
+        selection_combo(self, 'printer_id', 'Impressora de produção', printers, row.get('printer_id'), lambda r: r['identifier'] + ' • ' + r['model'])
         selection_combo(self, 'filament_id', 'Filamento recomendado', filaments, row.get('filament_id'), lambda r: r['name'] + ' • ' + r['material'])
-        self.line('settings', 'Configurações recomendadas', row.get('settings', ''), 'Dados manuais do fatiamento: camada, suportes, preenchimento…')
-        self.line('estimated_hours', 'Tempo estimado (horas)', minutes_to_hours(row.get('estimated_minutes', 0)), 'Ex.: 1,5 = 1 hora e 30 minutos')
-        self.line('planned_cost', 'Custo previsto por peça (R$)', money_optional(row.get('planned_cost_cents')), 'Vazio: não informado')
+        self.line('settings', 'Parâmetros de impressão', row.get('settings', ''), 'Dados manuais do fatiamento: camada, suportes, preenchimento…')
+        self.line('estimated_hours', 'Tempo por peça (horas)', minutes_to_hours(row.get('estimated_minutes', 0)), 'Ex.: 1,5 = 1 hora e 30 minutos')
+        self.line('planned_cost', 'Custo de produção por peça (R$)', money_optional(row.get('planned_cost_cents')), 'Vazio: não informado')
         self.line('suggested_price', 'Preço sugerido por peça (R$)', money_optional(row.get('suggested_price_cents')), 'Vazio: não informado')
         self.line('quality_notes', 'Observações de qualidade', row.get('quality_notes', ''))
+        from .production import Production
+        from .product_production_ui import ProductProductionFields
+        production=Production(products.storage)
+        variants=products.variants(identifier) if identifier else []
+        selected_row=parent.variants_table.currentRow() if parent is not None and hasattr(parent,'variants_table') else -1
+        variant=parent.variant_rows[selected_row] if selected_row>=0 and selected_row<len(parent.variant_rows) else (variants[0] if variants else None)
+        self.production_fields=ProductProductionFields(self,production,identifier,variant['id'] if variant else None)
+        self.form.addRow(self.production_fields);self.resize(850,850)
+        # Keep the production inputs visible in the actual edit window.
+        details=QWidget();details_form=QFormLayout(details)
+        for key in ('description','quality_notes'):
+            taken=self.form.takeRow(self.fields[key]);details_form.addRow(taken.labelItem.widget(),taken.fieldItem.widget())
+        self.production_fields.tabs.addTab(details,'Descrição e qualidade')
+        self.fields['filament_id'].hide();self.form.labelForField(self.fields['filament_id']).hide()
 
     def persist(self):
+        from pathlib import Path
+        from .transactions import transaction
+        controls=self.production_fields
+        inputs=controls.inputs() if controls.configured() else None
         values=self.values();values['estimated_minutes']=hours_to_minutes(values.pop('estimated_hours'))
-        self.saved_id = self.products.save(values, self.identifier)
+        imported=[]
+        try:
+            with transaction(self.products.db):
+                self.saved_id=self.products.save(values,self.identifier)
+                variant=controls.variant_id or next((row['id'] for row in self.products.variants(self.saved_id)),None)
+                if variant is None:raise ValueError('Restaure uma variante da peça antes de editar a ficha de produção.')
+                previous_variant=self.products.get('variants',variant)
+                metadata={key:field.text().strip() for key,field in controls.variant_fields.items()}
+                if any(metadata[key]!=previous_variant[key] for key in metadata):
+                    metadata.update(planned_cost=money_optional(previous_variant['planned_cost_cents']),suggested_price=money_optional(previous_variant['suggested_price_cents']),calculation_id=previous_variant['calculation_id'])
+                    self.products.save_variant(self.saved_id,metadata,variant)
+                project=controls.editor.project.currentData()
+                if controls.file_path.text():
+                    project=self.products.import_media(self.saved_id,controls.file_path.text(),'project')
+                    imported.append(self.products.storage.home/self.products.get('project_versions',project)['path'])
+                for source in controls.photo_paths:
+                    photo=self.products.import_media(self.saved_id,source,'photo')
+                    imported.append(self.products.storage.home/self.products.get('product_photos',photo)['path'])
+                if inputs:
+                    snapshot,filaments,extras,base,minutes=inputs
+                    controls.production.save_recipe(variant,values['printer_id'],project,minutes,filaments,base,values['settings'],extras=extras)
+        except Exception:
+            for path in imported:Path(path).unlink(missing_ok=True)
+            raise
 
 
 class VariantDialog(FormDialog):

@@ -1,3 +1,9 @@
+# Estado atual — correção: ficha completa dentro de Nova peça / Editar peça
+
+Usuário mostrou a janela Editar peça e confirmou que todos os detalhes/calculadora/extras deveriam estar nela. Corrigido: ProductDialog incorpora ProductProductionFields, com filamentos múltiplos/gramas, horas, impressora, parâmetros, extras detalhados, variante, fotos e importação STL/3MF. Custo automático/readonly quando configurado, atualização imediata, sem botão Calcular. Botão superior da ficha abre o mesmo formulário completo, sem segundo cadastro de custos. Dados básicos ainda podem ser salvos como ideia sem consumo informado; ficha de custos pode ser guardada sem STL/parâmetros, que são obrigatórios para gerar OP. Fotos/arquivos/cadastro/receita salvos atomicamente com limpeza de novos arquivos em falha. Nada de estoque/Financeiro na ideia; OP aproveita receita, custo entra somente na conclusão/Estoque.
+
+Schema 9/version2.9.1 preservados. Não gerar ZIP automaticamente: o ZIP entregue antes desta correção contém a janela anterior. Usuário não pediu novo ZIP nesta correção. Código/testes/GitHub e capturas em docs/capturas-cadastro-producao/, detalhes docs/cadastro-producao-integrado.md. Preservar C:\DrHeekLab. Notas seguintes históricas.
+
 # Última entrega — ZIP completo solicitado, extras e estoque em horas
 
 Usuário pediu ZIP explicitamente. Gerado pacote Windows completo com TODAS as alterações atuais (Produção unificada/ficha, cálculo automático, aba Extras, OP simples, reconhecimento na conclusão, Estoque único/peça comprada, horas e marca oficial). ZIP local dist/DrHeekLab-2.9.1-Extras-Producao-Windows.zip; run 38506019047; artifact 11868460181; código compilado 5fd331ce9a834d79cef6b56021fc35a11e628d76; versão 2.9.1/schema 9.

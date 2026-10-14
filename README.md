@@ -10,6 +10,8 @@ Também disponível: valor demonstrativo da peça em Produção, entrada de peç
 
 A ficha de Produção também oferece [extras detalhados e cálculo automático](docs/extras-producao.md), como argolas com quantidade e custo unitário.
 
+**Nova peça / Editar peça** agora abre a [ficha de Produção completa com cálculo automático e Extras](docs/cadastro-producao-integrado.md) dentro do próprio cadastro. O ZIP anterior ainda não contém esta correção.
+
 ## Executar a partir do código
 
 Windows (Python 3.12 para desenvolvimento):

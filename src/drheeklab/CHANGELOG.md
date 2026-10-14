@@ -1,3 +1,11 @@
+# 2.9.1 — Correção da janela Nova peça / Editar peça
+
+- Ficha de Produção completa dentro do cadastro: filamentos múltiplos, gramas, horas, cálculo automático, extras, variante, fotos e STL/3MF.
+- Botão de ficha também abre o mesmo cadastro, sem formulário separado de custos.
+- Ideias/fichas sem STL podem ser salvas; arquivo e parâmetros obrigatórios antes de criar OP.
+- Gravação atômica com limpeza de arquivos novos em erro; não movimenta Estoque/Financeiro ao cadastrar.
+- OPs, custos e arquivos históricos preservados, schema 9/versão 2.9.1 mantidos.
+
 # 2.9.1 — Extras na ficha de Produção
 
 - Aba de extras com nome, quantidade por peça e custo unitário (argolas, acessórios e outros).

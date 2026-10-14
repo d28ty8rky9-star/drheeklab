@@ -1,7 +1,7 @@
 """One workspace: select a catalog piece and create an ordinary production order."""
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QWidget,QVBoxLayout,QHBoxLayout,QSplitter,QScrollArea,QLabel,QPushButton,QMessageBox
-from .recipe_ui import RecipeDialog,RecipeOrderDialog
+from .recipe_ui import RecipeOrderDialog
 from .visual import action_style
 from .pricing import brl
 from decimal import Decimal
@@ -61,16 +61,8 @@ class WorkshopPage(QWidget):
         return RecipeOrderDialog(self.production_page.production,variant['id'],self)
 
     def edit_recipe(self):
-        try:
-            p=self.products_page;identifier=p.selected_product(False)
-            if identifier is None:raise ValueError('Selecione uma peça no catálogo.')
-            variants=[v for v in p.products.variants(identifier) if not v['archived']]
-            row=p.variants_table.currentRow()
-            variant=p.variant_rows[row] if 0<=row<len(p.variant_rows) else (variants[0] if variants else None)
-            if variant is None:raise ValueError('Cadastre uma variante ativa.')
-            dialog=RecipeDialog(self.production_page.production,variant['id'],self)
-            if dialog.exec():self.products_page.refresh();self.update_selection()
-        except ValueError as error:QMessageBox.information(self,'Ficha de produção',str(error))
+        # Both entry points open the complete piece form; no second cost form.
+        self.products_page.edit()
 
     def produce(self):
         try:dialog=self.prepare_order()

@@ -22,12 +22,13 @@ class RecipeProduction:
         if self.db.execute('SELECT 1 FROM purchased_products WHERE product_id=?',(variant['product_id'],)).fetchone():
             raise ValueError('Peça comprada pertence ao Estoque; cadastre um modelo próprio em Produção para imprimir.')
         self.products.active_product(variant['product_id'])
-        project=self.products.get('project_versions',project_id)
-        if project['archived'] or project['product_id']!=variant['product_id']:
-            raise ValueError('Selecione um STL/3MF ativo desta peça.')
-        self.products.media_path(project_id,'project')
+        if project_id is not None:
+            project=self.products.get('project_versions',project_id)
+            if project['archived'] or project['product_id']!=variant['product_id']:
+                raise ValueError('Selecione um STL/3MF ativo desta peça.')
+            self.products.media_path(project_id,'project')
         minutes=integer(minutes,'Tempo por peça',minimum=1)
-        parameters=required(parameters,'Parâmetros de impressão')
+        parameters=str(parameters or '').strip()
         extra_rows,extra_total=calculate_extras(extras)
         base=number(auxiliary,'Outros custos adicionais',places=2)
         estimate=self.catalog.estimate(printer_id,minutes,filaments,str(base+extra_total),1)
@@ -46,6 +47,8 @@ class RecipeProduction:
         recipe=self.recipe(variant_id)
         if not recipe:raise ValueError('Salve a ficha de produção desta variante antes de criar a OP.')
         qty=integer(quantity,'Quantidade',minimum=1);data=recipe['data'];estimate=data['estimate']
+        if data['project_id'] is None:raise ValueError('Adicione o STL/3MF em Editar peça antes de gerar a OP.')
+        required(data['parameters'],'Parâmetros de impressão')
         filaments=[(f['id'],str(number(f['grams'])*qty)) for f in estimate['filaments']]
         auxiliary=str(number(estimate['auxiliary'])*qty);minutes=data['minutes']*qty
         with transaction(self.db):
