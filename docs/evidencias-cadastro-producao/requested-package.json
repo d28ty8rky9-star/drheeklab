@@ -1,0 +1,34 @@
+{
+  "run_id": 38651226605,
+  "artifact_id": 11935270883,
+  "code_sha": "f0a72a32d13b6d99076a6a5690211d31f43d34b2",
+  "status": "passed",
+  "tests": 294,
+  "zip": "dist/DrHeekLab-2.9.1-CadastroCompleto-Windows.zip",
+  "zip_sha256": "702b47706d0ff261a667a275e75c02440b123caa892416577aaca33d9ff5c5c9",
+  "zip_digest_matches_github": true,
+  "installer_sha256": "ac4250f6a5f1f4d6ad15f2d00ab2b35b3d89c2f5a4ada95c180575aecd0afbb3",
+  "gui_sha256": "9726dd3f0dff28b2097ffe300d6271a50c0fdd6651b03e40aff069c7c1acf5cd",
+  "helper_sha256": "ec35a227dadbc0b44db2a70bf2284935adc16fe71e74d76a4a1d5d013c8e99f1",
+  "frozen_modules": [
+    "drheeklab.product_production_ui",
+    "drheeklab.extras_ui",
+    "drheeklab.production_extras",
+    "drheeklab.production_recipe",
+    "drheeklab.time_input",
+    "drheeklab.migration9",
+    "drheeklab.workshop_ui"
+  ],
+  "integrated_form_wired_in_executable": true,
+  "installation_checks": [
+    "install",
+    "reinstall",
+    "installed self-test",
+    "pre-update verified backup",
+    "database/media preserved",
+    "headless daily backup",
+    "task create/delete",
+    "uninstall"
+  ],
+  "manual_homologation": "pending"
+}

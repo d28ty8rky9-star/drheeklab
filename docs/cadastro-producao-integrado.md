@@ -1,3 +1,9 @@
+# ZIP atualizado solicitado e verificado
+
+[Download no GitHub](https://github.com/d28ty8rky9-star/drheeklab/actions/runs/38651226605/artifacts/11935270883). Cópia local: `dist/DrHeekLab-2.9.1-CadastroCompleto-Windows.zip`.
+
+Este ZIP inclui a ficha completa dentro de Nova peça / Editar peça. 294 testes Windows aprovados e instalação/reinstalação/preservação de dados verificadas. ZIP e hashes verificados; integração do formulário confirmada dentro do executável. Extrair em pasta nova e executar `installer/DrHeekLab-2.9.1-Fase8-Setup.exe`. Preservar `C:\DrHeekLab`. Avaliação prática do proprietário ainda pendente.
+
 # Ficha completa dentro de Nova peça / Editar peça — 2.9.1
 
 Correção da entrega anterior: cálculo e Extras tinham ficado numa janela separada da janela Nova peça/Editar peça mostrada pelo usuário. Agora estão dentro da própria janela de cadastro.
@@ -21,4 +27,4 @@ Capturas reais da janela Nova peça, com dados temporários:
 - [Ficha completa e custo automático](capturas-cadastro-producao/nova-peca-completa.png)
 - [Extras dentro de Nova peça](capturas-cadastro-producao/extras-na-nova-peca.png)
 
-294 testes locais aprovados, zero falhas/erros/pulos; suíte completa [Windows aprovada](https://github.com/d28ty8rky9-star/drheeklab/actions/runs/38508888418). Empacotamento ignorado, zero artefatos. Evidências em `evidencias-cadastro-producao/`. Esta é uma atualização do código no GitHub. O ZIP entregue anteriormente ainda usa a janela anterior; novo ZIP/instalador somente sob pedido explícito. Avaliação prática do proprietário no Windows permanece pendente.
+294 testes locais aprovados, zero falhas/erros/pulos; suíte completa [Windows aprovada](https://github.com/d28ty8rky9-star/drheeklab/actions/runs/38508888418). Empacotamento ignorado, zero artefatos. Evidências em `evidencias-cadastro-producao/`. Pacote completo atualizado gerado após pedido explícito: ver download abaixo. Novos ZIPs/instaladores somente sob pedido explícito. Avaliação prática do proprietário no Windows permanece pendente.

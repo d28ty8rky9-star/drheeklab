@@ -1,3 +1,13 @@
+# Última entrega — ZIP pedido com ficha completa dentro de Nova peça
+
+Usuário pediu novo ZIP explicitamente após confirmar cálculo automático, OP sem recadastro e custo sem duplicação. Pacote COMPLETO Windows gerado: dist/DrHeekLab-2.9.1-CadastroCompleto-Windows.zip; run 38651226605; artifact 11935270883; código compilado f0a72a32d13b6d99076a6a5690211d31f43d34b2; versão 2.9.1/schema 9.
+
+294 testes Windows aprovados, zero falhas/erros/pulos. Pacote funcional, instalação/reinstalação/backup/preservação de banco e mídia/agendamento/desinstalação aprovados. CRC do ZIP válido e SHA256 igual ao digest GitHub (702b47706d0ff261a667a275e75c02440b123caa892416577aaca33d9ff5c5c9); hashes GUI/helper/Setup conferidos. product_production_ui incluído e bytecode do construtor ProductDialog dentro do executável realmente referencia ProductProductionFields: integração confirmada, não somente presença do módulo. Evidências docs/evidencias-cadastro-producao/requested-package*.json.
+
+Instalar: extrair ZIP em pasta nova, executar installer/DrHeekLab-2.9.1-Fase8-Setup.exe. Preservar C:\DrHeekLab (banco/fotos/documentos), fazer backup antes da reinstalação; excluir apenas pasta extraída de entrega antiga. Avaliação prática do proprietário permanece pendente.
+
+Autorização vale para ESTA entrega. Futuras mudanças: código/testes/GitHub, sem gerar ZIP/instalador até pedido explícito. Não disparar gerar_pacote=true automaticamente. Notas seguintes históricas.
+
 # Estado atual — correção: ficha completa dentro de Nova peça / Editar peça
 
 Usuário mostrou a janela Editar peça e confirmou que todos os detalhes/calculadora/extras deveriam estar nela. Corrigido: ProductDialog incorpora ProductProductionFields, com filamentos múltiplos/gramas, horas, impressora, parâmetros, extras detalhados, variante, fotos e importação STL/3MF. Custo automático/readonly quando configurado, atualização imediata, sem botão Calcular. Botão superior da ficha abre o mesmo formulário completo, sem segundo cadastro de custos. Dados básicos ainda podem ser salvos como ideia sem consumo informado; ficha de custos pode ser guardada sem STL/parâmetros, que são obrigatórios para gerar OP. Fotos/arquivos/cadastro/receita salvos atomicamente com limpeza de novos arquivos em falha. Nada de estoque/Financeiro na ideia; OP aproveita receita, custo entra somente na conclusão/Estoque.
