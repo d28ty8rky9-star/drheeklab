@@ -25,7 +25,7 @@ class EntryEditor(QWidget):
         self.variant.currentIndexChanged.connect(self.projects);self.projects()
         self.filaments=[];self.filament_layout=QVBoxLayout();layout.addLayout(self.filament_layout)
         button('Adicionar carretel deste modelo',self.add_spool,layout);self.add_spool()
-        aux=QHBoxLayout();layout.addLayout(aux);aux.addWidget(QLabel('Custos adicionais (R$ por peça)' if recipe else 'Auxiliares (R$)'));self.aux=QLineEdit('0');aux.addWidget(self.aux)
+        aux=QHBoxLayout();layout.addLayout(aux);aux.addWidget(QLabel('Outros custos adicionais (R$ por peça)' if recipe else 'Auxiliares (R$)'));self.aux=QLineEdit('0');aux.addWidget(self.aux)
         self.weight=QLineEdit()
         if not recipe:
             aux.addWidget(QLabel('Peso manual de rateio (opcional)'));aux.addWidget(self.weight)

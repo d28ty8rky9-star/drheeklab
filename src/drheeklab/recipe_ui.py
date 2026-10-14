@@ -1,10 +1,13 @@
 """Production specification editor and minimal recipe-based OP dialogs."""
 from decimal import Decimal
-from PySide6.QtWidgets import QLabel,QPushButton
+from PySide6.QtWidgets import QLabel,QPushButton,QTabWidget
 from .phase2_ui import FormDialog
 from .phase5_ui import EntryEditor
 from .production import PRIORITIES
 from .pricing import brl
+from .extras_ui import ExtrasEditor
+from .production_extras import calculate_extras
+from .pricing import number
 from .time_input import hours_to_minutes,minutes_to_hours
 
 class RecipeDialog(FormDialog):
@@ -16,7 +19,7 @@ class RecipeDialog(FormDialog):
         self.combo('printer','Impressora',{p['id']:p['identifier'] for p in production.catalog.rows('printers') if p['status']=='operational'},product['printer_id'] or 1)
         self.line('hours','Tempo por peça (horas)',minutes_to_hours(product['estimated_minutes'] or 60),'Ex.: 1,5 = 1 hora e 30 minutos')
         self.line('parameters','Parâmetros de impressão *',product['settings'])
-        self.editor=EntryEditor(production,recipe=True);self.form.addRow(self.editor)
+        self.editor=EntryEditor(production,recipe=True)
         index=next(i for i in range(self.editor.variant.count()) if self.editor.variant.itemData(i)[0]==variant_id)
         self.editor.variant.setCurrentIndex(index);self.editor.variant.setEnabled(False)
         self.editor.quantity.setText('1');self.editor.quantity.setReadOnly(True)
@@ -35,11 +38,13 @@ class RecipeDialog(FormDialog):
             for f in data['estimate']['filaments']:
                 self.editor.add_spool();combo,grams,_=self.editor.filaments[-1]
                 combo.setCurrentIndex(combo.findData(f['id']));grams.setText(str(f['grams']))
-            self.editor.aux.setText(str(data['estimate']['auxiliary']))
+            self.editor.aux.setText(str(data.get('auxiliary_base',data['estimate']['auxiliary'])))
+        self.tabs=QTabWidget();self.tabs.addTab(self.editor,'Filamentos e arquivo')
+        self.extras=ExtrasEditor(saved['data'].get('extras',[]) if saved else []);self.tabs.addTab(self.extras,'Extras • argolas e acessórios');self.form.addRow(self.tabs)
         self.preview=QLabel();self.preview.setWordWrap(True);self.form.addRow(self.preview)
-        estimate=QPushButton('Calcular custo da ficha');estimate.clicked.connect(self.show_estimate);self.form.addRow(estimate)
         self.preview.setText(self.preview.text()+' • Valores por unidade.')
         self.form.addRow(QLabel('Salvar a ficha não movimenta estoque e não registra custo no Financeiro.'))
+        self.extras.changed.connect(self.show_estimate)
         self.editor.changed=self.show_estimate
         for field in self.fields.values():
             (field.currentIndexChanged if hasattr(field,'currentIndexChanged') else field.textChanged).connect(self.show_estimate)
@@ -49,23 +54,20 @@ class RecipeDialog(FormDialog):
         self.show_estimate()
 
     def estimate(self):
-        v=self.values();entry=self.editor.value()
-        return self.production.catalog.estimate(v['printer'],hours_to_minutes(v['hours']),entry['filaments'],entry['auxiliary'],1)
+        v=self.values();_,extras_total=calculate_extras(self.extras.value())
+        auxiliary=number(self.editor.aux.text(),'Outros custos adicionais',places=2)+extras_total
+        filaments=[(combo.currentData(),grams.text()) for combo,grams,_ in self.editor.filaments]
+        return self.production.catalog.estimate(v['printer'],hours_to_minutes(v['hours']),filaments,str(auxiliary),1)
 
     def show_estimate(self,*args):
         try:
             estimate=self.estimate();cost=estimate.get('acquisition_production_cost')
-            # The estimate is planning; accounting uses the frozen acquisition
-            # parameters when known, otherwise the reference cost.
-            if cost is None:
-                from .pricing import calculate
-                e=self.editor.value();cost=calculate(estimate['printer'],hours_to_minutes(self.values()['hours']),estimate['filaments'],e['auxiliary'],1,actual=True).get('acquisition_production_cost')
             self.preview.setText('Valor de produção por peça: '+brl(Decimal(cost if cost is not None else estimate['total_cost']))+' • Referência: '+brl(Decimal(estimate['total_cost'])))
         except ValueError as error:self.preview.setText(str(error))
 
     def persist(self):
         v=self.values();entry=self.editor.value()
-        self.production.save_recipe(self.variant_id,v['printer'],entry['project_id'],hours_to_minutes(v['hours']),entry['filaments'],entry['auxiliary'],v['parameters'])
+        self.production.save_recipe(self.variant_id,v['printer'],entry['project_id'],hours_to_minutes(v['hours']),entry['filaments'],entry['auxiliary'],v['parameters'],extras=self.extras.value())
 
 class RecipeOrderDialog(FormDialog):
     def __init__(self,production,variant_id,parent=None):

@@ -5,6 +5,7 @@ from .catalog import required
 from .pricing import integer, number, calculate, cents
 from .storage import now
 from .transactions import transaction
+from .production_extras import calculate_extras
 
 class RecipeProduction:
     def recipe(self, variant_id):
@@ -15,7 +16,7 @@ class RecipeProduction:
         row=self.db.execute('SELECT recipe FROM recipe_orders WHERE op_id=?',(identifier,)).fetchone()
         return json.loads(row[0]) if row else None
 
-    def save_recipe(self, variant_id, printer_id, project_id, minutes, filaments, auxiliary='0', parameters=''):
+    def save_recipe(self, variant_id, printer_id, project_id, minutes, filaments, auxiliary='0', parameters='', *, extras=()):
         """Amounts and duration describe ONE unit. Save a revision, not an expense."""
         variant=self.products.active_variant(variant_id)
         if self.db.execute('SELECT 1 FROM purchased_products WHERE product_id=?',(variant['product_id'],)).fetchone():
@@ -27,11 +28,13 @@ class RecipeProduction:
         self.products.media_path(project_id,'project')
         minutes=integer(minutes,'Tempo por peça',minimum=1)
         parameters=required(parameters,'Parâmetros de impressão')
-        estimate=self.catalog.estimate(printer_id,minutes,filaments,auxiliary,1)
+        extra_rows,extra_total=calculate_extras(extras)
+        base=number(auxiliary,'Outros custos adicionais',places=2)
+        estimate=self.catalog.estimate(printer_id,minutes,filaments,str(base+extra_total),1)
         if not sum(number(f['grams']) for f in estimate['filaments']):
             raise ValueError('Informe o consumo de filamento por peça.')
         data={'printer_id':printer_id,'project_id':project_id,'minutes':minutes,
-              'parameters':parameters,'estimate':estimate}
+              'parameters':parameters,'estimate':estimate,'auxiliary_base':str(base),'extras':extra_rows}
         with transaction(self.db):
             previous=self.recipe(variant_id);revision=previous['revision']+1 if previous else 1
             self.db.execute('INSERT INTO production_recipes VALUES(?,?,?,?) ON CONFLICT(variant_id) DO UPDATE SET revision=excluded.revision,data=excluded.data,updated_at=excluded.updated_at',

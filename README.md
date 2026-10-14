@@ -8,6 +8,8 @@ O novo fluxo salva os dados técnicos na ficha de Produção, cria OPs simples e
 
 Também disponível: valor demonstrativo da peça em Produção, entrada de peça comprada diretamente no Estoque e tempo informado em horas. [Como usar](docs/valor-producao-estoque-horas.md).
 
+A ficha de Produção também oferece [extras detalhados e cálculo automático](docs/extras-producao.md), como argolas com quantidade e custo unitário.
+
 ## Executar a partir do código
 
 Windows (Python 3.12 para desenvolvimento):

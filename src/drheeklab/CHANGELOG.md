@@ -1,3 +1,11 @@
+# 2.9.1 — Extras na ficha de Produção
+
+- Aba de extras com nome, quantidade por peça e custo unitário (argolas, acessórios e outros).
+- Cálculo automático ao editar horas, filamentos ou extras, mesmo antes da seleção do STL.
+- Ficha salva os detalhes e a OP aproveita a cópia com quantidade/custo escalados, sem recadastro.
+- Custos demonstrativos continuam sem efeitos no Financeiro até conclusão e entrada no Estoque.
+- Fichas antigas, snapshots, schema 9 e versão 2.9.1 preservados.
+
 # 2.9.1 — Valor de produção, estoque independente e horas
 
 - Valor demonstrativo por peça/variante no catálogo e seleção; cálculo da ficha atualiza ao editar material, horas e adicionais.

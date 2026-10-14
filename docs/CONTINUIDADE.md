@@ -1,3 +1,9 @@
+# Estado atual — extras detalhados em Produção, OP somente fluxo
+
+Implementada aba Extras • argolas e acessórios na ficha de Produção. Nome, quantidade por peça, custo unitário; soma por linha e total. Prévia automática ao mudar filamentos, horas, adicionais ou extras, inclusive antes de escolher STL. Não há botão obrigatório de cálculo. Salvar continua validando arquivo/parâmetros. Extras persistidos no JSON versionado da receita, auxiliary_base separado do total; ficha antiga mantém auxiliares anteriores. OP copia ficha/extras imutáveis e multiplica o custo pela quantidade, sem solicitar os itens de novo. Cadastro de extras não movimenta materiais auxiliares/caixa. Custo reconhecido somente após conclusão e publicação no estoque.
+
+Sem mudança de schema (continua 9) ou versão (2.9.1). Código/GitHub, testes e capturas; ZIP/instalador somente se solicitado. Preservar dados, OPs e receitas anteriores. Veja docs/extras-producao.md, tests/test_production_extras.py e docs/evidencias-extras-producao/. Notas seguintes históricas.
+
 # Estado atual — valor demonstrativo, peça comprada no Estoque e horas
 
 Pedido atual implementado em 2.9.1: Valor de produção por variante selecionada, cartão e tabela; prévia da ficha atualiza em tempo real (filamentos, tempo, adicionais). Peça comprada cadastrada diretamente por Estoque → Nova peça comprada, sem selecionar produto/variante em Produção ou exigir STL/OP. Identificação interna fica no catálogo de estoque e mantém reserva, Vendas, CPV, busca e filtros Financeiro/catálogo PDF. Custos e pagamentos continuam separados.
