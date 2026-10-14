@@ -1,0 +1,25 @@
+{
+  "run_id": 38652867662,
+  "artifact_id": 11935828123,
+  "code_sha": "2c182cac4fb8878bb6e37e2e6b831403ba4013fe",
+  "status": "passed",
+  "tests": 294,
+  "zip": "dist/DrHeekLab-2.9.1-CadastroCompleto-Refeito-Windows.zip",
+  "zip_sha256": "4408e3282cb1a993aa1a085f7e42a2c01900f32638b26410598b1f87d108008c",
+  "zip_digest_matches_github": true,
+  "installer_sha256": "07dc85e274aa1666008c33bf1a7b36f8a817b368cd357222740bf3c96be7be3f",
+  "gui_sha256": "071e901abcaff1b9f90d4e12ca8a7d6fed62132f83750d7ca45240be16a8c1d3",
+  "helper_sha256": "dffde203c57d37f941ca29d0c66bf1d47b8c794812f5fe461e68c15848c04b02",
+  "integrated_form_wired_in_executable": true,
+  "installation_checks": [
+    "install",
+    "reinstall",
+    "installed self-test",
+    "pre-update verified backup",
+    "database/media preserved",
+    "headless daily backup",
+    "task create/delete",
+    "uninstall"
+  ],
+  "manual_homologation": "pending"
+}

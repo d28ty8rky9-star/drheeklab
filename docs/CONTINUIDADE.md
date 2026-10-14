@@ -1,3 +1,11 @@
+# Última entrega — ZIP refeito após publicação do ambiente
+
+Usuário pediu explicitamente refazer o ZIP depois de publicar o ambiente. Nova compilação completa Windows: dist/DrHeekLab-2.9.1-CadastroCompleto-Refeito-Windows.zip; run 38652867662; artifact 11935828123; código compilado 2c182cac4fb8878bb6e37e2e6b831403ba4013fe. Versão 2.9.1/schema 9, mesma ficha integrada com cálculo automático/extras/OP sem recadastro/custo único.
+
+294 testes Windows aprovados, zero falhas/erros/pulos. Pacote e instalação/reinstalação/backup/preservação de banco e mídia/agendamento/desinstalação aprovados. SHA256 do ZIP 4408e3282cb1a993aa1a085f7e42a2c01900f32638b26410598b1f87d108008c igual ao digest do GitHub; CRC e hashes GUI/helper/Setup conferidos. Integração ProductProductionFields no construtor ProductDialog do executável confirmada via bytecode. Evidências docs/evidencias-cadastro-producao/requested-package-rebuilt*.json.
+
+Fechar programa, extrair em pasta nova e executar installer/DrHeekLab-2.9.1-Fase8-Setup.exe; preservar C:\DrHeekLab e fazer backup antes de reinstalar. Avaliação manual do proprietário continua pendente. Esta autorização cobre ESTA nova entrega; futuros ZIPs/instaladores somente sob pedido explícito. Notas seguintes históricas.
+
 # Última entrega — ZIP pedido com ficha completa dentro de Nova peça
 
 Usuário pediu novo ZIP explicitamente após confirmar cálculo automático, OP sem recadastro e custo sem duplicação. Pacote COMPLETO Windows gerado: dist/DrHeekLab-2.9.1-CadastroCompleto-Windows.zip; run 38651226605; artifact 11935270883; código compilado f0a72a32d13b6d99076a6a5690211d31f43d34b2; versão 2.9.1/schema 9.

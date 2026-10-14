@@ -1,3 +1,9 @@
+# ZIP refeito solicitado após publicação do ambiente
+
+[Download do ZIP refeito no GitHub](https://github.com/d28ty8rky9-star/drheeklab/actions/runs/38652867662/artifacts/11935828123). Cópia local: `dist/DrHeekLab-2.9.1-CadastroCompleto-Refeito-Windows.zip`.
+
+Nova compilação verificada: 294 testes Windows, instalação/reinstalação/preservação aprovados; ZIP/CRC/hashes e integração da ficha no executável conferidos. Fechar o programa, extrair em pasta nova e executar `installer/DrHeekLab-2.9.1-Fase8-Setup.exe`. Preservar `C:\DrHeekLab`. Mantém versão 2.9.1 e todas as alterações descritas abaixo. Avaliação prática do proprietário pendente.
+
 # ZIP atualizado solicitado e verificado
 
 [Download no GitHub](https://github.com/d28ty8rky9-star/drheeklab/actions/runs/38651226605/artifacts/11935270883). Cópia local: `dist/DrHeekLab-2.9.1-CadastroCompleto-Windows.zip`.
