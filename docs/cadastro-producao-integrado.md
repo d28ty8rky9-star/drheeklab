@@ -21,4 +21,4 @@ Capturas reais da janela Nova peça, com dados temporários:
 - [Ficha completa e custo automático](capturas-cadastro-producao/nova-peca-completa.png)
 - [Extras dentro de Nova peça](capturas-cadastro-producao/extras-na-nova-peca.png)
 
-Evidências em `evidencias-cadastro-producao/`. Esta é uma atualização do código no GitHub. O ZIP entregue anteriormente ainda usa a janela anterior; novo ZIP/instalador somente sob pedido explícito. Avaliação prática do proprietário no Windows permanece pendente.
+294 testes locais aprovados, zero falhas/erros/pulos; suíte completa [Windows aprovada](https://github.com/d28ty8rky9-star/drheeklab/actions/runs/38508888418). Empacotamento ignorado, zero artefatos. Evidências em `evidencias-cadastro-producao/`. Esta é uma atualização do código no GitHub. O ZIP entregue anteriormente ainda usa a janela anterior; novo ZIP/instalador somente sob pedido explícito. Avaliação prática do proprietário no Windows permanece pendente.
