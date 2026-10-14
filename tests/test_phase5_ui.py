@@ -22,7 +22,7 @@ def test_production_ui_create_confirm_checklist_photos_and_complete(tmp_path):
     store,p=setup(tmp_path)
     form=OrderDialog(p);form.fields['responsible'].setText('Operador');form.fields['parameters'].setText('0,2 mm / 15% / 210 C');form.editors[0].quantity.setText('2')
     form.submit();assert form.result()==QDialog.Accepted,form.error.text();op=form.saved_id;p.start(op)
-    confirm=ConfirmDialog(p,op);confirm.fields['minutes'].setText('60');confirm.submit()
+    confirm=ConfirmDialog(p,op);confirm.fields['hours'].setText('1');confirm.submit()
     assert confirm.result()==QDialog.Accepted,confirm.error.text()
     for piece in p.pieces(op):
         inspect=InspectionDialog(p,op,piece);inspect.fields['responsible'].setText('QA')

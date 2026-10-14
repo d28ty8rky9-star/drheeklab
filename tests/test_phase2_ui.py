@@ -65,7 +65,7 @@ def test_calculator_ui_saves_exact_example_then_confirms_real_cost(tmp_path, mon
     window.navigate(1)
     calculator = window.calculator
     calculator.title.setText('Exemplo aprovado')
-    calculator.minutes.setText('0')
+    calculator.hours.setText('0')
     calculator.final.setText('35')
     calculator.spool_rows[0][2].setText('300')
     calculator.preview()
@@ -80,7 +80,7 @@ def test_calculator_ui_saves_exact_example_then_confirms_real_cost(tmp_path, mon
     assert catalog.get('filaments', spool_id)['remaining_mg'] == 1000000
     actual = ActualDialog(catalog, identifier, calculator)
     actual.fields[str(spool_id)].setText('310')
-    actual.fields['minutes'].setText('60')
+    actual.fields['hours'].setText('1')
     monkeypatch.setattr(QMessageBox, 'question', lambda *args: QMessageBox.Yes)
     actual.submit()
     assert actual.result() == QDialog.Accepted

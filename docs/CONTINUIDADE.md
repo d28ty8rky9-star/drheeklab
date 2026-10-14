@@ -1,3 +1,13 @@
+# Estado atual — valor demonstrativo, peça comprada no Estoque e horas
+
+Pedido atual implementado em 2.9.1: Valor de produção por variante selecionada, cartão e tabela; prévia da ficha atualiza em tempo real (filamentos, tempo, adicionais). Peça comprada cadastrada diretamente por Estoque → Nova peça comprada, sem selecionar produto/variante em Produção ou exigir STL/OP. Identificação interna fica no catálogo de estoque e mantém reserva, Vendas, CPV, busca e filtros Financeiro/catálogo PDF. Custos e pagamentos continuam separados.
+
+Tempo nos formulários da peça (cadastro, ficha, OP antiga, ajuste de confirmação e calculadora) agora em horas. Banco/APIs/histórico continuam em minutos; Decimal com arredondamento para minuto inteiro. Exemplos 1,5h=90min e 0,25h=15min; rascunhos antigos convertidos na leitura. Não alterar fórmulas.
+
+Schema 9: tabela purchased_products, migração/backup transacional; preservadas tabelas/dados existentes e snapshots de OPs. Não cadastrar peça comprada no catálogo visível da Produção. Detalhes docs/valor-producao-estoque-horas.md; evidências docs/evidencias-estoque-horas/ e capturas docs/capturas-estoque-horas/.
+
+Somente código/testes/GitHub. Nenhum pacote solicitado nesta alteração. ZIP/instalador apenas mediante pedido explícito; os pacotes antigos não incluem alterações recentes. Preservar C:\DrHeekLab. Sem worktree. Avaliação manual do proprietário pendente. Notas seguintes históricas.
+
 # Estado atual — ficha de Produção → OP simples → Estoque → custo no Financeiro
 
 Usuário confirmou custo sem pagamento automático. Implementado em 2.9.1: ficha de produção por variante (arquivo, filamentos/gramas por peça, tempo por peça, auxiliares, parâmetros, custos congelados); OP mínima (quantidade, responsável, prioridade, pedido opcional); consumo confirmado sem reconhecer custo/unidades públicas antes da conclusão; inspeção com três fotos distintas e observações; reconhecimento único na primeira conclusão; Estoque único por unidade; valor atual do estoque no Financeiro. Ajuste excepcional de consumo/tempo preservado. Entrada manual de peça comprada e vendas/CPV/caixa preservados.

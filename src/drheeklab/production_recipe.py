@@ -18,6 +18,8 @@ class RecipeProduction:
     def save_recipe(self, variant_id, printer_id, project_id, minutes, filaments, auxiliary='0', parameters=''):
         """Amounts and duration describe ONE unit. Save a revision, not an expense."""
         variant=self.products.active_variant(variant_id)
+        if self.db.execute('SELECT 1 FROM purchased_products WHERE product_id=?',(variant['product_id'],)).fetchone():
+            raise ValueError('Peça comprada pertence ao Estoque; cadastre um modelo próprio em Produção para imprimir.')
         self.products.active_product(variant['product_id'])
         project=self.products.get('project_versions',project_id)
         if project['archived'] or project['product_id']!=variant['product_id']:

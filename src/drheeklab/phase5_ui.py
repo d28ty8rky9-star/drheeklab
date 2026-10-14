@@ -8,6 +8,7 @@ from PySide6.QtWidgets import QWidget,QVBoxLayout,QHBoxLayout,QLabel,QComboBox,Q
 from .phase2_ui import FormDialog, table, fill_table, button, scroll
 from .production import Production, STATES, PRIORITIES, CHECKS, CHECK_LABELS, VIEWS
 from .pricing import brl
+from .time_input import hours_to_minutes,minutes_to_hours
 
 
 class EntryEditor(QWidget):
@@ -24,7 +25,7 @@ class EntryEditor(QWidget):
         self.variant.currentIndexChanged.connect(self.projects);self.projects()
         self.filaments=[];self.filament_layout=QVBoxLayout();layout.addLayout(self.filament_layout)
         button('Adicionar carretel deste modelo',self.add_spool,layout);self.add_spool()
-        aux=QHBoxLayout();layout.addLayout(aux);aux.addWidget(QLabel('Auxiliares (R$)'));self.aux=QLineEdit('0');aux.addWidget(self.aux)
+        aux=QHBoxLayout();layout.addLayout(aux);aux.addWidget(QLabel('Custos adicionais (R$ por peça)' if recipe else 'Auxiliares (R$)'));self.aux=QLineEdit('0');aux.addWidget(self.aux)
         self.weight=QLineEdit()
         if not recipe:
             aux.addWidget(QLabel('Peso manual de rateio (opcional)'));aux.addWidget(self.weight)
@@ -43,12 +44,15 @@ class EntryEditor(QWidget):
         remove=QPushButton('Remover');row.addWidget(remove);self.filament_layout.addLayout(row)
         data=(combo,grams,row);self.filaments.append(data)
         remove.clicked.connect(lambda:self.remove_spool(data))
+        if getattr(self,'changed',None):
+            combo.currentIndexChanged.connect(self.changed);grams.textChanged.connect(self.changed);self.changed()
 
     def remove_spool(self,data):
         self.filaments.remove(data)
         while data[2].count():
             widget=data[2].takeAt(0).widget();widget.hide();widget.deleteLater()
         self.filament_layout.removeItem(data[2])
+        if getattr(self,'changed',None):self.changed()
 
     def value(self):
         if not self.variant.currentData() or not self.project.currentData():raise ValueError('Cadastre um modelo, variante e arquivo STL/3MF em Produtos.')
@@ -59,7 +63,7 @@ class OrderDialog(FormDialog):
     def __init__(self, production,parent=None):
         super().__init__('Nova OP — lote simples ou misto',parent);self.production=production;self.resize(850,750)
         self.combo('printer','Impressora',{p['id']:p['identifier'] for p in production.catalog.rows('printers') if p['status']=='operational'},1)
-        self.line('minutes','Tempo previsto total do lote (min)',60)
+        self.line('hours','Tempo previsto total do lote (horas)','1','Ex.: 1,5 = 1 hora e 30 minutos')
         self.line('responsible','Responsável *');self.line('parameters','Camada, preenchimento, temperaturas, suportes *')
         self.combo('priority','Prioridade',PRIORITIES,'normal')
         choices={None:'Para estoque'}
@@ -79,13 +83,13 @@ class OrderDialog(FormDialog):
 
     def persist(self):
         v=self.values(); weights=[e.weight.text().strip() for e in self.editors]
-        self.saved_id=self.production.create(v['printer'],v['minutes'],[e.value() for e in self.editors],v['responsible'],v['parameters'],v['priority'],v['item'],weights if any(weights) else None,v['allocation_reason'])
+        self.saved_id=self.production.create(v['printer'],hours_to_minutes(v['hours']),[e.value() for e in self.editors],v['responsible'],v['parameters'],v['priority'],v['item'],weights if any(weights) else None,v['allocation_reason'])
 
 
 class ConfirmDialog(FormDialog):
     def __init__(self,production,identifier,parent=None):
         super().__init__('Confirmar tentativa: tempo, consumo e falhas',parent);self.production=production;self.identifier=identifier
-        self.line('minutes','Tempo real confirmado (min)',production.elapsed_minutes(identifier))
+        self.line('hours','Tempo real confirmado (horas)',minutes_to_hours(production.elapsed_minutes(identifier)),'Ex.: 1,5 = 1 hora e 30 minutos')
         self.line('progress','Progresso estimado (%)',100);self.line('reason','Motivo das falhas / interrupção')
         self.inputs=[]
         for e in production.entries(identifier):
@@ -111,7 +115,7 @@ class ConfirmDialog(FormDialog):
             value={'entry_id':e['id'],'consumptions':{key:field.text() for key,field in fs.items()},'failed':failed.text(),'auxiliary':aux.text()}
             if loss.text().strip():value['loss_percent']=loss.text()
             entries.append(value)
-        self.production.confirm(self.identifier,v['minutes'],entries,v['progress'],v['reason'])
+        self.production.confirm(self.identifier,hours_to_minutes(v['hours']),entries,v['progress'],v['reason'])
 
 
 class InspectionDialog(FormDialog):
@@ -154,7 +158,7 @@ class ProductionPage(QWidget):
         bar2.addWidget(self.priority_box);button('Alterar prioridade',self.set_priority,bar2);button('↑',lambda:self.move(-1),bar2);button('↓',lambda:self.move(1),bar2);button('Parâmetros / revalidação',self.revalidate,bar2);button('Registrar problema',self.problem,bar2)
         self.inspection_progress=QProgressBar();self.inspection_progress.setFormat("Peças aprovadas / planejadas: %v / %m");q.addWidget(self.inspection_progress)
         self.summary_label=QLabel();self.summary_label.setWordWrap(True);q.addWidget(self.summary_label)
-        self.piece_table=table(['Peça','Variante','Estado','Inspeção','Custo alocado']);q.addWidget(self.piece_table)
+        self.piece_table=table(['Peça','Variante','Estado','Inspeção','Custo alocado']);self.piece_table.setColumnHidden(4,True);q.addWidget(self.piece_table)
         self.history=QTextEdit();self.history.setReadOnly(True);q.addWidget(self.history)
         button('Histórico e fotos da peça',self.inspection_history,q)
         button('Emitir relatório PDF da OP',self.pdf,q)

@@ -36,7 +36,7 @@ class CatalogPDFDialog(FormDialog):
         self.line('title','Título','Catálogo Dr. Heek Lab');self.line('notes','Observações da oferta')
         self.listing=QTableWidget(0,4);self.listing.setHorizontalHeaderLabels(['Incluir','Modelo / variante','Preço escolhido (R$)','Descrição resumida'])
         self.listing.setMinimumHeight(320);self.form.addRow(self.listing);self.rows=[];products=Products(documents.storage)
-        for product in products.search():
+        for product in products.search(include_stock=True):
             for variant in products.variants(product['id']):
                 if variant['archived']:continue
                 index=self.listing.rowCount();self.listing.insertRow(index);check=QCheckBox();self.listing.setCellWidget(index,0,check)

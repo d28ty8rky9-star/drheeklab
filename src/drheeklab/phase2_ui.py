@@ -9,6 +9,7 @@ from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QFormLayout, Q
     QTableWidget, QTableWidgetItem, QHeaderView, QMessageBox, QTextEdit,
     QScrollArea, QTabWidget)
 from .catalog import Catalog, PRINTER_STATES, FILAMENT_STATES
+from .time_input import hours_to_minutes,minutes_to_hours
 from .pricing import brl, hourly_cost, compare, number
 
 
@@ -398,7 +399,7 @@ class ActualDialog(FormDialog):
         self.catalog, self.identifier = catalog, identifier
         self.planned = json.loads(catalog.get('calculations', identifier)['planned'])
         self.form.addRow(QLabel('A confirmação é única e reduz saldos conhecidos.\nReferências de custo permanecem as da previsão.'))
-        self.line('minutes', 'Tempo real (minutos)', self.planned['minutes'])
+        self.line('hours', 'Tempo real (horas)', minutes_to_hours(self.planned['minutes']), 'Ex.: 1,5 = 1 hora e 30 minutos')
         self.line('quantity', 'Quantidade real de peças', self.planned['quantity'])
         self.line('auxiliary', 'Materiais auxiliares reais (R$)', self.planned['auxiliary'])
         for row in self.planned['filaments']:
@@ -408,7 +409,7 @@ class ActualDialog(FormDialog):
         values = self.values()
         if QMessageBox.question(self, 'Consolidar custo real', 'Confirmar tempo e consumo? Saldo conhecido será reduzido e o tempo será somado à impressora. Não será possível confirmar novamente.', QMessageBox.Yes | QMessageBox.No, QMessageBox.No) != QMessageBox.Yes:
             raise ValueError('Confirmação cancelada; nenhum dado foi consolidado.')
-        self.comparison = self.catalog.confirm_actual(self.identifier, values['minutes'],
+        self.comparison = self.catalog.confirm_actual(self.identifier, hours_to_minutes(values['hours']),
             {row['id']: values[str(row['id'])] for row in self.planned['filaments']}, values['auxiliary'], values['quantity'])
 
 
@@ -433,13 +434,13 @@ class CalculatorPage(QWidget):
         self.title = QLineEdit()
         self.title.setPlaceholderText('Descrição para identificar o cálculo')
         self.printer = QComboBox()
-        self.minutes = QLineEdit('60')
+        self.hours = QLineEdit('1');self.hours.setPlaceholderText('Ex.: 1,5 = 1 hora e 30 minutos')
         self.quantity = QLineEdit('1')
         self.markup = QLineEdit(str(storage.get('markup_percent', '200')))
         self.auxiliary = QLineEdit('0')
         self.final = QLineEdit()
         self.final.setPlaceholderText('Vazio: usar preço sugerido; 0: preço final gratuito')
-        for label, item in (('Descrição *', self.title), ('Impressora', self.printer), ('Tempo previsto (minutos)', self.minutes),
+        for label, item in (('Descrição *', self.title), ('Impressora', self.printer), ('Tempo previsto (horas)', self.hours),
                             ('Quantidade de peças', self.quantity), ('Acréscimo (%)', self.markup),
                             ('Materiais auxiliares TOTAL (R$)', self.auxiliary), ('Preço final TOTAL (R$)', self.final)):
             form.addRow(label, item)
@@ -471,7 +472,7 @@ class CalculatorPage(QWidget):
         self.timer.setSingleShot(True)
         self.timer.setInterval(600)
         self.timer.timeout.connect(self.save_draft)
-        for item in (self.title, self.minutes, self.quantity, self.markup, self.auxiliary, self.final):
+        for item in (self.title, self.hours, self.quantity, self.markup, self.auxiliary, self.final):
             item.textChanged.connect(self.changed)
         self.printer.currentIndexChanged.connect(self.changed)
         self.refresh()
@@ -549,7 +550,7 @@ class CalculatorPage(QWidget):
             self.timer.start()
 
     def save_draft(self):
-        data = {key: getattr(self, key).text() for key in ('title', 'minutes', 'quantity', 'markup', 'auxiliary', 'final')}
+        data = {key: getattr(self, key).text() for key in ('title', 'hours', 'quantity', 'markup', 'auxiliary', 'final')}
         data['printer'] = self.printer.currentData()
         data['filaments'] = [[combo.currentData(), weight.text()] for _, combo, weight in self.spool_rows]
         self.storage.save_draft('calculator', json.dumps(data, ensure_ascii=False))
@@ -560,7 +561,8 @@ class CalculatorPage(QWidget):
         if saved:
             try:
                 data = json.loads(saved)
-                for key in ('title', 'minutes', 'quantity', 'markup', 'auxiliary', 'final'):
+                if 'hours' not in data:data['hours']=minutes_to_hours(data['minutes'])
+                for key in ('title', 'hours', 'quantity', 'markup', 'auxiliary', 'final'):
                     getattr(self, key).setText(str(data[key]))
                 self.printer.setCurrentIndex(self.printer.findData(data['printer']))
                 for identifier, weight in data['filaments']:
@@ -576,7 +578,7 @@ class CalculatorPage(QWidget):
         selections = [(combo.currentData(), weight.text()) for _, combo, weight in self.spool_rows]
         if any(identifier is None for identifier, weight in selections):
             raise ValueError('Selecione carretéis disponíveis; cadastre filamentos em Estoque.')
-        return {'printer_id': self.printer.currentData(), 'minutes': self.minutes.text(), 'selections': selections,
+        return {'printer_id': self.printer.currentData(), 'minutes': hours_to_minutes(self.hours.text()), 'selections': selections,
                 'auxiliary': self.auxiliary.text(), 'quantity': self.quantity.text(), 'markup': self.markup.text(),
                 'final': self.final.text() if self.final.text().strip() else None}
 

@@ -70,6 +70,8 @@ class Production(RecipeProduction):
             for entry in entries:
                 variant = self.products.active_variant(entry['variant_id'])
                 model = self.products.active_product(variant['product_id'])
+                if self.db.execute('SELECT 1 FROM purchased_products WHERE product_id=?',(model['id'],)).fetchone():
+                    raise ValueError('Peça comprada pertence ao Estoque, não à produção.')
                 project = self.products.get('project_versions', entry['project_id'])
                 if project['archived']: raise ValueError('Restaure a versão do arquivo antes de criar nova OP.')
                 if project['product_id'] != model['id']: raise ValueError('Arquivo não pertence ao modelo selecionado.')

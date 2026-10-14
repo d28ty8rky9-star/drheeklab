@@ -25,7 +25,7 @@ def test_real_recipe_minimal_op_inspection_stock_and_finance(tmp_path,monkeypatc
     assert not p.inventory.pieces()
     reopen=RecipeDialog(p,variant,window)
     assert reopen.editor.filaments[0][1].text()=='25'
-    assert reopen.fields['minutes'].text()=='60';reopen.reject()
+    assert reopen.fields['hours'].text()=='1';reopen.reject()
     order=window.workshop.prepare_order();order.fields['quantity'].setText('2');order.fields['responsible'].setText('Operador')
     assert set(order.fields)=={'quantity','responsible','priority','item'}
     monkeypatch.setattr(window.workshop,'prepare_order',lambda:order)

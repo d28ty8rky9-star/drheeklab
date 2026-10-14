@@ -7,7 +7,7 @@ import uuid
 from decimal import Decimal
 from PySide6.QtGui import QImageReader
 from .catalog import Catalog, required
-from .pricing import cents, integer
+from .pricing import cents, integer,brl
 from .storage import now
 from .transactions import transaction
 from .backup import digest
@@ -44,18 +44,28 @@ class Products:
             raise ValueError('Restaure a variante antes de movimentar seu estoque.')
         return variant
 
-    def search(self, text='', category=None, archived=False):
+    def search(self, text='', category=None, archived=False, *, include_stock=False):
         # Literal match, including accented text, avoids SQL LIKE wildcard surprises.
         rows = [dict(row) for row in self.db.execute('SELECT * FROM products WHERE archived=? ORDER BY id', (int(archived),))]
         term = text.casefold().strip()
         result = []
         for row in rows:
+            if not include_stock and self.db.execute('SELECT 1 FROM purchased_products WHERE product_id=?',(row['id'],)).fetchone():continue
             variants = self.variants(row['id'])
             searchable = ' '.join(str(row[k]) for k in ('code', 'name', 'description', 'quality_notes'))
             searchable += ' ' + ' '.join(' '.join(str(v[k]) for k in ('name', 'size', 'color', 'material')) for v in variants)
             if (not term or term in searchable.casefold()) and (category is None or row['category'] == category):
                 result.append(row)
         return result
+
+    def production_cost_label(self, product_id):
+        costs=[]
+        for row in self.db.execute('SELECT r.data FROM production_recipes r JOIN variants v ON v.id=r.variant_id WHERE v.product_id=? AND v.archived=0',(product_id,)):
+            estimate=json.loads(row[0])['estimate'];value=estimate.get('acquisition_production_cost')
+            costs.append(Decimal(value if value is not None else estimate['total_cost']))
+        if not costs:return 'Ficha não preenchida'
+        lower,upper=min(costs),max(costs)
+        return brl(lower) if lower==upper else brl(lower)+' a '+brl(upper)+' (variantes)'
 
     def save(self, data, identifier=None):
         category = data.get('category', 'decorative')

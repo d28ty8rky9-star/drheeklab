@@ -1,3 +1,12 @@
+# 2.9.1 — Valor de produção, estoque independente e horas
+
+- Valor demonstrativo por peça/variante no catálogo e seleção; cálculo da ficha atualiza ao editar material, horas e adicionais.
+- Nova peça comprada diretamente no Estoque, sem ficha em Produção, STL ou OP; reservas e venda/CPV preservados.
+- Campos de tempo da peça em horas, com conversão para minutos sem modificar fórmulas ou histórico.
+- Rascunhos antigos da calculadora convertidos; peças compradas disponíveis em Vendas/Financeiro/busca/catálogo PDF.
+- Banco schema 9 com migração/backup; custo da impressão continua reconhecido apenas na conclusão e entrada no estoque.
+- ZIP e instalador somente quando solicitados.
+
 # 2.9.1 — Ficha de produção, OP simples e estoque único
 
 - Ficha por variante com arquivo, filamentos, gramas, tempo, auxiliares e parâmetros; sem movimentação no cadastro.

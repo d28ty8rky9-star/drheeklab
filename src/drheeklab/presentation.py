@@ -35,7 +35,7 @@ class ModernPresentation:
         products.gallery.setGridSize(QSize(245,215))
         products.gallery.setSpacing(8);products.gallery.setMinimumHeight(220)
         from .phase2_ui import table
-        self.product_table=table(['Código','Peça','Categoria','Preço'])
+        self.product_table=table(['Código','Peça','Categoria','Preço','Valor de produção (demonstrativo)'])
         self.product_table.hide();products.layout().insertWidget(3,self.product_table)
         self.product_table.itemSelectionChanged.connect(lambda:self.select_table_product(products))
         products._after_refresh=lambda:self.sync_product_table(products)
@@ -74,7 +74,7 @@ class ModernPresentation:
         from .products import CATEGORIES
         rows=page.products.search(page.search.text(),page.category.currentData(),page.trash.isChecked())
         self.product_table.blockSignals(True)
-        fill_table(self.product_table,[(r['code'],r['name'],CATEGORIES.get(r['category'],r['category']),currency(r['suggested_price_cents']) if r['suggested_price_cents'] is not None else 'Não informado') for r in rows])
+        fill_table(self.product_table,[(r['code'],r['name'],CATEGORIES.get(r['category'],r['category']),currency(r['suggested_price_cents']) if r['suggested_price_cents'] is not None else 'Não informado',page.products.production_cost_label(r['id'])) for r in rows])
         self.product_ids=[r['id'] for r in rows]
         selected=page.selected_product(False)
         self.product_table.clearSelection();self.product_table.setCurrentCell(-1,-1)

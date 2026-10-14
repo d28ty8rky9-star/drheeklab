@@ -13,6 +13,7 @@ from .catalog import Catalog
 from .products import Products, CATEGORIES
 from .inventory import Inventory, PIECE_STATES
 from .pricing import brl
+from .time_input import hours_to_minutes,minutes_to_hours
 from .phase2_ui import FormDialog, button, table, fill_table, scroll, date_br, date_iso, decimal_cents, grams
 
 
@@ -40,13 +41,14 @@ class ProductDialog(FormDialog):
         selection_combo(self, 'printer_id', 'Impressora recomendada', printers, row.get('printer_id'), lambda r: r['identifier'] + ' • ' + r['model'])
         selection_combo(self, 'filament_id', 'Filamento recomendado', filaments, row.get('filament_id'), lambda r: r['name'] + ' • ' + r['material'])
         self.line('settings', 'Configurações recomendadas', row.get('settings', ''), 'Dados manuais do fatiamento: camada, suportes, preenchimento…')
-        self.line('estimated_minutes', 'Tempo estimado (minutos)', row.get('estimated_minutes', 0))
+        self.line('estimated_hours', 'Tempo estimado (horas)', minutes_to_hours(row.get('estimated_minutes', 0)), 'Ex.: 1,5 = 1 hora e 30 minutos')
         self.line('planned_cost', 'Custo previsto por peça (R$)', money_optional(row.get('planned_cost_cents')), 'Vazio: não informado')
         self.line('suggested_price', 'Preço sugerido por peça (R$)', money_optional(row.get('suggested_price_cents')), 'Vazio: não informado')
         self.line('quality_notes', 'Observações de qualidade', row.get('quality_notes', ''))
 
     def persist(self):
-        self.saved_id = self.products.save(self.values(), self.identifier)
+        values=self.values();values['estimated_minutes']=hours_to_minutes(values.pop('estimated_hours'))
+        self.saved_id = self.products.save(values, self.identifier)
 
 
 class VariantDialog(FormDialog):
@@ -155,7 +157,7 @@ class ProductsPage(QWidget):
             price = 'Preço não informado' if product['suggested_price_cents'] is None else brl(Decimal(product['suggested_price_cents']) / 100)
             photos = self.products.media(product['id'], 'photo')
             photo = next((p for p in photos if p['is_primary']), None)
-            item = QListWidgetItem(f"{product['code']} • {product['name']}\n{CATEGORIES.get(product['category'], product['category'])} • {price}" + ('\nSem foto principal' if not photo else ''))
+            item = QListWidgetItem(f"{product['code']} • {product['name']}\n{CATEGORIES.get(product['category'], product['category'])} • {price}\nValor de produção: {self.products.production_cost_label(product['id'])}" + ('\nSem foto principal' if not photo else ''))
             if photo:
                 try:
                     item.setIcon(QIcon(str(self.products.media_path(photo['id'], 'photo', verify=False))))
@@ -184,7 +186,7 @@ class ProductsPage(QWidget):
             self.variant_rows, self.photo_rows, self.project_rows = [], [], []
         else:
             product = self.products.get('products', identifier)
-            self.info.setText(f"{product['code']} • {product['name']} • {CATEGORIES[product['category']]}\n{product['description']}\nConfigurações: {product['settings']} • {product['estimated_minutes']} min\nQualidade: {product['quality_notes']}")
+            self.info.setText(f"{product['code']} • {product['name']} • {CATEGORIES[product['category']]}\n{product['description']}\nConfigurações: {product['settings']} • {minutes_to_hours(product['estimated_minutes'])} h\nQualidade: {product['quality_notes']}")
             self.variant_rows = self.products.variants(identifier, self.variant_trash.isChecked())
             self.photo_rows = self.products.media(identifier, 'photo')
             self.project_rows = self.products.media(identifier, 'project')
@@ -326,6 +328,10 @@ class ReceiptDialog(FormDialog):
         super().__init__('Entrada de peças físicas • não registra venda', parent)
         self.inventory = inventory
         self.operation_key = uuid.uuid4().hex
+        self.combo('entry_kind','Tipo de entrada',{'existing':'Peça já cadastrada','purchased':'Nova peça comprada (sem Produção)'},'existing')
+        self.line('name','Nome da peça comprada *')
+        self.line('description','Descrição da peça comprada')
+        self.line('suggested_price','Preço de venda sugerido (R$)','')
         choices = {r['id']: r['code'] + ' • ' + r['product_name'] + ' / ' + r['name'] for r in inventory.products.all_variants()}
         self.combo('variant_id', 'Produto / variante *', choices, next(iter(choices), None))
         calcs = {None: 'Entrada manual (peças já existentes)'}
@@ -342,7 +348,18 @@ class ReceiptDialog(FormDialog):
         self.checked = QCheckBox('Confirmo a verificação prévia de cada peça quando marcar disponível')
         self.form.addRow(self.checked)
         self.fields['calculation_id'].currentIndexChanged.connect(self.load_calculation)
+        self.fields['entry_kind'].currentIndexChanged.connect(self.entry_kind_changed)
+        self.entry_kind_changed()
         self.form.addRow(QLabel('Não há nova baixa de filamento. Custo existente é rateado sem duplicação.\nPeças vinculadas a OP exigem inspeção formal com três fotos em Produção.'))
+
+    def entry_kind_changed(self):
+        purchased=self.fields['entry_kind'].currentData()=='purchased'
+        for key in ('name','description','suggested_price'):
+            self.fields[key].setVisible(purchased);self.form.labelForField(self.fields[key]).setVisible(purchased)
+        for key in ('variant_id','calculation_id'):
+            self.fields[key].setVisible(not purchased);self.form.labelForField(self.fields[key]).setVisible(not purchased)
+        if purchased:self.fields['calculation_id'].setCurrentIndex(self.fields['calculation_id'].findData(None))
+        self.load_calculation()
 
     def load_calculation(self):
         identifier = self.fields['calculation_id'].currentData()
@@ -355,11 +372,16 @@ class ReceiptDialog(FormDialog):
 
     def persist(self):
         values = self.values()
-        if values['variant_id'] is None:
-            raise ValueError('Cadastre um produto e uma variante primeiro.')
+        purchased=values.pop('entry_kind')=='purchased'
+        name=values.pop('name');description=values.pop('description');suggested_price=values.pop('suggested_price')
+        if not purchased and values['variant_id'] is None:
+            raise ValueError('Selecione uma peça existente ou escolha Nova peça comprada.')
         if values['state'] == 'available' and not self.checked.isChecked():
             raise ValueError('Confirme a verificação prévia das peças ou use Aguardando verificação.')
-        self.receipt_id, self.piece_ids = self.inventory.receive(**values, operation_key=self.operation_key)
+        if purchased:
+            values.pop('variant_id');values.pop('calculation_id')
+            self.receipt_id,self.piece_ids=self.inventory.receive_purchased(name=name,description=description,suggested_price=suggested_price,**values,operation_key=self.operation_key)
+        else:self.receipt_id, self.piece_ids = self.inventory.receive(**values, operation_key=self.operation_key)
 
 
 class ReserveDialog(FormDialog):
@@ -454,7 +476,7 @@ class StockPage(QWidget):
         self.pieces_table.setSelectionMode(QTableWidget.ExtendedSelection); pb.addWidget(self.pieces_table)
         controls = QHBoxLayout(); button('Verificar / liberar selecionadas', self.review, controls)
         button('Descartar selecionadas', self.piece_loss, controls); pb.addLayout(controls)
-        controls=QHBoxLayout();button('Entrada manual / peça comprada',self.receive,controls)
+        controls=QHBoxLayout();button('Entrada manual / peça comprada',self.receive,controls);button('Nova peça comprada',self.receive_purchased,controls)
         button('Reservar disponíveis',self.reserve,controls);pb.addLayout(controls)
         self.tabs.addTab(physical, 'Estoque')
         reservations = QWidget(); rb = QVBoxLayout(reservations)
@@ -551,6 +573,11 @@ class StockPage(QWidget):
     def receive(self):
         if ReceiptDialog(self.inventory, self).exec() == QDialog.Accepted:
             self.refresh()
+
+    def receive_purchased(self):
+        dialog=ReceiptDialog(self.inventory,self)
+        dialog.fields['entry_kind'].setCurrentIndex(dialog.fields['entry_kind'].findData('purchased'))
+        if dialog.exec()==QDialog.Accepted:self.refresh()
 
     def reserve(self):
         index=self.pieces_table.currentRow()

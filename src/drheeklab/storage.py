@@ -11,11 +11,12 @@ from .migration5 import STATEMENTS as PRODUCTION_STATEMENTS
 from .migration6 import STATEMENTS as FINANCE_STATEMENTS
 from .migration7 import STATEMENTS as DOCUMENT_STATEMENTS
 from .migration8 import STATEMENTS as RECIPE_STATEMENTS
+from .migration9 import STATEMENTS as PURCHASED_STATEMENTS
 
 FOLDERS = ("Banco de Dados", "Projetos STL e 3MF", "Fotos dos Produtos", "Orçamentos",
            "Pedidos e Comprovantes", "Catálogos", "Relatórios", "Backups", "Logs", "Marca")
 ENVIRONMENTS = {"test": "TESTES", "production": "PRODUÇÃO"}
-SCHEMA_VERSION = 8
+SCHEMA_VERSION = 9
 MIGRATIONS = {1: (
     "CREATE TABLE settings (key TEXT PRIMARY KEY, value TEXT NOT NULL)",
     "CREATE TABLE users (id INTEGER PRIMARY KEY CHECK(id=1), salt TEXT NOT NULL, password_hash TEXT NOT NULL, iterations INTEGER NOT NULL)",
@@ -30,7 +31,7 @@ MIGRATIONS = {1: (
     "INSERT INTO printers(manufacturer,model,identifier,purchase_cents,investment_hour_cents,energy_hour_cents,maintenance_hour_cents,status) VALUES('Bambu Lab','A1 Mini','A1-MINI-01',240000,75,10,25,'operational')",
     "INSERT INTO settings VALUES('markup_percent','\"200\"') ON CONFLICT(key) DO NOTHING",
     "INSERT INTO settings VALUES('low_filament_grams','\"100\"') ON CONFLICT(key) DO NOTHING",
-), 3: STATEMENTS, 4: SALES_STATEMENTS, 5: PRODUCTION_STATEMENTS, 6: FINANCE_STATEMENTS, 7: DOCUMENT_STATEMENTS, 8: RECIPE_STATEMENTS}
+), 3: STATEMENTS, 4: SALES_STATEMENTS, 5: PRODUCTION_STATEMENTS, 6: FINANCE_STATEMENTS, 7: DOCUMENT_STATEMENTS, 8: RECIPE_STATEMENTS, 9: PURCHASED_STATEMENTS}
 
 def now():
     return datetime.now(timezone.utc).isoformat()

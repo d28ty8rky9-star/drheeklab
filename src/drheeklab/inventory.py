@@ -100,6 +100,16 @@ class Inventory:
         visible='NOT EXISTS(SELECT 1 FROM production_pieces pp JOIN production_entries e ON e.id=pp.entry_id JOIN recipe_orders ro ON ro.op_id=e.op_id LEFT JOIN production_completions c ON c.op_id=e.op_id WHERE pp.piece_id=p.id AND c.op_id IS NULL)'
         return [dict(row) for row in self.db.execute(sql+' WHERE '+visible+(' AND p.variant_id=?' if variant_id is not None else '')+' ORDER BY p.id',(variant_id,) if variant_id is not None else ())]
 
+    def receive_purchased(self, name, quantity, source, state, condition, operation_key, total_cost='0', reviewer='', description='', suggested_price=''):
+        """Create a stock-only saleable item and receipt atomically."""
+        with transaction(self.db):
+            product=self.products.save({'name':name,'description':description,'category':'decorative','suggested_price':suggested_price})
+            self.db.execute('INSERT INTO purchased_products VALUES(?)',(product,))
+            variant=self.products.variants(product)[0]['id']
+            receipt,pieces=self.receive(variant,quantity,source,state,condition,operation_key,total_cost=total_cost,reviewer=reviewer)
+            self.storage.audit('estoque:peça comprada',f'products:{product}',None,{'receipt':receipt,'pieces':pieces},source)
+        return receipt,pieces
+
     def receive(self, variant_id, quantity, source, state, condition, operation_key, total_cost='0', calculation_id=None, reviewer=''):
         quantity = integer(quantity, 'Quantidade', minimum=1)
         if quantity > 10000:

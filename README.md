@@ -6,6 +6,8 @@ Disponível: login, ambientes separados, temas, menu recolhível, configuraçõe
 
 O novo fluxo salva os dados técnicos na ficha de Produção, cria OPs simples e libera Estoque/custo financeiro na conclusão com fotos e observações, sem pagamento automático. Veja [como usar e limites](docs/fluxo-producao-estoque.md). Código atualizado; o pacote anterior não contém esta alteração.
 
+Também disponível: valor demonstrativo da peça em Produção, entrada de peça comprada diretamente no Estoque e tempo informado em horas. [Como usar](docs/valor-producao-estoque-horas.md).
+
 ## Executar a partir do código
 
 Windows (Python 3.12 para desenvolvimento):
