@@ -1,3 +1,7 @@
+# Estado atual — Vendas simplificada e cálculo por origem
+
+Implementadas abas Vendas, Orçamentos, Clientes, Contas a pagar e receber e Precificação. Nova venda: cliente, unidades exatas do estoque, detalhes históricos, produzidas +100%, compradas +30%, acessórios pelo custo. Valor real das peças editável; acessórios separados e somados ao custo. Sem despesa/pagamento automático duplicado. Schema 10/versão 2.9.1. Consulte docs/vendas-estoque.md e testes test_stock_sale*.py. ZIP somente mediante pedido explícito. Notas seguintes históricas.
+
 # Última entrega — ZIP refeito após publicação do ambiente
 
 Usuário pediu explicitamente refazer o ZIP depois de publicar o ambiente. Nova compilação completa Windows: dist/DrHeekLab-2.9.1-CadastroCompleto-Refeito-Windows.zip; run 38652867662; artifact 11935828123; código compilado 2c182cac4fb8878bb6e37e2e6b831403ba4013fe. Versão 2.9.1/schema 9, mesma ficha integrada com cálculo automático/extras/OP sem recadastro/custo único.

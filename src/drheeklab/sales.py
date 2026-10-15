@@ -16,7 +16,9 @@ from .sales_documents import emit,import_attachment,owned_path
 
 PAYMENT_METHODS={'pix':'Pix','cash':'Dinheiro','debit':'Débito','credit_card':'Crédito','transfer':'Transferência','other':'Outros','customer_credit':'Crédito do cliente'}
 
-class Sales:
+from .stock_sale import StockSales
+
+class Sales(StockSales):
     def __init__(self,storage):
         self.storage,self.db=storage,storage.db
         self.inventory=Inventory(storage)
@@ -99,7 +101,7 @@ class Sales:
             if fulfillment not in ('stock','production'): raise ValueError('Origem do item inválida.')
             if fulfillment=='stock' and variant is None: raise ValueError('Item de estoque precisa de variante cadastrada.')
             result.append({'variant_id':variant_id,'description':description,'quantity':quantity,'unit_price_cents':unit,
-                'total_cents':unit*quantity,'fulfillment':fulfillment,'snapshot':{'product':product,'variant':variant},'files':list(item.get('files',[]))})
+                'total_cents':unit*quantity,'fulfillment':fulfillment,'snapshot':{'product':product,'variant':variant},'files':list(item.get('files',[])),'piece_ids':item.get('piece_ids')})
         return result
 
     def quote_state(self,row):
@@ -171,7 +173,7 @@ class Sales:
         for index,row in enumerate(rows):
             item=self.db.execute('INSERT INTO order_items(order_id,variant_id,description,quantity,unit_price_cents,total_cents,snapshot,fulfillment) VALUES(?,?,?,?,?,?,?,?)',
                 (identifier,row['variant_id'],row['description'],row['quantity'],row['unit_price_cents'],row['total_cents'],json.dumps(row['snapshot'],ensure_ascii=False),row['fulfillment'])).lastrowid
-            if row['fulfillment']=='stock': self.reserve_item(item)
+            if row['fulfillment']=='stock': self.reserve_item(item,piece_ids=row.get('piece_ids'))
             for source in row.get('files',[]): import_attachment(self.storage,source,order_id=identifier,item_id=item,item_index=index,created=files)
         planned=installments if installments is not None else ([{'amount':str(Decimal(total)/100),'due_on':due_on}] if total else [])
         self._installments(identifier,planned,total)
@@ -275,7 +277,7 @@ class Sales:
             self.emit_order(order_id,files)
             return payment
 
-    def reserve_item(self,item_id,variant_id=None):
+    def reserve_item(self,item_id,variant_id=None,*,piece_ids=None):
         with transaction(self.db):
             item=self.get('order_items',item_id); order=self.get('orders',item['order_id'])
             if order['state']=='cancelled': raise ValueError('Pedido cancelado não reserva peças.')
@@ -286,7 +288,7 @@ class Sales:
             if variant_id is not None and variant_id!=expected: raise ValueError('Não é possível trocar a variante de um item aprovado.')
             if item['variant_id'] is None and existing is None:
                 self.db.execute('INSERT INTO order_fulfillment VALUES(?,?)',(item_id,expected))
-            reserved=self.inventory.reserve(expected,item['quantity'],order['code'],'order-item-'+str(item_id)+'-'+uuid.uuid4().hex)
+            reserved=self.inventory.reserve(expected,item['quantity'],order['code'],'order-item-'+str(item_id)+'-'+uuid.uuid4().hex,piece_ids=piece_ids)
             self.db.execute('UPDATE order_items SET reservation_id=? WHERE id=?',(reserved,item_id))
             self.storage.audit('pedido:peças reservadas',f'order_items:{item_id}',None,{'reservation_id':reserved})
             return reserved

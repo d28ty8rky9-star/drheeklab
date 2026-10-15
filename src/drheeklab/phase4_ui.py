@@ -419,30 +419,45 @@ class OrderDetails(QDialog):
 class SalesPage(QWidget):
     def __init__(self,storage,calculator):
         super().__init__(); self.sales=Sales(storage)
-        box=QVBoxLayout(self); self.tabs=QTabWidget(); box.addWidget(self.tabs)
+        box=QVBoxLayout(self); self.new_sale_button=button('Nova venda',self.sale_new,box); self.tabs=QTabWidget(); box.addWidget(self.tabs)
         clients=QWidget(); cb=QVBoxLayout(clients); controls=QHBoxLayout()
         button('Novo cliente',self.client_new,controls); button('Editar',self.client_edit,controls); button('Histórico',self.client_history,controls); button('Arquivar / restaurar',self.client_archive,controls)
         self.trash=QCheckBox('Lixeira'); self.trash.toggled.connect(self.refresh); controls.addWidget(self.trash); cb.addLayout(controls)
-        self.client_table=table(['ID','Nome','Telefone','E-mail','Crédito disponível']); cb.addWidget(self.client_table); self.tabs.addTab(clients,'Clientes')
+        self.client_table=table(['ID','Nome','Telefone','E-mail','Crédito disponível']); cb.addWidget(self.client_table)
         quotes=QWidget(); qb=QVBoxLayout(quotes); self.quote_table=table(['ID','Código','Cliente','Total','Validade','Situação']); qb.addWidget(self.quote_table)
-        controls=QHBoxLayout(); button('Novo orçamento',self.quote_new,controls); button('Aprovar → pedido',self.quote_approve,controls); button('Rejeitar',self.quote_reject,controls); button('Abrir PDF',self.quote_pdf,controls); button('Nova versão PDF',self.quote_emit,controls); qb.addLayout(controls); self.tabs.addTab(quotes,'Orçamentos')
-        orders=QWidget(); ob=QVBoxLayout(orders); self.order_table=table(['ID','Pedido','Cliente','Total','Recebido bruto','Crédito aplicado','Saldo','Entrega','Situação','Pagamento']); ob.addWidget(self.order_table)
-        controls=QHBoxLayout(); button('Novo pedido',self.order_new,controls); button('Detalhes / pagamentos / entrega',self.order_details,controls); ob.addLayout(controls); self.tabs.addTab(orders,'Pedidos')
+        controls=QHBoxLayout(); button('Novo orçamento',self.quote_new,controls); button('Aprovar → venda',self.quote_approve,controls); button('Rejeitar',self.quote_reject,controls); button('Abrir PDF',self.quote_pdf,controls); button('Nova versão PDF',self.quote_emit,controls); qb.addLayout(controls)
+        orders=QWidget(); ob=QVBoxLayout(orders); self.order_table=table(['ID','Venda','Cliente','Total','Recebido bruto','Crédito aplicado','Saldo','Entrega','Situação','Pagamento']); ob.addWidget(self.order_table)
+        controls=QHBoxLayout(); button('Venda sob encomenda',self.order_new,controls); button('Detalhes / pagamentos / entrega',self.order_details,controls); ob.addLayout(controls)
         self.order_table.doubleClicked.connect(lambda index:self.order_details())
-        self.receivables_table=table(['Pedido','Cliente','Vencimento','Previsto','Aplicado','Saldo','Situação']); self.tabs.addTab(self.receivables_table,'Contas a receber')
+        from .finance import Finance
+        self.finance=Finance(storage)
+        accounts=QTabWidget()
+        payable=QWidget();pb=QVBoxLayout(payable)
+        self.payables_table=table(['Parcela','Descrição','Categoria','Fornecedor','Previsto','Vencimento','Pago','Saldo','Situação']);pb.addWidget(self.payables_table)
+        actions=QHBoxLayout();pb.addLayout(actions)
+        button('Nova conta a pagar',self.payable_new,actions);button('Pagar parcela',self.payable_pay,actions)
+        receivable=QWidget();rb=QVBoxLayout(receivable)
+        self.receivables_table=table(['Venda','Cliente','Vencimento','Previsto','Aplicado','Saldo','Situação']);rb.addWidget(self.receivables_table)
+        button('Detalhes / registrar recebimento',self.receivable_details,rb)
+        accounts.addTab(payable,'A pagar');accounts.addTab(receivable,'A receber')
+        self.tabs.addTab(orders,'Vendas');self.tabs.addTab(quotes,'Orçamentos');self.tabs.addTab(clients,'Clientes');self.tabs.addTab(accounts,'Contas a pagar e receber')
         self.tabs.addTab(calculator,'Precificação'); self.refresh()
     def refresh(self,*args):
         self.client_rows=self.sales.clients(self.trash.isChecked())
         fill_table(self.client_table,[[r['id'],r['name'],r['phone'],r['email'],currency(self.sales.credit_balance(r['id']))] for r in self.client_rows])
         self.quote_rows=self.sales.quotes()
         fill_table(self.quote_table,[[r['id'],r['code'],json.loads(r['client_snapshot'])['name'],currency(r['total_cents']),date_br(r['valid_until']) or 'Sem validade',QUOTE_STATES[r['display_state']]] for r in self.quote_rows])
-        self.order_rows=self.sales.orders(); order_values=[]; receivables=[]
+        self.order_rows=self.sales.orders(); order_values=[]; receivables=[]; self.receivable_order_ids=[]
         for row in self.order_rows:
             customer=json.loads(row['client_snapshot'])['name']; f=self.sales.financial(row['id']); delivery=self.sales.delivery(row['id'])
             order_values.append([row['id'],row['code'],customer,currency(row['total_cents']),currency(f['cash_received']),currency(f['credit_applied']),currency(f['balance']),DELIVERY_STATES[delivery['state']],'Cancelado' if row['state']=='cancelled' else 'Aprovado','Cancelado' if row['state']=='cancelled' else 'Quitado' if f['balance']==0 else 'Parcial' if f['paid'] else 'Pendente'])
             for item in self.sales.installment_status(row['id']):
+                self.receivable_order_ids.append(row['id'])
                 receivables.append([row['code'],customer,date_br(item['due_on']) or 'Sem vencimento',currency(item['amount_cents']),currency(item['received_cents']),currency(item['balance_cents']),INSTALLMENT_STATES[item['status']]])
         fill_table(self.order_table,order_values); fill_table(self.receivables_table,receivables)
+        self.payable_rows=self.finance.payables()
+        from .finance import STATUS
+        fill_table(self.payables_table,[[r['id'],r['description'],r['category'],r['supplier'],currency(r['amount_cents']),date_br(r['due_on']) or 'Sem vencimento',currency(r['paid_cents']),currency(r['balance_cents']),STATUS[r['status']]] for r in self.payable_rows])
         if getattr(self, '_after_refresh', None): self._after_refresh()
     def selected(self,listing,rows):
         index=listing.currentRow()
@@ -469,6 +484,13 @@ class SalesPage(QWidget):
             f=self.sales.financial(row['id']);lines.append(row['code']+' • '+currency(f['total'])+' • saldo '+currency(f['balance'])+' • '+('Cancelado' if row['state']=='cancelled' else 'Aprovado'))
             lines.extend('  '+date_br(p['paid_on'])+' • '+PAYMENT_METHODS[p['method']]+' • '+currency(p['amount_cents']) for p in self.sales.payments(row['id']))
         text.setPlainText('\n'.join(lines));box.addWidget(text);dialog.exec()
+    def sale_new(self):
+        from .stock_sale_ui import StockSaleDialog
+        dialog=StockSaleDialog(self.sales,self)
+        if dialog.exec()==QDialog.Accepted:
+            self.refresh();self.tabs.setCurrentIndex(0)
+            OrderDetails(self.sales,dialog.saved_id,self).exec();self.refresh()
+
     def quote_new(self):
         if CommercialDialog(self.sales,'quote',self).exec()==QDialog.Accepted:self.refresh()
     def order_new(self):
@@ -498,3 +520,20 @@ class SalesPage(QWidget):
     def order_details(self):
         identifier=self.selected(self.order_table,self.order_rows)
         if identifier is not None:OrderDetails(self.sales,identifier,self).exec();self.refresh()
+
+    def payable_new(self):
+        from .phase6_ui import PayableDialog
+        if PayableDialog(self.finance,self).exec()==QDialog.Accepted:self.refresh()
+
+    def payable_pay(self):
+        from .phase6_ui import PayDialog
+        identifier=self.selected(self.payables_table,self.payable_rows)
+        if identifier is not None:
+            row=next(r for r in self.payable_rows if r['id']==identifier)
+            if PayDialog(self.finance,row,self).exec()==QDialog.Accepted:self.refresh()
+
+    def receivable_details(self):
+        index=self.receivables_table.currentRow()
+        if index<0:
+            QMessageBox.information(self,'Selecione um registro','Selecione uma linha.');return
+        OrderDetails(self.sales,self.receivable_order_ids[index],self).exec();self.refresh()

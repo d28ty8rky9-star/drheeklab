@@ -369,7 +369,7 @@ class ReceiptDialog(FormDialog):
         super().__init__('Entrada de peças físicas • não registra venda', parent)
         self.inventory = inventory
         self.operation_key = uuid.uuid4().hex
-        self.combo('entry_kind','Tipo de entrada',{'existing':'Peça já cadastrada','purchased':'Nova peça comprada (sem Produção)'},'existing')
+        self.combo('entry_kind','Tipo de entrada',{'existing':'Peça já cadastrada','purchased':'Nova peça comprada (sem Produção)','accessory':'Novo acessório (luz, argola, etc.)'},'existing')
         self.line('name','Nome da peça comprada *')
         self.line('description','Descrição da peça comprada')
         self.line('suggested_price','Preço de venda sugerido (R$)','')
@@ -394,12 +394,13 @@ class ReceiptDialog(FormDialog):
         self.form.addRow(QLabel('Não há nova baixa de filamento. Custo existente é rateado sem duplicação.\nPeças vinculadas a OP exigem inspeção formal com três fotos em Produção.'))
 
     def entry_kind_changed(self):
-        purchased=self.fields['entry_kind'].currentData()=='purchased'
+        purchased=self.fields['entry_kind'].currentData() in ('purchased','accessory')
         for key in ('name','description','suggested_price'):
             self.fields[key].setVisible(purchased);self.form.labelForField(self.fields[key]).setVisible(purchased)
         for key in ('variant_id','calculation_id'):
             self.fields[key].setVisible(not purchased);self.form.labelForField(self.fields[key]).setVisible(not purchased)
         if purchased:self.fields['calculation_id'].setCurrentIndex(self.fields['calculation_id'].findData(None))
+        self.form.labelForField(self.fields['name']).setText('Nome do acessório *' if self.fields['entry_kind'].currentData()=='accessory' else 'Nome da peça comprada *')
         self.load_calculation()
 
     def load_calculation(self):
@@ -413,7 +414,7 @@ class ReceiptDialog(FormDialog):
 
     def persist(self):
         values = self.values()
-        purchased=values.pop('entry_kind')=='purchased'
+        kind=values.pop('entry_kind');purchased=kind in ('purchased','accessory')
         name=values.pop('name');description=values.pop('description');suggested_price=values.pop('suggested_price')
         if not purchased and values['variant_id'] is None:
             raise ValueError('Selecione uma peça existente ou escolha Nova peça comprada.')
@@ -421,7 +422,7 @@ class ReceiptDialog(FormDialog):
             raise ValueError('Confirme a verificação prévia das peças ou use Aguardando verificação.')
         if purchased:
             values.pop('variant_id');values.pop('calculation_id')
-            self.receipt_id,self.piece_ids=self.inventory.receive_purchased(name=name,description=description,suggested_price=suggested_price,**values,operation_key=self.operation_key)
+            self.receipt_id,self.piece_ids=(self.inventory.receive_accessory if kind=='accessory' else self.inventory.receive_purchased)(name=name,description=description,suggested_price=suggested_price,**values,operation_key=self.operation_key)
         else:self.receipt_id, self.piece_ids = self.inventory.receive(**values, operation_key=self.operation_key)
 
 
@@ -520,6 +521,7 @@ class StockPage(QWidget):
         controls=QHBoxLayout();button('Entrada manual / peça comprada',self.receive,controls);button('Nova peça comprada',self.receive_purchased,controls)
         button('Reservar disponíveis',self.reserve,controls);pb.addLayout(controls)
         self.tabs.addTab(physical, 'Estoque')
+        accessories=QWidget();ab=QVBoxLayout(accessories);self.accessories_table=table(['Unidade','Acessório','Estado','Custo']);ab.addWidget(self.accessories_table);button('Novo acessório',self.accessory_new,ab);button('Revisar / disponibilizar acessório',self.accessory_review,ab);self.tabs.addTab(accessories,'Acessórios')
         reservations = QWidget(); rb = QVBoxLayout(reservations)
         self.reservations_table = table(['ID', 'Referência', 'Produto / variante', 'Quantidade', 'Situação']); rb.addWidget(self.reservations_table)
         controls = QHBoxLayout(); button('Liberar reserva', lambda: self.finish_reservation('release'), controls)
@@ -541,6 +543,8 @@ class StockPage(QWidget):
         fill_table(self.stock_table, [[r['id'],r['code']+' • '+r['product_name']+' / '+r['name']+(' (arquivado)' if r['archived'] or r['product_archived'] else ''),r['physical'],r['reserved'],r['available'],r['personal'],r['quarantine'],r['discarded']] for r in self.stock_rows])
         self.piece_rows = self.inventory.pieces()
         fill_table(self.pieces_table, [[r['id'],r['code']+' • '+r['product_name']+' / '+r['variant_name'],PIECE_STATES[r['state']],r['condition'],brl(Decimal(r['unit_cost_cents'])/100),r['receipt_id'],r['reservation_id'] or '—'] for r in self.piece_rows])
+        self.accessory_rows=[p for p in self.piece_rows if self.inventory.db.execute('SELECT 1 FROM accessory_products ap JOIN variants v ON v.product_id=ap.product_id WHERE v.id=?',(p['variant_id'],)).fetchone()]
+        fill_table(self.accessories_table,[(p['id'],p['product_name'],PIECE_STATES[p['state']],brl(Decimal(p['unit_cost_cents'])/100)) for p in self.accessory_rows])
         self.reservation_rows = self.inventory.reservations()
         names = {'reserved':'Reservada','released':'Liberada','issued':'Baixada'}
         fill_table(self.reservations_table, [[r['id'],r['reference'],r['code']+' / '+r['variant_name'],r['quantity'],names[r['state']]] for r in self.reservation_rows])
@@ -615,6 +619,10 @@ class StockPage(QWidget):
         if ReceiptDialog(self.inventory, self).exec() == QDialog.Accepted:
             self.refresh()
 
+    def accessory_new(self):
+        dialog=ReceiptDialog(self.inventory,self);dialog.fields['entry_kind'].setCurrentIndex(dialog.fields['entry_kind'].findData('accessory'))
+        if dialog.exec()==QDialog.Accepted:self.refresh()
+
     def receive_purchased(self):
         dialog=ReceiptDialog(self.inventory,self)
         dialog.fields['entry_kind'].setCurrentIndex(dialog.fields['entry_kind'].findData('purchased'))
@@ -633,6 +641,12 @@ class StockPage(QWidget):
         if not indexes:
             QMessageBox.information(self, 'Selecione peças', 'Selecione uma ou várias linhas no Estoque.'); return []
         return [self.piece_rows[index]['id'] for index in indexes]
+
+    def accessory_review(self):
+        index=self.accessories_table.currentRow()
+        if index<0:
+            QMessageBox.information(self,'Selecione um acessório','Selecione uma linha.');return
+        if ReviewDialog(self.inventory,[self.accessory_rows[index]['id']],self).exec()==QDialog.Accepted:self.refresh()
 
     def review(self):
         ids = self.selected_pieces()

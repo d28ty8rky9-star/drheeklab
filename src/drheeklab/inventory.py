@@ -100,6 +100,14 @@ class Inventory:
         visible='NOT EXISTS(SELECT 1 FROM production_pieces pp JOIN production_entries e ON e.id=pp.entry_id JOIN recipe_orders ro ON ro.op_id=e.op_id LEFT JOIN production_completions c ON c.op_id=e.op_id WHERE pp.piece_id=p.id AND c.op_id IS NULL)'
         return [dict(row) for row in self.db.execute(sql+' WHERE '+visible+(' AND p.variant_id=?' if variant_id is not None else '')+' ORDER BY p.id',(variant_id,) if variant_id is not None else ())]
 
+    def receive_accessory(self, **values):
+        with transaction(self.db):
+            receipt,pieces=self.receive_purchased(**values)
+            product=self.products.get('variants',self.get('receipts',receipt)['variant_id'])['product_id']
+            self.db.execute('INSERT INTO accessory_products VALUES(?)',(product,))
+            self.storage.audit('estoque:acessório',f'products:{product}',None,{'receipt':receipt},values['source'])
+        return receipt,pieces
+
     def receive_purchased(self, name, quantity, source, state, condition, operation_key, total_cost='0', reviewer='', description='', suggested_price=''):
         """Create a stock-only saleable item and receipt atomically."""
         with transaction(self.db):
@@ -183,12 +191,20 @@ class Inventory:
     def reservations(self):
         return [dict(row) for row in self.db.execute('SELECT r.*,v.name AS variant_name,p.code,p.name AS product_name FROM reservations r JOIN variants v ON v.id=r.variant_id JOIN products p ON p.id=v.product_id ORDER BY r.id DESC')]
 
-    def reserve(self, variant_id, quantity, reference, operation_key):
+    def reserve(self, variant_id, quantity, reference, operation_key, *, piece_ids=None):
         quantity = integer(quantity, 'Quantidade', minimum=1)
         required(reference, 'Referência da reserva'); required(operation_key, 'Identificador da operação')
         with transaction(self.db):
             self.products.active_variant(variant_id)
             pieces = self.db.execute("SELECT id FROM pieces WHERE variant_id=? AND state='available' ORDER BY id LIMIT ?", (variant_id, quantity)).fetchall()
+            if piece_ids is not None:
+                ids=self._unique_ids(piece_ids)
+                if len(ids)!=quantity:raise ValueError('Selecione exatamente a quantidade de unidades da venda.')
+                pieces=[]
+                for identifier in ids:
+                    piece=self.get('pieces',identifier)
+                    if piece['variant_id']!=variant_id or piece['state']!='available' or not self.published_piece(identifier):raise ValueError('A unidade selecionada não está disponível para venda.')
+                    pieces.append(piece)
             if len(pieces) != quantity:
                 raise ValueError('Não há quantidade disponível suficiente. Uso pessoal e peças não aprovadas não podem ser reservados.')
             reservation_id = self.db.execute("INSERT INTO reservations(variant_id,reference,quantity,created_at,state,operation_key) VALUES(?,?,?,?,'reserved',?)",

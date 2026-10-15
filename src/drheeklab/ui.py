@@ -374,8 +374,8 @@ class Window(QMainWindow):
 
     def open_new_sale(self):
         self.navigate(1)
-        self.sales_page.tabs.setCurrentIndex(2)
-        self.sales_page.order_new()
+        self.sales_page.tabs.setCurrentIndex(0)
+        self.sales_page.sale_new()
 
     def render_sidebar(self):
         self.sidebar_scroll.setFixedWidth(76 if self.collapsed else 216)
