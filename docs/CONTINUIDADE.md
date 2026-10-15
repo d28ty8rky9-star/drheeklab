@@ -1,3 +1,7 @@
+# Estado atual — Início com estoque resumido
+
+Removido Pedidos em andamento somente do Início; mantidos 3 indicadores financeiros, gráfico, atalhos e 4 estados de produção. Nova linha Filamentos (valor, carretéis ativos, kg conhecidos, desconhecidos=0 no total), Acessórios (valor/unidades), Estoque total (soma filamentos+acessórios+peças com detalhamento). Serviço único stock_totals, atualização ao abrir Início. 8 testes específicos passaram. docs/inicio-estoque.md e tests/test_home_stock.py. Nenhum ZIP solicitado para esta mudança. Notas seguintes históricas.
+
 # Ajuste adicional — ocultar baixadas no estoque atual
 
 Listas de peças/acessórios filtram somente estados fisicamente em mãos, sem apagar dados ou movimentos. Reservadas visíveis, baixadas/descartadas ocultas, devolvidas voltam em quarentena. Correção Financeiro/Clientes anterior aprovada Windows no run38672860664. Validação: 308 testes locais na correção financeira, 10 testes específicos após filtro de estoque; suíte Windows final aprovada no run38673220952 sobre cbab1239d9ee30f97524e61bff4fad346ea5f355, pacote ignorado. Nenhum ZIP solicitado para estas mudanças. Notas seguintes históricas.

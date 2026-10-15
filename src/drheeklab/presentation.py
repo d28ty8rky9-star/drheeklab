@@ -23,9 +23,10 @@ class ModernPresentation:
         for button in home.findChildren(QPushButton):
             layout.removeWidget(button);shortcuts.addWidget(button)
         layout.insertLayout(2,shortcuts)
-        self.home_strip=MetricStrip(titles[1]);layout.insertWidget(2,self.home_strip)
+        self.home_strip=MetricStrip(titles[1][:3]);layout.insertWidget(2,self.home_strip)
         self.home_chart=BarChart('Vendas e recebimentos • mês atual');layout.insertWidget(3,self.home_chart)
-        self.production_strip=MetricStrip(titles[2]);layout.insertWidget(4,self.production_strip)
+        self.production_strip=MetricStrip(['Aguardando','Imprimindo','Aguardando inspeção','Concluído']);layout.insertWidget(4,self.production_strip)
+        self.home_stock_strip=MetricStrip(['Filamentos','Acessórios','Estoque total']);layout.insertWidget(5,self.home_stock_strip)
         self.finance_extra=MetricStrip(['Despesas pagas','A pagar','Caixa no período','Saldo final']);window.finance_page.layout().insertWidget(1,self.finance_extra)
         self.finance_chart=BarChart('Vendas e caixa • período selecionado');window.finance_page.layout().insertWidget(1,self.finance_chart)
         # A view switch keeps the same selected product and handlers.
@@ -100,11 +101,21 @@ class ModernPresentation:
         w=self.window
         if index in (0,1):
             m=w.sales_page.sales.indicators();values=[currency(m['sold']),currency(m['net_received']),currency(m['receivable']),m['active_orders']]
-            self.strips[1].set_values(values);self.home_strip.set_values(values)
+            self.strips[1].set_values(values);self.home_strip.set_values(values[:3])
             self.home_chart.set_values([('Vendido',m['sold'],values[0]),('Recebido líquido',m['net_received'],values[1])])
         if index in (0,2):
             rows=w.production_page.production.queue();values=[sum(r['state']==state for r in rows) for state in STATES]
             self.strips[2].set_values(values);self.production_strip.set_values(values)
+        if index in (0,3):
+            from decimal import Decimal
+            from .stock_totals import stock_totals
+            t=stock_totals(w.stock_page.inventory)
+            total=t['filament_cents']+t['piece_cents']+t['accessory_cents']
+            self.home_stock_strip.set_values([currency(t['filament_cents']),currency(t['accessory_cents']),currency(total)])
+            kg=format(Decimal(t['filament_mg'])/1000000,'f').replace('.',',')
+            self.home_stock_strip.cards[0].detail.setText(str(t['filament_count'])+' filamentos • '+kg+' kg conhecidos restantes\nSaldo desconhecido: '+str(t['filament_unknown'])+' (R$ 0,00 no total)')
+            self.home_stock_strip.cards[1].detail.setText(str(t['accessory_count'])+' unidades em estoque')
+            self.home_stock_strip.cards[2].detail.setText('Filamentos + acessórios + peças\nPeças: '+currency(t['piece_cents']))
         if index==3:
             rows=w.stock_page.inventory.summary()
             t=w.stock_page.totals
