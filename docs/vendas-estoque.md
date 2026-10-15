@@ -20,3 +20,5 @@ Atualização: Auxiliares retirado da navegação (dados históricos mantidos). 
 Filamento novo na interface exige peso inicial e entra com esse saldo integral e valor total da compra. Campo de saldo segue o peso inicial, sem edição nesta criação; cadastros antigos continuam editáveis/auditados e podem manter saldo desconhecido. Tabela acrescenta Valor restante, calculado pelo custo de compra proporcional ao saldo. Produção confirmada, perdas e ajustes atualizam o valor automaticamente sem lançamento de caixa adicional.
 
 Validação desta atualização: 305 testes locais aprovados, zero falhas/erros/pulos. Capturas: capturas-vendas/estoque-separado.png e nova-venda-total-lucro.png.
+
+Validação Windows aprovada no run 38665100231 sobre fcf16710b5979b6bb6a4839f1d31fc0986c34182; pacote ignorado e zero artefatos.
