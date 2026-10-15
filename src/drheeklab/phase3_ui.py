@@ -549,7 +549,7 @@ class StockPage(QWidget):
         self.filament_total.setText('Saldo conhecido: '+grams(t['filament_mg'])+' g • Valor de aquisição em estoque: '+money(t['filament_cents'])+' • Sem saldo: '+str(t['filament_unknown'])+' • Excluídos da valoração por dados insuficientes: '+str(t['filament_unvalued']))
         self.piece_total.setText(str(t['piece_count'])+' peças em mãos • Custo total: '+money(t['piece_cents'])+' • Inclui reservadas, a verificar e uso pessoal; exclui vendidas/descartadas.')
         self.accessory_total.setText(str(t['accessory_count'])+' acessórios em mãos • Custo total: '+money(t['accessory_cents']))
-        all_pieces=self.inventory.pieces()
+        all_pieces=[p for p in self.inventory.pieces() if p['state'] in ('available','reserved','quarantine','personal')]
         accessory_ids={r[0] for r in self.inventory.db.execute('SELECT v.id FROM variants v JOIN accessory_products a ON a.product_id=v.product_id')}
         self.piece_rows = [p for p in all_pieces if p['variant_id'] not in accessory_ids]
         fill_table(self.pieces_table, [[r['id'],r['code']+' • '+r['product_name']+' / '+r['variant_name'],PIECE_STATES[r['state']],r['condition'],brl(Decimal(r['unit_cost_cents'])/100),r['receipt_id'],r['reservation_id'] or '—'] for r in self.piece_rows])

@@ -22,3 +22,5 @@ Filamento novo na interface exige peso inicial e entra com esse saldo integral e
 Validação desta atualização: 305 testes locais aprovados, zero falhas/erros/pulos. Capturas: capturas-vendas/estoque-separado.png e nova-venda-total-lucro.png.
 
 Validação Windows aprovada no run 38665100231 sobre fcf16710b5979b6bb6a4839f1d31fc0986c34182; pacote ignorado e zero artefatos.
+
+Listas Estoque de peças/Acessórios mostram somente unidades fisicamente em mãos (disponíveis, reservadas, quarentena, uso pessoal). Baixadas e descartadas continuam nos registros de origem, Movimentos, Vendas/Financeiro e Perdas, mas saem das listas atuais. Devolução física as traz de volta em quarentena sem alterar o custo. Reservadas continuam visíveis até a baixa real, inclusive se já quitadas.

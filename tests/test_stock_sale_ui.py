@@ -80,3 +80,23 @@ def test_checkbox_selection_survives_filter_and_total_does_not_add_accessory_twi
     form.submit();assert form.result()==QDialog.Accepted,form.error.text()
     assert sales.financial(form.saved_id)['total']==3000
     assert sales.items(form.saved_id)[1]['unit_price_cents']==1500
+
+
+def test_issued_units_hidden_from_stock_but_journal_and_return_preserved(system):
+    store,p,*_=system;sales,client,produced,bought,accessories=prepared(system)
+    window=Window(store);page=window.stock_page
+    sale=sales.create_stock_sale(client,[bought[0]],[accessories[0]])
+    page.refresh()
+    assert bought[0] in {r['id'] for r in page.piece_rows}
+    assert accessories[0] in {r['id'] for r in page.accessory_rows}
+    sales.deliver(sale,'send','shipping',carrier='Correios');page.refresh()
+    assert bought[0] not in {r['id'] for r in page.piece_rows}
+    assert accessories[0] not in {r['id'] for r in page.accessory_rows}
+    assert {r['piece_id'] for r in p.inventory.movements() if r['kind']=='issue'}=={bought[0],accessories[0]}
+    assert p.inventory.get('pieces',bought[0])['state']=='issued'
+    sales.cancel(sale,'Devolução')
+    sales.return_cancelled_pieces(sale,[bought[0],accessories[0]],'Retorno conferido');page.refresh()
+    assert bought[0] in {r['id'] for r in page.piece_rows}
+    assert accessories[0] in {r['id'] for r in page.accessory_rows}
+    assert next(r for r in page.accessory_rows if r['id']==accessories[0])['state']=='quarantine'
+    window.close()

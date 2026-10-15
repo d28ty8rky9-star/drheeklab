@@ -1,3 +1,7 @@
+# Ajuste adicional — ocultar baixadas no estoque atual
+
+Listas de peças/acessórios filtram somente estados fisicamente em mãos, sem apagar dados ou movimentos. Reservadas visíveis, baixadas/descartadas ocultas, devolvidas voltam em quarentena. Correção Financeiro/Clientes anterior aprovada Windows no run38672860664. Nenhum ZIP solicitado para estas mudanças. Notas seguintes históricas.
+
 # Estado atual — correção Financeiro e saldo por cliente
 
 Corrigidos índices visuais Financeiro4/Impressoras5 e filtros financeiros por dia local dos eventos UTC; históricos preservados. Clientes acrescenta Total vendido, Recebido bruto menos reembolsos e A receber, separados do Crédito disponível. Teste de venda enviada a prazo na virada UTC e pagamento/cancelamento. Ver docs/financeiro-clientes.md e tests/test_finance_local_date.py. Sem ZIP solicitado nesta atualização; somente código/testes/GitHub. Notas seguintes históricas.
