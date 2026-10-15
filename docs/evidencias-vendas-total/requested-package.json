@@ -1,0 +1,73 @@
+{
+  "run_id": 38666818545,
+  "artifact_id": 11943311256,
+  "code_sha": "6a8189b8c1f3cd77f18538d54014a49b383407b2",
+  "status": "passed",
+  "tests": 305,
+  "zip": "dist/DrHeekLab-2.9.1-VendasLucro-Estoque-Windows.zip",
+  "zip_sha256": "8b1c7e5a6053d83a23fa4548b1e9645cdf9a6d7960bde93d2bc8ac787b063f32",
+  "zip_digest_matches_github": true,
+  "crc_ok": true,
+  "executable_hashes_verified": true,
+  "installer_evidence": {
+    "installer-qa/installed-qa-1.json": {
+      "status": "passed",
+      "version": "2.9.1",
+      "checks": [
+        "auth",
+        "PNG/logo",
+        "quote/order",
+        "partial payments/fees",
+        "versioned PDFs",
+        "OP batch/time/consumption",
+        "3-photo individual inspection",
+        "stock delivery",
+        "payables/capital/cash/CPV reconciliation",
+        "CSV/Excel export",
+        "branded reports/catalog PDFs",
+        "notifications/trash",
+        "restart persistence",
+        "verified backup/transfer",
+        "encrypted backup/restore"
+      ],
+      "data": "temporary only"
+    },
+    "installer-qa/installed-qa-2.json": {
+      "status": "passed",
+      "version": "2.9.1",
+      "checks": [
+        "auth",
+        "PNG/logo",
+        "quote/order",
+        "partial payments/fees",
+        "versioned PDFs",
+        "OP batch/time/consumption",
+        "3-photo individual inspection",
+        "stock delivery",
+        "payables/capital/cash/CPV reconciliation",
+        "CSV/Excel export",
+        "branded reports/catalog PDFs",
+        "notifications/trash",
+        "restart persistence",
+        "verified backup/transfer",
+        "encrypted backup/restore"
+      ],
+      "data": "temporary only"
+    },
+    "installer-qa/result.json": {
+      "checks": [
+        "install",
+        "reinstall",
+        "installed self-test",
+        "pre-update verified backup",
+        "database/media preserved",
+        "headless daily backup",
+        "task create/delete",
+        "uninstall"
+      ],
+      "manual_homologation": "pending",
+      "status": "passed"
+    }
+  },
+  "manual_homologation": "pending"
+}
