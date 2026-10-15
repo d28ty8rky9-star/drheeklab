@@ -11,3 +11,5 @@ Teste reproduz venda enviada por150, não paga, na virada UTC; verifica tabela e
 Versão2.9.1/schema10 mantidos. Nenhum ZIP gerado neste pedido; pacotes anteriores não incluem esta correção. Avaliação manual com o banco do usuário ainda pendente.
 
 Validação local: 308 testes aprovados, zero falhas/erros/pulos.
+
+Windows aprovado: run38672860664 (correção financeira) e38673220952 (incluindo ocultação de baixadas no estoque). Pacote ignorado em ambos. Evidências em evidencias-financeiro-clientes/.

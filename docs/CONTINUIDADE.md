@@ -1,6 +1,6 @@
 # Ajuste adicional — ocultar baixadas no estoque atual
 
-Listas de peças/acessórios filtram somente estados fisicamente em mãos, sem apagar dados ou movimentos. Reservadas visíveis, baixadas/descartadas ocultas, devolvidas voltam em quarentena. Correção Financeiro/Clientes anterior aprovada Windows no run38672860664. Nenhum ZIP solicitado para estas mudanças. Notas seguintes históricas.
+Listas de peças/acessórios filtram somente estados fisicamente em mãos, sem apagar dados ou movimentos. Reservadas visíveis, baixadas/descartadas ocultas, devolvidas voltam em quarentena. Correção Financeiro/Clientes anterior aprovada Windows no run38672860664. Validação: 308 testes locais na correção financeira, 10 testes específicos após filtro de estoque; suíte Windows final aprovada no run38673220952 sobre cbab1239d9ee30f97524e61bff4fad346ea5f355, pacote ignorado. Nenhum ZIP solicitado para estas mudanças. Notas seguintes históricas.
 
 # Estado atual — correção Financeiro e saldo por cliente
 
