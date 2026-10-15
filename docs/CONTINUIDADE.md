@@ -1,3 +1,7 @@
+# Última entrega — ZIP com Início Financeiro Clientes e Estoque atual
+
+ZIP solicitado: dist/DrHeekLab-2.9.1-Inicio-Financeiro-Estoque-Windows.zip; run38675129326; artifact11945697929; código f9f43c8c00b80d55416a8caa5bd599f0c809466d. 310 testes Windows aprovados sem falhas/erros/pulos, pacote/instalação/reinstalação/preservação dados aprovados. SHA256 igual ao GitHub, CRC e hashes executáveis/instalador conferidos. Evidências docs/evidencias-inicio-estoque/requested-package.json. Executar installer/DrHeekLab-2.9.1-Fase8-Setup.exe; preservar C:\DrHeekLab. Inclui novo Início, filtros de data local Financeiro/cartões, saldo por cliente e ocultação de baixadas no Estoque. Avaliação manual pendente. Futuras entregas ZIP só sob pedido explícito. Notas seguintes históricas.
+
 # Estado atual — Início com estoque resumido
 
 Removido Pedidos em andamento somente do Início; mantidos 3 indicadores financeiros, gráfico, atalhos e 4 estados de produção. Nova linha Filamentos (valor, carretéis ativos, kg conhecidos, desconhecidos=0 no total), Acessórios (valor/unidades), Estoque total (soma filamentos+acessórios+peças com detalhamento). Serviço único stock_totals, atualização ao abrir Início. 8 testes específicos passaram; suíte Windows aprovada no run38674361176 sobre edf3be6d2db825d2b46c32080b9d427d74357f59, pacote ignorado. docs/inicio-estoque.md e tests/test_home_stock.py. Nenhum ZIP solicitado para esta mudança. Notas seguintes históricas.

@@ -1,0 +1,73 @@
+{
+  "run_id": 38675129326,
+  "artifact_id": 11945697929,
+  "code_sha": "f9f43c8c00b80d55416a8caa5bd599f0c809466d",
+  "status": "passed",
+  "tests": 310,
+  "zip": "dist/DrHeekLab-2.9.1-Inicio-Financeiro-Estoque-Windows.zip",
+  "zip_sha256": "27aeeb2e5231d9b7981f41f5bda9ca7c68e47c23c7d02b638d0508d00ace8556",
+  "zip_digest_matches_github": true,
+  "crc_ok": true,
+  "executable_hashes_verified": true,
+  "installer_evidence": {
+    "installer-qa/installed-qa-1.json": {
+      "status": "passed",
+      "version": "2.9.1",
+      "checks": [
+        "auth",
+        "PNG/logo",
+        "quote/order",
+        "partial payments/fees",
+        "versioned PDFs",
+        "OP batch/time/consumption",
+        "3-photo individual inspection",
+        "stock delivery",
+        "payables/capital/cash/CPV reconciliation",
+        "CSV/Excel export",
+        "branded reports/catalog PDFs",
+        "notifications/trash",
+        "restart persistence",
+        "verified backup/transfer",
+        "encrypted backup/restore"
+      ],
+      "data": "temporary only"
+    },
+    "installer-qa/installed-qa-2.json": {
+      "status": "passed",
+      "version": "2.9.1",
+      "checks": [
+        "auth",
+        "PNG/logo",
+        "quote/order",
+        "partial payments/fees",
+        "versioned PDFs",
+        "OP batch/time/consumption",
+        "3-photo individual inspection",
+        "stock delivery",
+        "payables/capital/cash/CPV reconciliation",
+        "CSV/Excel export",
+        "branded reports/catalog PDFs",
+        "notifications/trash",
+        "restart persistence",
+        "verified backup/transfer",
+        "encrypted backup/restore"
+      ],
+      "data": "temporary only"
+    },
+    "installer-qa/result.json": {
+      "manual_homologation": "pending",
+      "status": "passed",
+      "checks": [
+        "install",
+        "reinstall",
+        "installed self-test",
+        "pre-update verified backup",
+        "database/media preserved",
+        "headless daily backup",
+        "task create/delete",
+        "uninstall"
+      ]
+    }
+  },
+  "manual_homologation": "pending"
+}
