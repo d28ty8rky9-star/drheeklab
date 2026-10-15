@@ -109,10 +109,10 @@ class ModernPresentation:
             rows=w.stock_page.inventory.summary()
             t=w.stock_page.totals
             self.strips[3].set_values([currency(t['filament_cents']),currency(t['piece_cents']),currency(t['accessory_cents']),currency(t['filament_cents']+t['piece_cents']+t['accessory_cents'])])
-        if index==3:
+        if index==4:
             m=w.finance_page.report_data['metrics'];self.finance_extra.set_values([currency(m[k]) for k in ('expenses_paid_cents','payable_cents','cash_flow_cents','cash_closing_cents')]);self.strips[4].set_values([currency(m[k]) for k in ('sold_cents','received_net_cents','receivable_cents','commercial_result_cents')])
             self.finance_chart.set_values([(label,m[key],currency(m[key])) for label,key in [('Vendido','sold_cents'),('Recebido líquido','received_net_cents'),('Despesas pagas','expenses_paid_cents')]])
-        if index==4:
+        if index==5:
             box=self.printer_cards.layout()
             while box.count():
                 widget=box.takeAt(0).widget();widget.hide();widget.deleteLater()

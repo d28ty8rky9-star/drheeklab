@@ -14,6 +14,7 @@ from .inventory import Inventory
 from .pricing import cents,integer,grams_mg,money
 from .journal import record
 from .storage import now
+from .event_dates import event_day
 from .transactions import transaction
 
 TREATMENTS={'inventory':'Compra para estoque','allocated':'Pagamento de recurso apropriado na produção','capital':'Investimento em equipamento','operating':'Despesa operacional adicional'}
@@ -34,7 +35,9 @@ def period(start=None,end=None):
 
 
 class Finance:
-    def __init__(self,storage):self.storage,self.db=storage,storage.db
+    def __init__(self,storage):
+        self.storage,self.db=storage,storage.db
+        self.db.create_function('event_day',1,event_day)
 
     @contextmanager
     def event(self):
@@ -93,7 +96,7 @@ class Finance:
         for r in self.db.execute('SELECT i.*,p.description,p.supplier,p.category_snapshot,p.state,p.incurred_on FROM payable_installments i JOIN payables p ON p.id=i.payable_id WHERE p.incurred_on<=? ORDER BY COALESCE(i.due_on,\'9999-12-31\'),i.id',(end,)):
             row=dict(r);paid=self.db.execute('SELECT COALESCE(SUM(amount_cents),0) FROM payable_payments WHERE installment_id=? AND paid_on<=?',(row['id'],end)).fetchone()[0]
             cancellation=self.db.execute("SELECT created_at FROM audit WHERE operation='financeiro:conta cancelada' AND record=? ORDER BY id LIMIT 1",(f'payable:{row["payable_id"]}',)).fetchone()
-            cancelled=row['state']=='cancelled' and cancellation and cancellation[0][:10]<=end
+            cancelled=row['state']=='cancelled' and cancellation and event_day(cancellation[0])<=end
             row['paid_cents']=paid;row['balance_cents']=0 if cancelled else row['amount_cents']-paid
             row['status']='cancelled' if cancelled else 'paid' if not row['balance_cents'] else 'overdue' if row['due_on'] and row['due_on']<end else 'partial' if paid else 'pending'
             row['category']=json.loads(row['category_snapshot'])['name'];rows.append(row)
@@ -218,10 +221,10 @@ class Finance:
                 printer=prod[0] if prod else calc[0] if calc else None
                 product=self.db.execute('SELECT product_id FROM variants WHERE id=?',(r['variant_id'],)).fetchone()[0]
                 snapshot={'commercial':json.loads(r['item_snapshot']),'description':r['description'],'cost_basis':'existing_piece','printer_id':printer}
-                self.db.execute('INSERT INTO financial_costs(movement_id,item_id,piece_id,printer_id,product_id,cost_cents,occurred_on,snapshot) VALUES(?,?,?,?,?,?,?,?)',(r['id'],r['item_id'],r['piece_id'],printer,product,r['cost_cents'] or 0,r['created_at'][:10],json.dumps(snapshot,ensure_ascii=False)))
+                self.db.execute('INSERT INTO financial_costs(movement_id,item_id,piece_id,printer_id,product_id,cost_cents,occurred_on,snapshot) VALUES(?,?,?,?,?,?,?,?)',(r['id'],r['item_id'],r['piece_id'],printer,product,r['cost_cents'] or 0,event_day(r['created_at']),json.dumps(snapshot,ensure_ascii=False)))
                 self.storage.audit('financeiro:CPV capturado',f'movement:{r["id"]}',None,snapshot,'Custo histórico da baixa; nenhum consumo ou caixa adicional')
             for r in self.db.execute('SELECT r.*,c.id AS cost_id,c.cost_cents FROM order_returns r JOIN financial_costs c ON c.piece_id=r.piece_id JOIN order_items i ON i.id=c.item_id AND i.order_id=r.order_id WHERE NOT EXISTS(SELECT 1 FROM financial_returns f WHERE f.return_id=r.id)').fetchall():
-                self.db.execute('INSERT INTO financial_returns VALUES(?,?,?,?)',(r['id'],r['cost_id'],r['cost_cents'],r['created_at'][:10]))
+                self.db.execute('INSERT INTO financial_returns VALUES(?,?,?,?)',(r['id'],r['cost_id'],r['cost_cents'],event_day(r['created_at'])))
 
     def cash_events(self,start=None,end=None):
         start,end=period(start,end);rows=[]
@@ -240,9 +243,9 @@ class Finance:
 
     def receivables(self,as_of=None):
         end=optional_date(as_of) or date.today().isoformat();rows=[]
-        for r in self.db.execute('SELECT i.*,o.client_id,o.code,o.created_at,c.created_at AS cancelled_at FROM installments i JOIN orders o ON o.id=i.order_id LEFT JOIN cancellations c ON c.order_id=o.id WHERE substr(o.created_at,1,10)<=?',(end,)):
+        for r in self.db.execute('SELECT i.*,o.client_id,o.code,o.created_at,c.created_at AS cancelled_at FROM installments i JOIN orders o ON o.id=i.order_id LEFT JOIN cancellations c ON c.order_id=o.id WHERE event_day(o.created_at)<=?',(end,)):
             row=dict(r);paid=self.db.execute('SELECT COALESCE(SUM(a.amount_cents),0) FROM installment_allocations a JOIN payments p ON p.id=a.payment_id WHERE a.installment_id=? AND p.paid_on<=?',(row['id'],end)).fetchone()[0]
-            cancelled=row['cancelled_at'] and row['cancelled_at'][:10]<=end
+            cancelled=row['cancelled_at'] and event_day(row['cancelled_at'])<=end
             row['paid_cents']=paid;row['balance_cents']=0 if cancelled else row['amount_cents']-paid
             row['status']='cancelled' if cancelled else 'paid' if not row['balance_cents'] else 'overdue' if row['due_on'] and row['due_on']<end else 'partial' if paid else 'pending';rows.append(row)
         return rows
@@ -258,16 +261,16 @@ class Finance:
             recipe=self.db.execute('SELECT 1 FROM recipe_orders WHERE op_id=?',(op['id'],)).fetchone()
             if recipe:
                 event=self.db.execute('SELECT completed_at FROM production_completions WHERE op_id=?',(op['id'],)).fetchone()
-                if not event or event[0][:10]>end:continue
+                if not event or event_day(event[0])>end:continue
                 completion=event[0]
             entries={r['id']:r['product_id'] for r in self.db.execute('SELECT e.id,v.product_id FROM production_entries e JOIN variants v ON v.id=e.variant_id WHERE e.op_id=?',(op['id'],))}
             absorbed={}
-            for attempt in self.db.execute('SELECT * FROM production_attempts WHERE op_id=? AND substr(created_at,1,10)<=?',(op['id'],end)):
+            for attempt in self.db.execute('SELECT * FROM production_attempts WHERE op_id=? AND event_day(created_at)<=?',(op['id'],end)):
                 for actual in json.loads(attempt['actual']):
                     entry=actual['entry_id'];product=entries[entry]
                     if product_id is not None and product!=product_id:continue
                     loss=actual['loss_cents']
-                    recognition=completion[:10] if recipe else attempt['created_at'][:10]
+                    recognition=event_day(completion) if recipe else event_day(attempt['created_at'])
                     if loss and start<=recognition<=end:
                         events.append({'date':recognition,'op':op['code'],'attempt_id':attempt['id'],'entry_id':entry,'product_id':product,'printer_id':op['printer_id'],'kind':'loss','amount_cents':loss,'cash_cents':0})
                     if loss and completion and attempt['created_at']<=completion:
@@ -276,9 +279,9 @@ class Finance:
                         # model has only rejects, only attempts with physical
                         # survivors remain in their frozen quarantined cost.
                         if approved or actual['produced']>0:absorbed[entry]=absorbed.get(entry,0)+loss
-            if completion and start<=completion[:10]<=end:
+            if completion and start<=event_day(completion)<=end:
                 for entry,amount in absorbed.items():
-                    events.append({'date':completion[:10],'op':op['code'],'attempt_id':None,'entry_id':entry,'product_id':entries[entry],'printer_id':op['printer_id'],'kind':'absorption','amount_cents':-amount,'cash_cents':0})
+                    events.append({'date':event_day(completion),'op':op['code'],'attempt_id':None,'entry_id':entry,'product_id':entries[entry],'printer_id':op['printer_id'],'kind':'absorption','amount_cents':-amount,'cash_cents':0})
         return events
 
     def report(self,start=None,end=None,client_id=None,product_id=None,printer_id=None,status=None):
@@ -288,12 +291,12 @@ class Finance:
         if status is not None and status not in STATUS:raise ValueError('Situação financeira inválida.')
         self.capture_costs();receivables=self.receivables(end);sale_rows=[];selected_orders=set();eligible_orders=set()
         full_groups={}
-        costs=[dict(r) for r in self.db.execute('SELECT * FROM financial_costs WHERE occurred_on<=?',(end,))]
-        returns=[dict(r) for r in self.db.execute('SELECT * FROM financial_returns WHERE occurred_on<=?',(end,))]
-        for item in self.db.execute('SELECT i.*,o.client_id,o.code,o.created_at,c.created_at AS cancelled_at FROM order_items i JOIN orders o ON o.id=i.order_id LEFT JOIN cancellations c ON c.order_id=o.id WHERE substr(o.created_at,1,10)<=?',(end,)):
+        costs=[{**dict(r),'occurred_on':r['business_day']} for r in self.db.execute('SELECT c.*,event_day(m.created_at) business_day FROM financial_costs c JOIN stock_movements m ON m.id=c.movement_id WHERE event_day(m.created_at)<=?',(end,))]
+        returns=[{**dict(r),'occurred_on':r['business_day']} for r in self.db.execute('SELECT f.*,event_day(r.created_at) business_day FROM financial_returns f JOIN order_returns r ON r.id=f.return_id WHERE event_day(r.created_at)<=?',(end,))]
+        for item in self.db.execute('SELECT i.*,o.client_id,o.code,o.created_at,c.created_at AS cancelled_at FROM order_items i JOIN orders o ON o.id=i.order_id LEFT JOIN cancellations c ON c.order_id=o.id WHERE event_day(o.created_at)<=?',(end,)):
             if client_id is not None and item['client_id']!=client_id:continue
             obligations=[r for r in receivables if r['order_id']==item['order_id']]
-            finance_status='cancelled' if item['cancelled_at'] and item['cancelled_at'][:10]<=end else 'paid' if sum(r['balance_cents'] for r in obligations)==0 else 'overdue' if any(r['status']=='overdue' for r in obligations) else 'partial' if any(r['paid_cents'] for r in obligations) else 'pending'
+            finance_status='cancelled' if item['cancelled_at'] and event_day(item['cancelled_at'])<=end else 'paid' if sum(r['balance_cents'] for r in obligations)==0 else 'overdue' if any(r['status']=='overdue' for r in obligations) else 'partial' if any(r['paid_cents'] for r in obligations) else 'pending'
             if status is not None and finance_status!=status:continue
             snap=json.loads(item['snapshot']);model=snap.get('product');variant=snap.get('variant')
             if not model:
@@ -317,7 +320,7 @@ class Finance:
                 selected_orders.add(item['order_id'])
                 relevant=[c for c in item_costs if c['printer_id']==printer]
                 cpv=sum(c['cost_cents'] for c in relevant if start<=c['occurred_on']<=end)-sum(r['cost_cents'] for r in returns if start<=r['occurred_on']<=end and r['cost_id'] in {c['id'] for c in relevant})
-                created=item['created_at'][:10];cancelled=item['cancelled_at'][:10] if item['cancelled_at'] else None
+                created=event_day(item['created_at']);cancelled=event_day(item['cancelled_at']) if item['cancelled_at'] else None
                 sign=int(start<=created<=end)-int(cancelled is not None and start<=cancelled<=end)
                 sale_rows.append({'order_id':item['order_id'],'order':item['code'],'item_id':item['id'],'client_id':item['client_id'],'product_id':model_id,'printer_id':printer,'description':item['description'],'approved_on':created,'cancelled_on':cancelled,'status':finance_status,'quantity':qty*sign,'sales_cents':item['unit_price_cents']*qty*sign,'discount_cents':discount*qty*sign,'cost_cents':cpv,'pending_quantity':missing if printer is None and finance_status!='cancelled' else 0,'priced_quantity':qty})
         scoped=any(v is not None for v in (client_id,product_id,printer_id,status))
@@ -354,8 +357,8 @@ class Finance:
         for o in self.db.execute('SELECT o.*,c.created_at AS cancelled_at,c.retained_cents FROM orders o LEFT JOIN cancellations c ON c.order_id=o.id'):
             if o['id'] not in selected_orders:continue
             if product_id is None and printer_id is None:
-                freight+=o['freight_cents']*(int(start<=o['created_at'][:10]<=end)-int(o['cancelled_at'] is not None and start<=o['cancelled_at'][:10]<=end))
-                if o['cancelled_at'] and start<=o['cancelled_at'][:10]<=end:retained+=o['retained_cents']
+                freight+=o['freight_cents']*(int(start<=event_day(o['created_at'])<=end)-int(o['cancelled_at'] is not None and start<=event_day(o['cancelled_at'])<=end))
+                if o['cancelled_at'] and start<=event_day(o['cancelled_at'])<=end:retained+=o['retained_cents']
         gross=sum(r['sales_cents'] for r in sale_rows)+freight
         cpv=sum(r['cost_cents'] for r in sale_rows)
         pending=sum(r['pending_quantity'] for r in sale_rows)
@@ -367,24 +370,24 @@ class Finance:
                 for column in ('sales_cents','cost_cents','quantity','pending_quantity','discount_cents'):group[column]+=r[column]
         for group in (*grouped_products.values(),*grouped_printers.values()):group['gross_result_cents']=group['sales_cents']-group['cost_cents']
         production=[]
-        for r in self.db.execute('''SELECT a.*,o.printer_id,o.code,o.item_id,CASE WHEN ro.op_id IS NULL THEN a.created_at ELSE c.completed_at END AS recognized_at FROM production_attempts a JOIN production_orders o ON o.id=a.op_id LEFT JOIN recipe_orders ro ON ro.op_id=o.id LEFT JOIN production_completions c ON c.op_id=o.id WHERE substr(CASE WHEN ro.op_id IS NULL THEN a.created_at ELSE c.completed_at END,1,10) BETWEEN ? AND ?''',(start,end)):
+        for r in self.db.execute('''SELECT a.*,o.printer_id,o.code,o.item_id,CASE WHEN ro.op_id IS NULL THEN a.created_at ELSE c.completed_at END AS recognized_at FROM production_attempts a JOIN production_orders o ON o.id=a.op_id LEFT JOIN recipe_orders ro ON ro.op_id=o.id LEFT JOIN production_completions c ON c.op_id=o.id WHERE event_day(CASE WHEN ro.op_id IS NULL THEN a.created_at ELSE c.completed_at END) BETWEEN ? AND ?''',(start,end)):
             if printer_id is not None and r['printer_id']!=printer_id:continue
             item=self.db.execute('SELECT order_id FROM order_items WHERE id=?',(r['item_id'],)).fetchone() if r['item_id'] else None
             if (client_id is not None or status is not None) and (not item or item[0] not in eligible_orders):continue
             for a in json.loads(r['actual']):
                 e=self.db.execute('SELECT e.*,v.product_id FROM production_entries e JOIN variants v ON v.id=e.variant_id WHERE e.id=?',(a['entry_id'],)).fetchone()
                 if product_id is not None and e['product_id']!=product_id:continue
-                rejected=self.db.execute("SELECT count(*) FROM production_pieces pp JOIN inspections i ON i.id=(SELECT MAX(ii.id) FROM inspections ii WHERE ii.piece_id=pp.piece_id AND substr(ii.created_at,1,10)<=?) WHERE pp.attempt_id=? AND pp.entry_id=? AND i.result='rejected'",(end,r['id'],a['entry_id'])).fetchone()[0]
+                rejected=self.db.execute("SELECT count(*) FROM production_pieces pp JOIN inspections i ON i.id=(SELECT MAX(ii.id) FROM inspections ii WHERE ii.piece_id=pp.piece_id AND event_day(ii.created_at)<=?) WHERE pp.attempt_id=? AND pp.entry_id=? AND i.result='rejected'",(end,r['id'],a['entry_id'])).fetchone()[0]
                 loss=a['loss_cents']+(int((Decimal(a['existing_cents']-a['loss_cents'])*rejected/a['produced']).quantize(Decimal('1'),rounding=ROUND_HALF_UP)) if a['produced'] else 0)
                 printer=json.loads(self.db.execute('SELECT planned FROM production_orders WHERE id=?',(r['op_id'],)).fetchone()[0])['printer']
                 components=split(a['machine_cents'],[printer[k] for k in ('investment_hour_cents','energy_hour_cents','maintenance_hour_cents')]) if a['machine_cents'] else [0,0,0]
-                production.append({'source':f'OP {r["code"]} / tentativa {r["id"]} / modelo {a["entry_id"]}','date':r['recognized_at'][:10],'printer_id':r['printer_id'],'product_id':e['product_id'],'cost_cents':a['existing_cents'],'reference_cents':a['reference_cents'],'loss_cents':loss,'failed':a['failed'],'rejected':rejected,'investment_cents':components[0],'energy_cents':components[1],'maintenance_reserve_cents':components[2]})
+                production.append({'source':f'OP {r["code"]} / tentativa {r["id"]} / modelo {a["entry_id"]}','date':event_day(r['recognized_at']),'printer_id':r['printer_id'],'product_id':e['product_id'],'cost_cents':a['existing_cents'],'reference_cents':a['reference_cents'],'loss_cents':loss,'failed':a['failed'],'rejected':rejected,'investment_cents':components[0],'energy_cents':components[1],'maintenance_reserve_cents':components[2]})
         # Independent calculator confirmations also remain visible; never CPV/cash.
-        for r in self.db.execute('SELECT * FROM calculations WHERE actual IS NOT NULL AND substr(confirmed_at,1,10) BETWEEN ? AND ?',(start,end)):
+        for r in self.db.execute('SELECT * FROM calculations WHERE actual IS NOT NULL AND event_day(confirmed_at) BETWEEN ? AND ?',(start,end)):
             if printer_id is not None and r['printer_id']!=printer_id:continue
             if product_id is not None or client_id is not None or status is not None:continue
             a=json.loads(r['actual']);printer=a['printer'];machine=cents(a['machine_cost']);components=split(machine,[printer[k] for k in ('investment_hour_cents','energy_hour_cents','maintenance_hour_cents')]) if machine else [0,0,0]
-            production.append({'source':f'Cálculo #{r["id"]} • {r["title"]}','date':r['confirmed_at'][:10],'printer_id':r['printer_id'],'product_id':None,'cost_cents':cents(a.get('acquisition_production_cost') or a['total_cost']),'reference_cents':cents(a['total_cost']),'loss_cents':0,'failed':0,'rejected':0,'investment_cents':components[0],'energy_cents':components[1],'maintenance_reserve_cents':components[2]})
+            production.append({'source':f'Cálculo #{r["id"]} • {r["title"]}','date':event_day(r['confirmed_at']),'printer_id':r['printer_id'],'product_id':None,'cost_cents':cents(a.get('acquisition_production_cost') or a['total_cost']),'reference_cents':cents(a['total_cost']),'loss_cents':0,'failed':0,'rejected':0,'investment_cents':components[0],'energy_cents':components[1],'maintenance_reserve_cents':components[2]})
         balances=[r for r in receivables if r['order_id'] in selected_orders]
         # Product/printer filters cannot claim complete order debts belong to one item.
         if product_id is not None or printer_id is not None:

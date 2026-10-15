@@ -215,6 +215,13 @@ class Sales(StockSales):
     def credit_balance(self,client_id):
         return self.db.execute("SELECT COALESCE(SUM(CASE direction WHEN 'in' THEN amount_cents ELSE -amount_cents END),0) FROM client_credit WHERE client_id=?",(client_id,)).fetchone()[0]
 
+    def client_totals(self,client_id):
+        rows=self.orders(client_id)
+        amounts=[self.financial(r['id']) for r in rows]
+        return {'sold':sum(r['total_cents'] for r in rows if r['state']!='cancelled'),
+                'received':sum(r['cash_received']-r['refunded'] for r in amounts),
+                'receivable':sum(r['balance'] for r in amounts)}
+
     def financial(self,order_id):
         order=self.get('orders',order_id)
         row=self.db.execute("SELECT COALESCE(SUM(amount_cents),0),COALESCE(SUM(fee_cents),0),COALESCE(SUM(net_cents),0),COALESCE(SUM(CASE kind WHEN 'cash' THEN amount_cents ELSE 0 END),0) FROM payments WHERE order_id=?",(order_id,)).fetchone()

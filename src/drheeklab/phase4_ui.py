@@ -423,7 +423,7 @@ class SalesPage(QWidget):
         clients=QWidget(); cb=QVBoxLayout(clients); controls=QHBoxLayout()
         button('Novo cliente',self.client_new,controls); button('Editar',self.client_edit,controls); button('Histórico',self.client_history,controls); button('Arquivar / restaurar',self.client_archive,controls)
         self.trash=QCheckBox('Lixeira'); self.trash.toggled.connect(self.refresh); controls.addWidget(self.trash); cb.addLayout(controls)
-        self.client_table=table(['ID','Nome','Telefone','E-mail','Crédito disponível']); cb.addWidget(self.client_table)
+        self.client_table=table(['ID','Nome','Telefone','E-mail','Total vendido','Recebido bruto (menos reembolsos)','A receber','Crédito disponível']); cb.addWidget(self.client_table)
         quotes=QWidget(); qb=QVBoxLayout(quotes); self.quote_table=table(['ID','Código','Cliente','Total','Validade','Situação']); qb.addWidget(self.quote_table)
         controls=QHBoxLayout(); button('Novo orçamento',self.quote_new,controls); button('Aprovar → venda',self.quote_approve,controls); button('Rejeitar',self.quote_reject,controls); button('Abrir PDF',self.quote_pdf,controls); button('Nova versão PDF',self.quote_emit,controls); qb.addLayout(controls)
         orders=QWidget(); ob=QVBoxLayout(orders); self.order_table=table(['ID','Venda','Cliente','Total','Recebido bruto','Crédito aplicado','Saldo','Entrega','Situação','Pagamento']); ob.addWidget(self.order_table)
@@ -444,7 +444,8 @@ class SalesPage(QWidget):
         self.tabs.addTab(calculator,'Precificação'); self.refresh()
     def refresh(self,*args):
         self.client_rows=self.sales.clients(self.trash.isChecked())
-        fill_table(self.client_table,[[r['id'],r['name'],r['phone'],r['email'],currency(self.sales.credit_balance(r['id']))] for r in self.client_rows])
+        self.client_totals={r['id']:self.sales.client_totals(r['id']) for r in self.client_rows}
+        fill_table(self.client_table,[[r['id'],r['name'],r['phone'],r['email'],currency(self.client_totals[r['id']]['sold']),currency(self.client_totals[r['id']]['received']),currency(self.client_totals[r['id']]['receivable']),currency(self.sales.credit_balance(r['id']))] for r in self.client_rows])
         self.quote_rows=self.sales.quotes()
         fill_table(self.quote_table,[[r['id'],r['code'],json.loads(r['client_snapshot'])['name'],currency(r['total_cents']),date_br(r['valid_until']) or 'Sem validade',QUOTE_STATES[r['display_state']]] for r in self.quote_rows])
         self.order_rows=self.sales.orders(); order_values=[]; receivables=[]; self.receivable_order_ids=[]

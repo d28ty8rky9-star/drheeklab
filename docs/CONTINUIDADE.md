@@ -1,3 +1,7 @@
+# Estado atual — correção Financeiro e saldo por cliente
+
+Corrigidos índices visuais Financeiro4/Impressoras5 e filtros financeiros por dia local dos eventos UTC; históricos preservados. Clientes acrescenta Total vendido, Recebido bruto menos reembolsos e A receber, separados do Crédito disponível. Teste de venda enviada a prazo na virada UTC e pagamento/cancelamento. Ver docs/financeiro-clientes.md e tests/test_finance_local_date.py. Sem ZIP solicitado nesta atualização; somente código/testes/GitHub. Notas seguintes históricas.
+
 # Última entrega — ZIP com total vendido, lucro e estoques separados
 
 Pedido explícito atendido: dist/DrHeekLab-2.9.1-VendasLucro-Estoque-Windows.zip; run 38666818545; artifact 11943311256; código 6a8189b8c1f3cd77f18538d54014a49b383407b2. 305 testes Windows aprovados, zero falhas/erros/pulos. Compilação/instalação/preservação dados aprovadas; ZIP SHA256 igual ao GitHub, CRC e hashes executáveis verificados. Evidências docs/evidencias-vendas-total/requested-package.json. Executar installer/DrHeekLab-2.9.1-Fase8-Setup.exe, preservar C:\DrHeekLab. Avaliação manual pendente. Próximos ZIPs somente sob solicitação. Notas seguintes históricas.
