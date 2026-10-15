@@ -1,3 +1,7 @@
+# Última entrega — ZIP solicitado com Vendas simplificada
+
+ZIP completo Windows gerado mediante pedido: dist/DrHeekLab-2.9.1-Vendas-Windows.zip. Run 38660484911, artifact 11939141141, código 714a848cc4d2ec9b3776560c79561e8f9a2b49ae. 302 testes Windows aprovados, zero falhas/erros/pulos; compilação e verificação de instalação/preservação de dados aprovadas. SHA256 ZIP igual ao digest GitHub; CRC e hashes executáveis/instalador conferidos. Evidências docs/evidencias-vendas/requested-package.json. Extrair pasta nova, abrir installer/DrHeekLab-2.9.1-Fase8-Setup.exe. Preservar C:\DrHeekLab. Avaliação manual pendente. Próximos ZIPs somente sob pedido explícito. Notas seguintes históricas.
+
 # Estado atual — Vendas simplificada e cálculo por origem
 
 Implementadas abas Vendas, Orçamentos, Clientes, Contas a pagar e receber e Precificação. Nova venda: cliente, unidades exatas do estoque, detalhes históricos, produzidas +100%, compradas +30%, acessórios pelo custo. Valor real das peças editável; acessórios separados e somados ao custo. Sem despesa/pagamento automático duplicado. Schema 10/versão 2.9.1. Consulte docs/vendas-estoque.md e testes test_stock_sale*.py. Testes Windows aprovados no run 38659732134; pacote ignorado. ZIP somente mediante pedido explícito. Notas seguintes históricas.

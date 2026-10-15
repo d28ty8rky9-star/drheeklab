@@ -1,0 +1,76 @@
+{
+  "run_id": 38660484911,
+  "artifact_id": 11939141141,
+  "code_sha": "714a848cc4d2ec9b3776560c79561e8f9a2b49ae",
+  "status": "passed",
+  "tests": 302,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "zip": "dist/DrHeekLab-2.9.1-Vendas-Windows.zip",
+  "zip_sha256": "53f462eab1dff777ffc7753f2b620e51f6e1c1f779444d440f356956a75bb21c",
+  "zip_digest_matches_github": true,
+  "crc_ok": true,
+  "executable_hashes_verified": true,
+  "installer_evidence": {
+    "installer-qa/installed-qa-1.json": {
+      "status": "passed",
+      "version": "2.9.1",
+      "checks": [
+        "auth",
+        "PNG/logo",
+        "quote/order",
+        "partial payments/fees",
+        "versioned PDFs",
+        "OP batch/time/consumption",
+        "3-photo individual inspection",
+        "stock delivery",
+        "payables/capital/cash/CPV reconciliation",
+        "CSV/Excel export",
+        "branded reports/catalog PDFs",
+        "notifications/trash",
+        "restart persistence",
+        "verified backup/transfer",
+        "encrypted backup/restore"
+      ],
+      "data": "temporary only"
+    },
+    "installer-qa/installed-qa-2.json": {
+      "status": "passed",
+      "version": "2.9.1",
+      "checks": [
+        "auth",
+        "PNG/logo",
+        "quote/order",
+        "partial payments/fees",
+        "versioned PDFs",
+        "OP batch/time/consumption",
+        "3-photo individual inspection",
+        "stock delivery",
+        "payables/capital/cash/CPV reconciliation",
+        "CSV/Excel export",
+        "branded reports/catalog PDFs",
+        "notifications/trash",
+        "restart persistence",
+        "verified backup/transfer",
+        "encrypted backup/restore"
+      ],
+      "data": "temporary only"
+    },
+    "installer-qa/result.json": {
+      "manual_homologation": "pending",
+      "status": "passed",
+      "checks": [
+        "install",
+        "reinstall",
+        "installed self-test",
+        "pre-update verified backup",
+        "database/media preserved",
+        "headless daily backup",
+        "task create/delete",
+        "uninstall"
+      ]
+    }
+  },
+  "manual_homologation": "pending"
+}
