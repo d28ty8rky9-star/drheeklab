@@ -7,3 +7,5 @@ Nova linha de cartões: Filamentos (valor de aquisição restante conhecido, nú
 Totais usam o mesmo serviço do Estoque, incluindo disponíveis/reservados/a verificar/uso pessoal e excluindo baixadas/descartadas. Atualização ao abrir Início; sem pagamento, despesa ou escrita contábil nova. Funcionalidades financeiras e atalhos preservados. Teste real comprova rolo desconhecido fora do valor/kg e atualização após venda/saída.
 
 Validação local: 8 testes de interface/valoração aprovados. Captura com dados de demonstração: capturas-inicio-estoque/inicio.png. Versão 2.9.1/schema10 mantidos. ZIP somente mediante pedido explícito.
+
+Suíte Windows aprovada no run38674361176, código edf3be6d2db825d2b46c32080b9d427d74357f59; pacote ignorado.
