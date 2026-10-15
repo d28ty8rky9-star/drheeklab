@@ -1,6 +1,6 @@
 # Estado atual — Vendas simplificada e cálculo por origem
 
-Implementadas abas Vendas, Orçamentos, Clientes, Contas a pagar e receber e Precificação. Nova venda: cliente, unidades exatas do estoque, detalhes históricos, produzidas +100%, compradas +30%, acessórios pelo custo. Valor real das peças editável; acessórios separados e somados ao custo. Sem despesa/pagamento automático duplicado. Schema 10/versão 2.9.1. Consulte docs/vendas-estoque.md e testes test_stock_sale*.py. ZIP somente mediante pedido explícito. Notas seguintes históricas.
+Implementadas abas Vendas, Orçamentos, Clientes, Contas a pagar e receber e Precificação. Nova venda: cliente, unidades exatas do estoque, detalhes históricos, produzidas +100%, compradas +30%, acessórios pelo custo. Valor real das peças editável; acessórios separados e somados ao custo. Sem despesa/pagamento automático duplicado. Schema 10/versão 2.9.1. Consulte docs/vendas-estoque.md e testes test_stock_sale*.py. Testes Windows aprovados no run 38659732134; pacote ignorado. ZIP somente mediante pedido explícito. Notas seguintes históricas.
 
 # Última entrega — ZIP refeito após publicação do ambiente
 
