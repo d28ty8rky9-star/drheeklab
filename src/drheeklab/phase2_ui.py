@@ -197,6 +197,10 @@ class FilamentDialog(FormDialog):
         self.remaining.setEnabled(not self.unknown.isChecked())
         self.unknown.toggled.connect(lambda checked: self.remaining.setEnabled(not checked))
         self.combo('state', 'Estado', FILAMENT_STATES, row.get('state', 'new'))
+        if identifier is None:
+            self.unknown.setEnabled(False);self.unknown.setToolTip('Filamento novo entra com o peso total; saldo desconhecido é mantido para cadastros antigos.')
+            self.remaining.setReadOnly(True);self.fields['state'].setEnabled(False)
+            self.fields['initial_grams'].textChanged.connect(self.remaining.setText)
         self.line('reason', 'Justificativa de ajuste de saldo', '', 'Obrigatória em correção de saldo ou finalização')
         self.form.addRow(QLabel('Filamento gratuito: compra = 0; a referência de preço pode ser maior que zero.'))
 
@@ -225,6 +229,9 @@ class FilamentDialog(FormDialog):
     def persist(self):
         values = self.values()
         values['purchased_on'] = date_iso(values['purchased_on'])
+        if self.identifier is None:
+            if not values['initial_grams']:raise ValueError('Informe o peso inicial do filamento novo.')
+            values['remaining_grams']=values['initial_grams'];values['state']='new'
         if self.unknown.isChecked():
             values['remaining_grams'] = None
             if values['state'] == 'new':
@@ -267,7 +274,7 @@ class CatalogPage(QWidget):
             button('Histórico de manutenção', self.maintenance_history, row)
             box.addLayout(row)
         else:
-            self.table = table(['ID', 'Nome / marca', 'Material / cor', 'Compra', 'Referência R$/g', 'Saldo estimado', 'Estado'])
+            self.table = table(['ID', 'Nome / marca', 'Material / cor', 'Compra', 'Referência R$/g', 'Saldo estimado', 'Valor restante', 'Estado'])
             self.alert = QLabel()
             self.alert.setWordWrap(True)
             box.addWidget(self.alert)
@@ -289,7 +296,7 @@ class CatalogPage(QWidget):
             else:
                 saldo = 'Desconhecido' if row['remaining_mg'] is None else grams(row['remaining_mg']) + ' g'
                 values.append([row['id'], row['name'] + ' / ' + row['brand'], row['material'] + ' / ' + row['color'],
-                               brl(Decimal(row['purchase_cents']) / 100), row['reference_per_g'], saldo, FILAMENT_STATES[row['state']]])
+                               brl(Decimal(row['purchase_cents']) / 100), row['reference_per_g'], saldo, self.filament_value_label(row), FILAMENT_STATES[row['state']]])
         fill_table(self.table, values)
         if self.kind == 'filaments':
             low = self.catalog.low_filaments()
@@ -297,6 +304,12 @@ class CatalogPage(QWidget):
                                (', '.join(row['name'] for row in low) if low else 'nenhum carretel conhecido abaixo do limite.') +
                                '\nSaldos desconhecidos não são estimados nem incluídos neste alerta.')
         if getattr(self, '_after_refresh', None): self._after_refresh()
+
+    @staticmethod
+    def filament_value_label(row):
+        from .stock_totals import filament_value
+        value=filament_value(row)
+        return 'Desconhecido' if value is None else brl(Decimal(value)/100)
 
     def selected(self):
         index = self.table.currentRow()

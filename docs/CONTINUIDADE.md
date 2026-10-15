@@ -1,3 +1,7 @@
+# Estado atual — total da venda, lucro, marcação e estoques separados
+
+Valor real informado é TOTAL com acessórios, sem somá-los novamente. Mínimo custos totais, sugerido produzidas +100% / compradas +30% + acessórios custo; lucro bruto total−custos, percentual somente sobre custo das peças. Seleção por caixas de marcação, independente da busca. Estoque sem Auxiliares visível (dados preservados), peças/acessórios separados, totais por categoria e geral. Filamento novo UI entra com saldo/peso completo; Valor restante diminui proporcionalmente ao consumo, sem pagamento duplicado. Antigos desconhecidos não são estimados. Versão 2.9.1/schema10. Ver docs/vendas-estoque.md, testes test_stock_totals.py/test_stock_sale_ui.py. ZIP não solicitado nesta alteração; somente código/GitHub/testes. Notas seguintes históricas.
+
 # Última entrega — ZIP solicitado com Vendas simplificada
 
 ZIP completo Windows gerado mediante pedido: dist/DrHeekLab-2.9.1-Vendas-Windows.zip. Run 38660484911, artifact 11939141141, código 714a848cc4d2ec9b3776560c79561e8f9a2b49ae. 302 testes Windows aprovados, zero falhas/erros/pulos; compilação e verificação de instalação/preservação de dados aprovadas. SHA256 ZIP igual ao digest GitHub; CRC e hashes executáveis/instalador conferidos. Evidências docs/evidencias-vendas/requested-package.json. Extrair pasta nova, abrir installer/DrHeekLab-2.9.1-Fase8-Setup.exe. Preservar C:\DrHeekLab. Avaliação manual pendente. Próximos ZIPs somente sob pedido explícito. Notas seguintes históricas.

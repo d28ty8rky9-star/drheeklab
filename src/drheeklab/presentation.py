@@ -11,7 +11,7 @@ class ModernPresentation:
     def __init__(self,window):
         self.window=window;self.strips={}
         pages={1:window.sales_page,2:window.production_page,3:window.stock_page,4:window.finance_page}
-        titles={1:['Vendido no mês','Recebido líquido no mês','A receber • total','Pedidos em andamento'],2:list(STATES.values()),3:['Carretéis cadastrados','Filamento baixo','Peças reservadas','Peças disponíveis'],4:['Vendido','Recebido líquido','A receber','Resultado gerencial']}
+        titles={1:['Vendido no mês','Recebido líquido no mês','A receber • total','Pedidos em andamento'],2:list(STATES.values()),3:['Filamentos • custo conhecido','Peças • custo em estoque','Acessórios • custo em estoque','Estoque • custo total'],4:['Vendido','Recebido líquido','A receber','Resultado gerencial']}
         for index,page in pages.items():
             strip=MetricStrip(titles[index]);page.layout().insertWidget(0,strip);self.strips[index]=strip
             page._after_refresh=lambda i=index:self.refresh(i)
@@ -107,7 +107,8 @@ class ModernPresentation:
             self.strips[2].set_values(values);self.production_strip.set_values(values)
         if index==3:
             rows=w.stock_page.inventory.summary()
-            self.strips[3].set_values([len(w.filaments_page.catalog.rows('filaments')),len(w.filaments_page.catalog.low_filaments()),sum(r['reserved'] for r in rows),sum(r['available'] for r in rows)])
+            t=w.stock_page.totals
+            self.strips[3].set_values([currency(t['filament_cents']),currency(t['piece_cents']),currency(t['accessory_cents']),currency(t['filament_cents']+t['piece_cents']+t['accessory_cents'])])
         if index==3:
             m=w.finance_page.report_data['metrics'];self.finance_extra.set_values([currency(m[k]) for k in ('expenses_paid_cents','payable_cents','cash_flow_cents','cash_closing_cents')]);self.strips[4].set_values([currency(m[k]) for k in ('sold_cents','received_net_cents','receivable_cents','commercial_result_cents')])
             self.finance_chart.set_values([(label,m[key],currency(m[key])) for label,key in [('Vendido','sold_cents'),('Recebido líquido','received_net_cents'),('Despesas pagas','expenses_paid_cents')]])

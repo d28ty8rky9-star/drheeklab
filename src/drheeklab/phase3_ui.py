@@ -497,6 +497,7 @@ class StockPage(QWidget):
         box = QVBoxLayout(self)
         self.tabs = QTabWidget(); box.addWidget(self.tabs)
         filament_wrapper = QWidget(); fw = QVBoxLayout(filament_wrapper)
+        self.filament_total=QLabel();self.filament_total.setWordWrap(True);fw.addWidget(self.filament_total)
         fw.addWidget(filaments_page)
         button('Registrar perda de filamento', self.filament_loss, fw)
         self.tabs.addTab(filament_wrapper, 'Filamentos')
@@ -508,20 +509,21 @@ class StockPage(QWidget):
         self.material_trash = QCheckBox('Lixeira'); self.material_trash.toggled.connect(self.refresh)
         controls.addWidget(self.material_trash); mb.addLayout(controls)
         self.material_table = table(['ID', 'Material', 'Unidade', 'Saldo', 'Referência R$/unidade']); mb.addWidget(self.material_table)
-        self.tabs.addTab(materials, 'Auxiliares')
+        materials.setParent(self);materials.hide() # Preserve historical auxiliary data and existing integrations.
         # Retain the aggregate model for existing integrations, without a
         # second user-facing inventory tab.
         self.stock_table = table(['Variante ID', 'Produto / variante', 'Físico', 'Reservado', 'Disponível', 'Uso pessoal', 'A verificar', 'Descartado'])
         self.stock_table.setParent(self);self.stock_table.hide()
         physical = QWidget(); pb = QVBoxLayout(physical)
+        self.piece_total=QLabel();self.piece_total.setWordWrap(True);pb.addWidget(self.piece_total)
         self.pieces_table = table(['ID peça', 'Produto / variante', 'Estado', 'Condição', 'Custo atribuído', 'Entrada', 'Reserva'])
         self.pieces_table.setSelectionMode(QTableWidget.ExtendedSelection); pb.addWidget(self.pieces_table)
         controls = QHBoxLayout(); button('Verificar / liberar selecionadas', self.review, controls)
         button('Descartar selecionadas', self.piece_loss, controls); pb.addLayout(controls)
         controls=QHBoxLayout();button('Entrada manual / peça comprada',self.receive,controls);button('Nova peça comprada',self.receive_purchased,controls)
         button('Reservar disponíveis',self.reserve,controls);pb.addLayout(controls)
-        self.tabs.addTab(physical, 'Estoque')
-        accessories=QWidget();ab=QVBoxLayout(accessories);self.accessories_table=table(['Unidade','Acessório','Estado','Custo']);ab.addWidget(self.accessories_table);button('Novo acessório',self.accessory_new,ab);button('Revisar / disponibilizar acessório',self.accessory_review,ab);self.tabs.addTab(accessories,'Acessórios')
+        self.tabs.addTab(physical, 'Estoque de peças')
+        accessories=QWidget();ab=QVBoxLayout(accessories);self.accessory_total=QLabel();self.accessory_total.setWordWrap(True);ab.addWidget(self.accessory_total);self.accessories_table=table(['Unidade','Acessório','Estado','Custo']);ab.addWidget(self.accessories_table);button('Novo acessório',self.accessory_new,ab);button('Revisar / disponibilizar acessório',self.accessory_review,ab);self.tabs.addTab(accessories,'Acessórios')
         reservations = QWidget(); rb = QVBoxLayout(reservations)
         self.reservations_table = table(['ID', 'Referência', 'Produto / variante', 'Quantidade', 'Situação']); rb.addWidget(self.reservations_table)
         controls = QHBoxLayout(); button('Liberar reserva', lambda: self.finish_reservation('release'), controls)
@@ -541,9 +543,17 @@ class StockPage(QWidget):
         fill_table(self.material_table, [[r['id'],r['name'],r['unit'],grams(r['balance_milli']),r['reference_per_unit']] for r in self.material_rows])
         self.stock_rows = self.inventory.summary()
         fill_table(self.stock_table, [[r['id'],r['code']+' • '+r['product_name']+' / '+r['name']+(' (arquivado)' if r['archived'] or r['product_archived'] else ''),r['physical'],r['reserved'],r['available'],r['personal'],r['quarantine'],r['discarded']] for r in self.stock_rows])
-        self.piece_rows = self.inventory.pieces()
+        from .stock_totals import stock_totals
+        self.totals=stock_totals(self.inventory)
+        t=self.totals;money=lambda c:brl(Decimal(c)/100)
+        self.filament_total.setText('Saldo conhecido: '+grams(t['filament_mg'])+' g • Valor de aquisição em estoque: '+money(t['filament_cents'])+' • Sem saldo: '+str(t['filament_unknown'])+' • Excluídos da valoração por dados insuficientes: '+str(t['filament_unvalued']))
+        self.piece_total.setText(str(t['piece_count'])+' peças em mãos • Custo total: '+money(t['piece_cents'])+' • Inclui reservadas, a verificar e uso pessoal; exclui vendidas/descartadas.')
+        self.accessory_total.setText(str(t['accessory_count'])+' acessórios em mãos • Custo total: '+money(t['accessory_cents']))
+        all_pieces=self.inventory.pieces()
+        accessory_ids={r[0] for r in self.inventory.db.execute('SELECT v.id FROM variants v JOIN accessory_products a ON a.product_id=v.product_id')}
+        self.piece_rows = [p for p in all_pieces if p['variant_id'] not in accessory_ids]
         fill_table(self.pieces_table, [[r['id'],r['code']+' • '+r['product_name']+' / '+r['variant_name'],PIECE_STATES[r['state']],r['condition'],brl(Decimal(r['unit_cost_cents'])/100),r['receipt_id'],r['reservation_id'] or '—'] for r in self.piece_rows])
-        self.accessory_rows=[p for p in self.piece_rows if self.inventory.db.execute('SELECT 1 FROM accessory_products ap JOIN variants v ON v.product_id=ap.product_id WHERE v.id=?',(p['variant_id'],)).fetchone()]
+        self.accessory_rows=[p for p in all_pieces if self.inventory.db.execute('SELECT 1 FROM accessory_products ap JOIN variants v ON v.product_id=ap.product_id WHERE v.id=?',(p['variant_id'],)).fetchone()]
         fill_table(self.accessories_table,[(p['id'],p['product_name'],PIECE_STATES[p['state']],brl(Decimal(p['unit_cost_cents'])/100)) for p in self.accessory_rows])
         self.reservation_rows = self.inventory.reservations()
         names = {'reserved':'Reservada','released':'Liberada','issued':'Baixada'}

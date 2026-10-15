@@ -35,7 +35,7 @@ def test_real_recipe_minimal_op_inspection_stock_and_finance(tmp_path,monkeypatc
     confirm=RecipeConfirmDialog(p,op,window);confirm.submit();assert confirm.result()==QDialog.Accepted,confirm.error.text()
     window.navigate(3);stock=window.stock_page
     tabs=[stock.tabs.tabText(i) for i in range(stock.tabs.count())]
-    assert 'Estoque' in tabs and 'Peças prontas' not in tabs and 'Peças físicas' not in tabs
+    assert 'Estoque de peças' in tabs and 'Peças prontas' not in tabs and 'Peças físicas' not in tabs
     assert stock.pieces_table.rowCount()==0
     window.navigate(4);assert window.finance_page.tables['production'].rowCount()==0
     for piece in p.pieces(op):
