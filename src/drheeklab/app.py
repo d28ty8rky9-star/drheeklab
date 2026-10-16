@@ -6,12 +6,13 @@ from pathlib import Path
 import sys
 from PySide6.QtWidgets import QApplication, QMessageBox, QInputDialog, QFileDialog
 from PySide6.QtCore import QLockFile
+from . import __display_version__
 from .storage import Storage, ENVIRONMENTS
 from .ui import Login, Window
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Dr. Heek Lab — Fases 1–8")
+    parser = argparse.ArgumentParser(description="Dr. Heek Lab — versão " + __display_version__)
     parser.add_argument("--environment", choices=ENVIRONMENTS)
     parser.add_argument("--data-dir", type=Path)
     parser.add_argument("--self-test", action="store_true", help="Validar o pacote em dados temporários, sem abrir armazenamento do usuário")

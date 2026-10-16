@@ -49,18 +49,18 @@ if (-not $iscc) {
 if ($IconPath) { & $compiler "/DOfficialIcon=$((Resolve-Path $IconPath).Path)" packaging/installer.iss }
 else { & $compiler packaging/installer.iss }
 if ($LASTEXITCODE -ne 0) { throw 'Falha na criação do instalador' }
-$setup = Get-ChildItem 'dist\installer\*.exe' | Where-Object { $_.Name -eq "DrHeekLab-$expected-Fase8-Setup.exe" }
+$setup = Get-ChildItem 'dist\installer\*.exe' | Where-Object { $_.Name -eq "DrHeekLab-$expected-Beta-Setup.exe" }
 if (-not $setup) { throw 'Instalador esperado ausente' }
 Get-FileHash $setup.FullName -Algorithm SHA256 | Format-List | Out-File 'dist\installer\SHA256.txt'
 Get-FileHash 'dist\DrHeekLab\DrHeekLab.exe','dist\DrHeekLabUpdate.exe' -Algorithm SHA256 | Format-List | Out-File 'dist\windows-SHA256.txt'
 Write-Host 'Pacote gerado. Execute o checklist Windows antes de liberar. Sem ícone oficial fornecido, a identidade final está pendente.'
 
 @"
-DR. HEEK LAB - VERSAO $expected
+DR. HEEK LAB - VERSAO $expected BETA
 
 Pacote completo para Windows.
 1. Extraia todo este ZIP em uma pasta nova.
-2. Execute installer\DrHeekLab-$expected-Fase8-Setup.exe.
+2. Execute installer\DrHeekLab-$expected-Beta-Setup.exe.
 3. Abra o programa pelo atalho Dr. Heek Lab.
 
 Voce pode excluir a pasta extraida da entrega anterior.

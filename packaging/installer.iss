@@ -1,12 +1,13 @@
-#define AppVersion "2.9.1"
+#define AppVersion "2.9.10"
 [Setup]
 AppId={{485013A4-F44F-47DF-9C89-9CECB56946A0}
 AppName=Dr. Heek Lab
 AppVersion={#AppVersion}
+AppVerName=Dr. Heek Lab {#AppVersion} Beta
 DefaultDirName={autopf}\DrHeekLab
 DefaultGroupName=Dr. Heek Lab
 OutputDir=..\dist\installer
-OutputBaseFilename=DrHeekLab-2.9.1-Fase8-Setup
+OutputBaseFilename=DrHeekLab-{#AppVersion}-Beta-Setup
 UninstallDisplayIcon={app}\DrHeekLab.exe
 #ifdef OfficialIcon
 SetupIconFile={#OfficialIcon}

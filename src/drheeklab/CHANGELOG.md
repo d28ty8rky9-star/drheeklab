@@ -1,3 +1,11 @@
+# 2.9.10 Beta — Identificação da versão beta
+
+- Versão exibida em título, menu lateral e Sobre: 2.9.10 Beta.
+- Identificação beta nas propriedades do executável e no instalador.
+- Inclui os ajustes de Início, Financeiro, Clientes, Estoque e a limpeza de código.
+- Dados, AppId do instalador, pastas de instalação/armazenamento e schema 10 preservados.
+- Pacote completo será gerado somente mediante pedido explícito.
+
 # 2.9.1 — Correção da janela Nova peça / Editar peça
 
 - Ficha de Produção completa dentro do cadastro: filamentos múltiplos, gramas, horas, cálculo automático, extras, variante, fotos e STL/3MF.

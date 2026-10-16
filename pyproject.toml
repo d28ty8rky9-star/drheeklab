@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "drheeklab"
-version = "2.9.1"
-description = "Gestão offline de impressão 3D — Fases 1–8"
+version = "2.9.10"
+description = "Dr. Heek Lab 2.9.10 Beta — gestão offline de impressão 3D"
 requires-python = ">=3.11"
 dependencies = ["PySide6==6.8.3", "reportlab==4.4.4", "openpyxl==3.1.5", "cryptography==46.0.3"]
 

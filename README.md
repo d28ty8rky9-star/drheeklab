@@ -1,4 +1,4 @@
-# Dr. Heek Lab — versão 2.9.1
+# Dr. Heek Lab — versão 2.9.10 Beta
 
 Aplicativo **desktop offline**, Python + PySide6 + SQLite, para Windows. As sete áreas estão implementadas; peças/modelos e ordens ficam juntos em Produção. O instalador e os fluxos de instalação/reinstalação, backup e preservação de dados passaram pela validação automatizada Windows; a avaliação prática no computador do proprietário permanece pendente.
 
@@ -155,4 +155,4 @@ Em Windows x64, com Python 3.12 e Inno Setup 6:
 ./packaging/build-windows.ps1 -IconPath C:\caminho\marca-oficial.ico
 ```
 
-Saídas esperadas: `dist\DrHeekLab\DrHeekLab.exe` e `dist\installer\DrHeekLab-2.8.0-Fase8-Setup.exe`. Usuário final não precisa de Python. Binários ficam em Program Files; dados em `C:\DrHeekLab` não são removidos pela desinstalação. Execute `docs/validacao-windows.md` antes de distribuir. Scripts e workflow estão preparados, mas **não foram executados em Windows**.
+Saídas esperadas: `dist\DrHeekLab\DrHeekLab.exe` e `dist\installer\DrHeekLab-2.9.10-Beta-Setup.exe`. Usuário final não precisa de Python. Binários ficam em Program Files; dados em `C:\DrHeekLab` não são removidos pela desinstalação. Execute `docs/validacao-windows.md` antes de distribuir. As versões anteriores foram compiladas e verificadas em Windows. O pacote 2.9.10 Beta será gerado somente mediante pedido explícito.

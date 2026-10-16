@@ -8,7 +8,7 @@ from PySide6.QtWidgets import (
     QLineEdit, QDialog, QFormLayout, QMessageBox, QTextEdit, QFileDialog, QApplication,
     QScrollArea, QTabWidget
 )
-from . import __version__
+from . import __display_version__
 from .security import Auth
 from .storage import ENVIRONMENTS
 from .backup import create_backup, daily_backup, restore_backup
@@ -101,7 +101,7 @@ class Window(QMainWindow):
         self._closed = False
         self.theme = storage.get("theme", "dark")
         self.collapsed = storage.get("sidebar_collapsed", False)
-        self.setWindowTitle(f"Dr. Heek Lab • versão {__version__} • {ENVIRONMENTS[storage.environment]}")
+        self.setWindowTitle(f"Dr. Heek Lab • versão {__display_version__} • {ENVIRONMENTS[storage.environment]}")
         self.resize(1180, 800)
         self.setMinimumSize(780, 560)
         root = QWidget()
@@ -120,7 +120,7 @@ class Window(QMainWindow):
         self.brand = QLabel("DR. HEEK\nLAB")
         self.brand.setObjectName("brand")
         side.addWidget(self.brand)
-        self.brand_version = QLabel("Versão " + __version__)
+        self.brand_version = QLabel("Versão " + __display_version__)
         self.brand_version.setObjectName("muted")
         side.addWidget(self.brand_version)
         collapse = QPushButton("☰")
@@ -269,7 +269,7 @@ class Window(QMainWindow):
     def about_page(self):
         from importlib.resources import files
         page = QWidget(); box = QVBoxLayout(page)
-        info = QLabel('Dr. Heek Lab • versão ' + __version__ +
+        info = QLabel('Dr. Heek Lab • versão ' + __display_version__ +
             '\nGestão offline de impressão 3D. Dados armazenados localmente.' +
             '\nAmbiente ativo: ' + ENVIRONMENTS[self.storage.environment] +
             '\nAcesso protegido por senha local. Testes e Produção possuem bancos, arquivos e preferências próprios.' +
@@ -501,7 +501,7 @@ class Window(QMainWindow):
         from importlib.resources import files
         dialog=QDialog(self);dialog.setWindowTitle('Sobre Dr. Heek Lab');dialog.resize(800,600)
         box=QVBoxLayout(dialog)
-        box.addWidget(QLabel('Dr. Heek Lab '+__version__+' • Fases 1–8\nAplicativo offline; não é sistema fiscal nem certificação ISO.\nValidação automatizada Windows aprovada; avaliação prática no computador do proprietário pendente.'))
+        box.addWidget(QLabel('Dr. Heek Lab '+__display_version__+' • Gestão de impressão 3D\nAplicativo offline; não é sistema fiscal nem certificação ISO.\nValidação automatizada Windows aprovada; avaliação prática no computador do proprietário pendente.'))
         history=QTextEdit();history.setReadOnly(True);history.setMarkdown(files('drheeklab').joinpath('CHANGELOG.md').read_text(encoding='utf-8'));box.addWidget(history)
         close=QPushButton('Fechar');close.clicked.connect(dialog.accept);box.addWidget(close);dialog.exec()
 
