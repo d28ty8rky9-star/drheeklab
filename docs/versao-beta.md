@@ -11,3 +11,5 @@ Esta alteração define a identificação beta no código; não cria release pú
 Validação local: 311 testes aprovados, zero falhas/erros/pulos.
 
 Suíte Windows aprovada no run38833805978 sobre2ba57d62df769965c551593a0fc1e24b9e5e7d41. Etapa de pacote ignorada; instalador Beta ainda não compilado.
+
+Primeira tentativa de pacote run38834443314 compilou, mas a reinstalação foi bloqueada por comparação de versão antiga (2.9.1) fixa no Inno. Corrigido para derivar os componentes numéricos de AppVersion na verificação, preservando a proteção contra downgrade. Nova geração e testes de instalação obrigatórios antes da entrega.

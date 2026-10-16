@@ -41,15 +41,38 @@ begin
   Result := not DirExists('C:\DrHeekLab');
 end;
 
+function NextVersionComponent(var Version: String): Cardinal;
+var
+  Separator: Integer;
+begin
+  Separator := Pos('.', Version);
+  if Separator = 0 then
+  begin
+    Result := StrToIntDef(Version, 0);
+    Version := '';
+  end
+  else
+  begin
+    Result := StrToIntDef(Copy(Version, 1, Separator - 1), 0);
+    Delete(Version, 1, Separator);
+  end;
+end;
+
 function PrepareToInstall(var NeedsRestart: Boolean): String;
 var
   ExitCode: Integer;
-  InstalledMS, InstalledLS: Cardinal;
+  InstalledMS, InstalledLS, TargetMS, TargetLS: Cardinal;
+  TargetVersion: String;
   ReportPath: String;
 begin
   Result := '';
+  TargetVersion := '{#AppVersion}';
+  TargetMS := NextVersionComponent(TargetVersion) shl 16;
+  TargetMS := TargetMS or NextVersionComponent(TargetVersion);
+  TargetLS := NextVersionComponent(TargetVersion) shl 16;
+  TargetLS := TargetLS or NextVersionComponent(TargetVersion);
   if GetVersionNumbers(ExpandConstant('{app}\DrHeekLab.exe'), InstalledMS, InstalledLS) then
-    if (InstalledMS > 131081) or ((InstalledMS = 131081) and (InstalledLS > 65536)) then
+    if (InstalledMS > TargetMS) or ((InstalledMS = TargetMS) and (InstalledLS > TargetLS)) then
     begin
       Result := 'Há uma versão mais recente instalada. Não é permitido rebaixar automaticamente.';
       Exit;
