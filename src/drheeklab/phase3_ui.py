@@ -4,17 +4,19 @@ from decimal import Decimal
 import json
 import uuid
 from PySide6.QtCore import Qt, QSize
-from PySide6.QtGui import QIcon, QPixmap, QDesktopServices
+from PySide6.QtGui import QIcon, QDesktopServices
 from PySide6.QtCore import QUrl
-from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
-    QLineEdit, QComboBox, QCheckBox, QListWidget, QListWidgetItem, QListView, QTabWidget,
-    QFileDialog, QMessageBox, QDialog, QInputDialog, QTableWidget, QTextEdit, QFormLayout)
+from PySide6.QtWidgets import (
+    QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QComboBox, QCheckBox, QListWidget,
+    QListWidgetItem, QListView, QTabWidget, QFileDialog, QMessageBox, QDialog, QInputDialog,
+    QTableWidget, QFormLayout
+)
 from .catalog import Catalog
 from .products import Products, CATEGORIES
 from .inventory import Inventory, PIECE_STATES
 from .pricing import brl
 from .time_input import hours_to_minutes,minutes_to_hours
-from .phase2_ui import FormDialog, button, table, fill_table, scroll, date_br, date_iso, decimal_cents, grams
+from .phase2_ui import FormDialog, button, table, fill_table, date_br, date_iso, decimal_cents, grams
 
 
 def money_optional(value):
@@ -501,19 +503,6 @@ class StockPage(QWidget):
         fw.addWidget(filaments_page)
         button('Registrar perda de filamento', self.filament_loss, fw)
         self.tabs.addTab(filament_wrapper, 'Filamentos')
-        materials = QWidget(); mb = QVBoxLayout(materials)
-        controls = QHBoxLayout()
-        button('Novo material', self.material_new, controls); button('Editar / ajustar', self.material_edit, controls)
-        button('Consumir', self.material_consume, controls); button('Registrar perda', self.material_loss, controls)
-        button('Arquivar / restaurar', self.material_archive, controls)
-        self.material_trash = QCheckBox('Lixeira'); self.material_trash.toggled.connect(self.refresh)
-        controls.addWidget(self.material_trash); mb.addLayout(controls)
-        self.material_table = table(['ID', 'Material', 'Unidade', 'Saldo', 'Referência R$/unidade']); mb.addWidget(self.material_table)
-        materials.setParent(self);materials.hide() # Preserve historical auxiliary data and existing integrations.
-        # Retain the aggregate model for existing integrations, without a
-        # second user-facing inventory tab.
-        self.stock_table = table(['Variante ID', 'Produto / variante', 'Físico', 'Reservado', 'Disponível', 'Uso pessoal', 'A verificar', 'Descartado'])
-        self.stock_table.setParent(self);self.stock_table.hide()
         physical = QWidget(); pb = QVBoxLayout(physical)
         self.piece_total=QLabel();self.piece_total.setWordWrap(True);pb.addWidget(self.piece_total)
         self.pieces_table = table(['ID peça', 'Produto / variante', 'Estado', 'Condição', 'Custo atribuído', 'Entrada', 'Reserva'])
@@ -539,21 +528,16 @@ class StockPage(QWidget):
 
     def refresh(self, *args):
         self.filaments_page.refresh()
-        self.material_rows = self.inventory.materials(self.material_trash.isChecked())
-        fill_table(self.material_table, [[r['id'],r['name'],r['unit'],grams(r['balance_milli']),r['reference_per_unit']] for r in self.material_rows])
-        self.stock_rows = self.inventory.summary()
-        fill_table(self.stock_table, [[r['id'],r['code']+' • '+r['product_name']+' / '+r['name']+(' (arquivado)' if r['archived'] or r['product_archived'] else ''),r['physical'],r['reserved'],r['available'],r['personal'],r['quarantine'],r['discarded']] for r in self.stock_rows])
-        from .stock_totals import stock_totals
-        self.totals=stock_totals(self.inventory)
+        from .stock_totals import stock_snapshot
+        snapshot=stock_snapshot(self.inventory)
+        self.totals=snapshot['totals']
         t=self.totals;money=lambda c:brl(Decimal(c)/100)
         self.filament_total.setText('Saldo conhecido: '+grams(t['filament_mg'])+' g • Valor de aquisição em estoque: '+money(t['filament_cents'])+' • Sem saldo: '+str(t['filament_unknown'])+' • Excluídos da valoração por dados insuficientes: '+str(t['filament_unvalued']))
         self.piece_total.setText(str(t['piece_count'])+' peças em mãos • Custo total: '+money(t['piece_cents'])+' • Inclui reservadas, a verificar e uso pessoal; exclui vendidas/descartadas.')
         self.accessory_total.setText(str(t['accessory_count'])+' acessórios em mãos • Custo total: '+money(t['accessory_cents']))
-        all_pieces=[p for p in self.inventory.pieces() if p['state'] in ('available','reserved','quarantine','personal')]
-        accessory_ids={r[0] for r in self.inventory.db.execute('SELECT v.id FROM variants v JOIN accessory_products a ON a.product_id=v.product_id')}
-        self.piece_rows = [p for p in all_pieces if p['variant_id'] not in accessory_ids]
+        self.piece_rows=snapshot['pieces']
         fill_table(self.pieces_table, [[r['id'],r['code']+' • '+r['product_name']+' / '+r['variant_name'],PIECE_STATES[r['state']],r['condition'],brl(Decimal(r['unit_cost_cents'])/100),r['receipt_id'],r['reservation_id'] or '—'] for r in self.piece_rows])
-        self.accessory_rows=[p for p in all_pieces if self.inventory.db.execute('SELECT 1 FROM accessory_products ap JOIN variants v ON v.product_id=ap.product_id WHERE v.id=?',(p['variant_id'],)).fetchone()]
+        self.accessory_rows=snapshot['accessories']
         fill_table(self.accessories_table,[(p['id'],p['product_name'],PIECE_STATES[p['state']],brl(Decimal(p['unit_cost_cents'])/100)) for p in self.accessory_rows])
         self.reservation_rows = self.inventory.reservations()
         names = {'reserved':'Reservada','released':'Liberada','issued':'Baixada'}
@@ -590,40 +574,10 @@ class StockPage(QWidget):
             QMessageBox.information(self, 'Selecione um item', 'Selecione uma linha na tabela.'); return None
         return rows[index]['id']
 
-    def material_new(self):
-        if MaterialDialog(self.inventory, parent=self).exec() == QDialog.Accepted:
-            self.refresh()
-
-    def material_edit(self):
-        identifier = self.selected(self.material_table, self.material_rows)
-        if identifier is not None and MaterialDialog(self.inventory, identifier, self).exec() == QDialog.Accepted:
-            self.refresh()
-
-    def material_consume(self):
-        identifier = self.selected(self.material_table, self.material_rows)
-        if identifier is not None and ConsumeMaterialDialog(self.inventory, identifier, self).exec() == QDialog.Accepted:
-            self.refresh()
-
-    def material_loss(self):
-        identifier = self.selected(self.material_table, self.material_rows)
-        if identifier is not None and LossDialog(self.inventory, 'material', identifier, self).exec() == QDialog.Accepted:
-            self.refresh()
-
     def filament_loss(self):
         identifier = self.filaments_page.selected()
         if identifier is not None and LossDialog(self.inventory, 'filament', identifier, self).exec() == QDialog.Accepted:
             self.refresh()
-
-    def material_archive(self):
-        identifier = self.selected(self.material_table, self.material_rows)
-        if identifier is None:
-            return
-        reason, ok = QInputDialog.getText(self, 'Arquivar / restaurar material', 'Justificativa obrigatória:')
-        if ok and QMessageBox.question(self, 'Confirmar', 'Confirmar arquivamento ou restauração?', QMessageBox.Yes | QMessageBox.No, QMessageBox.No) == QMessageBox.Yes:
-            try:
-                self.inventory.archive_material(identifier, not self.material_trash.isChecked(), reason); self.refresh()
-            except ValueError as error:
-                QMessageBox.warning(self, 'Verifique os dados', str(error))
 
     def receive(self):
         if ReceiptDialog(self.inventory, self).exec() == QDialog.Accepted:

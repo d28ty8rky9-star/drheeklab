@@ -1,6 +1,6 @@
 """Offline commercial workflow. Every financial value is an integer cent amount."""
 from contextlib import contextmanager
-from datetime import date,datetime,timedelta
+from datetime import date, timedelta
 from calendar import monthrange
 from decimal import Decimal
 import json

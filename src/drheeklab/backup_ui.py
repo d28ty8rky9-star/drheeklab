@@ -1,5 +1,5 @@
 """Explicit encryption choice and assisted least-privilege Windows scheduling."""
-from PySide6.QtWidgets import QInputDialog,QLineEdit,QMessageBox,QDialog,QVBoxLayout,QLabel,QPushButton,QFileDialog,QDialogButtonBox
+from PySide6.QtWidgets import QInputDialog, QLineEdit, QMessageBox, QLabel, QPushButton, QFileDialog, QDialogButtonBox
 from .backup_crypto import is_encrypted,validate_password
 from .phase2_ui import FormDialog
 from .scheduler import install_task,remove_task,export_task

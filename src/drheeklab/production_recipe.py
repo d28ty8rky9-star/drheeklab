@@ -1,6 +1,5 @@
 """Reusable per-variant recipes; planning never consumes stock or creates cash."""
 import json
-from decimal import Decimal
 from .catalog import required
 from .pricing import integer, number, calculate, cents
 from .storage import now

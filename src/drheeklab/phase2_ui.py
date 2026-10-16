@@ -3,7 +3,7 @@ from datetime import datetime, date
 from decimal import Decimal, ROUND_HALF_UP
 import json
 import sqlite3
-from PySide6.QtCore import Qt, QTimer
+from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QFormLayout, QLabel,
     QLineEdit, QPushButton, QDialog, QDialogButtonBox, QComboBox, QCheckBox,
     QTableWidget, QTableWidgetItem, QHeaderView, QMessageBox, QTextEdit,

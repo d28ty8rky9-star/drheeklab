@@ -1,5 +1,4 @@
 """Immutable branded internal reports and public catalogs; no live PDF views."""
-from datetime import date
 from decimal import Decimal
 from io import BytesIO
 import hashlib
@@ -11,7 +10,7 @@ from xml.sax.saxutils import escape
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4,landscape
 from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.platypus import SimpleDocTemplate,Paragraph,Spacer,Table,TableStyle,Image,PageBreak,KeepTogether
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image, PageBreak
 from .storage import now
 from .transactions import transaction
 from .catalog import required

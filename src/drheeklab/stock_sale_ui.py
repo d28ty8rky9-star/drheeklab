@@ -1,7 +1,7 @@
 """One new sale form: client, actual stock units, detail and automatic price."""
 from decimal import Decimal
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QDialog,QLabel,QPushButton,QHBoxLayout,QVBoxLayout,QWidget,QTabWidget,QTextEdit,QTableWidget,QLineEdit
+from PySide6.QtWidgets import QDialog, QLabel, QPushButton, QVBoxLayout, QWidget, QTabWidget, QTextEdit, QTableWidget, QLineEdit
 from .phase2_ui import FormDialog,table,fill_table
 from .pricing import brl
 
@@ -87,6 +87,5 @@ class StockSaleDialog(FormDialog):
     def persist(self):
         v=self.values()
         if v['client'] is None:raise ValueError('Selecione ou cadastre o cliente.')
-        from .pricing import cents
         final_total=v['actual_total'] if v['actual_total'].strip() else None
         self.saved_id=self.sales.create_stock_sale(v['client'],self.selected_ids(self.pieces,self.piece_rows),self.selected_ids(self.accessories,self.accessory_rows),final_total,notes=v['notes'])

@@ -4,8 +4,8 @@ from decimal import Decimal
 from pathlib import Path
 import csv
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QWidget,QDialog,QVBoxLayout,QHBoxLayout,QLabel,QLineEdit,QComboBox,QCheckBox,QPushButton,QTabWidget,QFileDialog,QMessageBox,QTableWidget,QTableWidgetItem
-from .phase2_ui import FormDialog,button,table,fill_table,date_iso,scroll
+from PySide6.QtWidgets import QWidget, QDialog, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QComboBox, QCheckBox, QTabWidget, QFileDialog, QMessageBox, QTableWidget, QTableWidgetItem
+from .phase2_ui import FormDialog, button, table, fill_table, date_iso
 from .phase4_ui import open_local
 from .documents import Documents,KINDS
 from .notifications import Notifications

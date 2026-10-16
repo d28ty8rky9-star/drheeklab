@@ -103,7 +103,8 @@ def test_eight_navigation_areas_and_sales_summary_are_integrated(tmp_path):
     order=sales.create_order(client,[{'description':'Peça','unit_price':'100'}]);sales.receive_payment(order,'30')
     window=Window(store);window.show();APP.processEvents()
     assert window.pages.count()==7
-    assert 'R$ 100,00' in window.business_summary.text() and 'R$ 70,00' in window.business_summary.text()
+    assert window.presentation.home_strip.cards[0].value.text()=='R$ 100,00'
+    assert window.presentation.home_strip.cards[2].value.text()=='R$ 70,00'
     window.navigate(1)
     assert window.sales_page.client_table.rowCount()==1
     assert window.sales_page.order_table.rowCount()==1

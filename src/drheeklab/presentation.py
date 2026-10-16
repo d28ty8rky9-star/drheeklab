@@ -1,7 +1,6 @@
 """Visual adapters over existing read-only domain reports."""
-from datetime import date
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QWidget,QVBoxLayout,QHBoxLayout,QLabel,QPushButton,QLineEdit,QTableWidget,QListView,QFrame,QScrollArea,QBoxLayout
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QLineEdit, QTableWidget, QScrollArea, QBoxLayout
 from .visual import MetricStrip,MetricCard,BarChart,action_style,modern_table
 from .phase4_ui import currency
 from .phase2_ui import minutes_label
@@ -18,7 +17,6 @@ class ModernPresentation:
         home=window.pages.widget(0).widget();layout=home.layout()
         # Keep notes, imported official logo and all shortcuts.
         layout.itemAt(1).widget().setText('Visão financeira do mês e acompanhamento da produção. Valores do ambiente ativo.')
-        window.business_summary.hide()
         shortcuts=QHBoxLayout()
         for button in home.findChildren(QPushButton):
             layout.removeWidget(button);shortcuts.addWidget(button)
@@ -109,7 +107,7 @@ class ModernPresentation:
         if index in (0,3):
             from decimal import Decimal
             from .stock_totals import stock_totals
-            t=stock_totals(w.stock_page.inventory)
+            t=w.stock_page.totals if index==3 else stock_totals(w.stock_page.inventory)
             total=t['filament_cents']+t['piece_cents']+t['accessory_cents']
             self.home_stock_strip.set_values([currency(t['filament_cents']),currency(t['accessory_cents']),currency(total)])
             kg=format(Decimal(t['filament_mg'])/1000000,'f').replace('.',',')
@@ -117,7 +115,6 @@ class ModernPresentation:
             self.home_stock_strip.cards[1].detail.setText(str(t['accessory_count'])+' unidades em estoque')
             self.home_stock_strip.cards[2].detail.setText('Filamentos + acessórios + peças\nPeças: '+currency(t['piece_cents']))
         if index==3:
-            rows=w.stock_page.inventory.summary()
             t=w.stock_page.totals
             self.strips[3].set_values([currency(t['filament_cents']),currency(t['piece_cents']),currency(t['accessory_cents']),currency(t['filament_cents']+t['piece_cents']+t['accessory_cents'])])
         if index==4:

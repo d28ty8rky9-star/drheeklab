@@ -1,7 +1,6 @@
 """Desktop production queue, mixed batches and photographic piece inspection."""
 from decimal import Decimal
 import json
-from pathlib import Path
 from PySide6.QtCore import QTimer, QUrl
 from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import QWidget,QVBoxLayout,QHBoxLayout,QLabel,QComboBox,QLineEdit,QPushButton,QFileDialog,QMessageBox,QTabWidget,QDialog,QTextEdit,QProgressBar

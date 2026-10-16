@@ -1,11 +1,10 @@
 """Offline finance: expenses, actual payments, owner funding and reports."""
 from datetime import date
 from decimal import Decimal
-import json
-from PySide6.QtWidgets import QWidget,QVBoxLayout,QHBoxLayout,QLabel,QLineEdit,QComboBox,QPushButton,QTabWidget,QMessageBox,QFileDialog,QTextEdit,QDialog
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QComboBox, QPushButton, QTabWidget, QMessageBox, QFileDialog, QTextEdit
 from .finance import Finance,TREATMENTS,ENTRY_KINDS,STATUS
 from .finance_exports import export_csv,export_excel,NAMES
-from .phase2_ui import FormDialog,button,table,fill_table,date_iso,date_br,scroll
+from .phase2_ui import FormDialog, button, table, fill_table, date_iso, date_br
 from .phase4_ui import InstallmentEditor,currency,open_local
 from .sales import Sales,PAYMENT_METHODS
 from .products import Products

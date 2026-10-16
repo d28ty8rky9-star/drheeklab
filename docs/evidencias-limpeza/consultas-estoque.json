@@ -1,0 +1,34 @@
+{
+  "antes": {
+    "selects": 35,
+    "pecas_visiveis": 4,
+    "acessorios_visiveis": 2,
+    "totals": {
+      "filament_count": 1,
+      "filament_cents": 9800,
+      "filament_mg": 980000,
+      "filament_unknown": 0,
+      "filament_unvalued": 0,
+      "piece_count": 4,
+      "piece_cents": 10620,
+      "accessory_count": 2,
+      "accessory_cents": 3000
+    }
+  },
+  "depois": {
+    "selects": 22,
+    "pecas_visiveis": 4,
+    "acessorios_visiveis": 2,
+    "totals": {
+      "filament_count": 1,
+      "filament_cents": 9800,
+      "filament_mg": 980000,
+      "filament_unknown": 0,
+      "filament_unvalued": 0,
+      "piece_count": 4,
+      "piece_cents": 10620,
+      "accessory_count": 2,
+      "accessory_cents": 3000
+    }
+  }
+}

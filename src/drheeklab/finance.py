@@ -11,7 +11,7 @@ from PySide6.QtGui import QImageReader
 from PySide6.QtPdf import QPdfDocument
 from .catalog import Catalog,required,optional_date
 from .inventory import Inventory
-from .pricing import cents,integer,grams_mg,money
+from .pricing import cents, grams_mg, money
 from .journal import record
 from .storage import now
 from .event_dates import event_day

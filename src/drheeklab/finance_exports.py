@@ -1,6 +1,5 @@
 """CSV and Excel exports with explicit money columns and literal user text."""
 import csv
-from decimal import Decimal
 from pathlib import Path
 from openpyxl import Workbook
 from .storage import now

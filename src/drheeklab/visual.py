@@ -1,7 +1,7 @@
 """Shared presentation components. No business writes or financial calculations."""
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QColor, QPainter, QPixmap, QIcon, QPen
-from PySide6.QtWidgets import QWidget, QFrame, QLabel, QVBoxLayout, QHBoxLayout, QLineEdit, QTableWidget, QPushButton, QStyle
+from PySide6.QtWidgets import QWidget, QFrame, QLabel, QVBoxLayout, QHBoxLayout, QStyle
 
 COLORS = {'purple':'#9565fa', 'blue':'#38bdf8', 'magenta':'#e879f9', 'green':'#34d399', 'amber':'#fbbf24', 'red':'#fb7185'}
 SPACING = 12

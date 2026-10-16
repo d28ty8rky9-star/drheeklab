@@ -11,8 +11,8 @@ from PySide6.QtWidgets import (QWidget,QVBoxLayout,QHBoxLayout,QLabel,QLineEdit,
 from .sales import Sales,PAYMENT_METHODS
 from .sales_documents import owned_path
 from .catalog import Catalog
-from .pricing import cents,integer,brl
-from .phase2_ui import FormDialog,button,table,fill_table,scroll,date_iso,date_br,decimal_cents
+from .pricing import cents, brl
+from .phase2_ui import FormDialog, button, table, fill_table, date_iso, date_br, decimal_cents
 
 QUOTE_STATES={'pending':'Pendente','approved':'Aprovado','rejected':'Rejeitado','expired':'Vencido'}
 DELIVERY_STATES={'waiting':'Aguardando envio/retirada','sent':'Enviado','delivered':'Entregue'}

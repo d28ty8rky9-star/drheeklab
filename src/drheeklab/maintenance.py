@@ -6,7 +6,7 @@ from datetime import datetime
 import sys
 from PySide6.QtCore import QLockFile,QCoreApplication
 from .storage import Storage,ENVIRONMENTS
-from .backup import create_backup,daily_backup
+from .backup import create_backup
 from . import __version__
 
 def run_backup(root,environment,*,destination=None,daily=False,password=None):

@@ -61,8 +61,9 @@ def test_stock_ui_receipt_personal_reinspection_reservation_release_and_loss(tmp
     dialog.fields['state'].setCurrentIndex(dialog.fields['state'].findData('personal'))
     dialog.submit(); assert dialog.result()==QDialog.Accepted
     page=window.stock_page; page.refresh()
-    assert page.stock_table.item(0,2).text()=='3'
-    assert page.stock_table.item(0,4).text()=='0'
+    assert page.pieces_table.rowCount()==3
+    assert {r['state'] for r in page.piece_rows}=={'personal'}
+    assert page.totals['piece_count']==3
     review=ReviewDialog(inventory,[dialog.piece_ids[0]],window)
     fields(review,{'condition':'Usada, aprovada após nova verificação','reviewer':'Proprietário'})
     review.submit(); assert review.result()==QDialog.Accepted
@@ -75,9 +76,11 @@ def test_stock_ui_receipt_personal_reinspection_reservation_release_and_loss(tmp
     monkeypatch.setattr(QMessageBox,'question',lambda *args: QMessageBox.Yes)
     loss.submit(); assert loss.result()==QDialog.Accepted
     page.refresh()
-    assert page.stock_table.item(0,2).text()=='2'
-    assert page.stock_table.item(0,4).text()=='1'
-    assert page.stock_table.item(0,7).text()=='1'
+    assert page.pieces_table.rowCount()==2
+    assert sorted(r['state'] for r in page.piece_rows)==['available','personal']
+    assert dialog.piece_ids[1] not in {r['id'] for r in page.piece_rows}
+    assert page.totals['piece_count']==2
+    assert inventory.get('pieces',dialog.piece_ids[1])['state']=='discarded'
     assert page.losses_table.rowCount()==1
     window.close()
     reopened=Storage(tmp_path)

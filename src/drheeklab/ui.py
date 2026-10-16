@@ -3,9 +3,11 @@ import os
 import shutil
 from PySide6.QtCore import Qt, QTimer, QUrl, QSize
 from PySide6.QtGui import QDesktopServices, QPixmap, QIcon
-from PySide6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel,
-    QPushButton, QStackedWidget, QFrame, QLineEdit, QDialog, QFormLayout, QMessageBox,
-    QTextEdit, QFileDialog, QTableWidget, QTableWidgetItem, QHeaderView, QApplication, QScrollArea, QTabWidget)
+from PySide6.QtWidgets import (
+    QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QStackedWidget, QFrame,
+    QLineEdit, QDialog, QFormLayout, QMessageBox, QTextEdit, QFileDialog, QApplication,
+    QScrollArea, QTabWidget
+)
 from . import __version__
 from .security import Auth
 from .storage import ENVIRONMENTS
@@ -17,7 +19,6 @@ from .phase5_ui import ProductionPage
 from .phase6_ui import FinancePage
 from .phase7_ui import DocumentCenter,NotificationDialog
 from .notifications import Notifications
-from .sales import Sales
 
 AREAS = ("Início", "Vendas", "Produção", "Estoque", "Financeiro", "Impressoras", "Configurações")
 SYMBOLS = ("⌂", "$", "⚙", "▤", "↗", "▣", "☷")
@@ -228,9 +229,6 @@ class Window(QMainWindow):
         self.low_alert = QLabel()
         self.low_alert.setWordWrap(True)
         self.low_alert.hide()
-        self.business_summary = QLabel()
-        self.business_summary.setWordWrap(True)
-        box.addWidget(self.business_summary)
         sale_button = QPushButton("Nova venda")
         sale_button.clicked.connect(self.open_new_sale)
         box.addWidget(sale_button)
@@ -344,9 +342,6 @@ class Window(QMainWindow):
         if index == 0:
             low = self.filaments_page.catalog.low_filaments()
             self.low_alert.setText('Filamento baixo: ' + (', '.join(row['name'] for row in low) if low else 'nenhum saldo conhecido abaixo do limite.'))
-            from .phase4_ui import currency
-            indicators=self.sales_page.sales.indicators()
-            self.business_summary.setText('Vendas aprovadas no mês: '+currency(indicators['sold'])+' • Recebido líquido menos reembolsos no mês: '+currency(indicators['net_received'])+'\nA receber (todos os pedidos): '+currency(indicators['receivable'])+' • Pedidos em andamento: '+str(indicators['active_orders'])+' • Parcelas atrasadas: '+str(indicators['overdue_installments']))
         elif index == 1:
             self.calculator.refresh()
             self.sales_page.refresh()

@@ -1,3 +1,7 @@
+# Estado atual — limpeza de código e consultas
+
+Limpeza solicitada: removidas interfaces ocultas Auxiliares/agregado de estoque, handlers inacessíveis, resumo oculto do Início/cálculo duplicado, imports sem uso e consultas desnecessárias. MaterialDialog/ConsumeMaterialDialog e domínio/dados financeiros preservados. stock_snapshot único para listas/totais; API stock_totals mantida. Testes ajustados para elementos visíveis sem remover casos. 310 testes locais passaram; consultas StockPage.refresh35→22 com mesmos dados; fonte Python7.828→7.773 linhas. docs/limpeza-codigo.md e evidencias-limpeza/. Versão2.9.1/schema10, nenhum ZIP solicitado. Notas seguintes históricas.
+
 # Última entrega — ZIP com Início Financeiro Clientes e Estoque atual
 
 ZIP solicitado: dist/DrHeekLab-2.9.1-Inicio-Financeiro-Estoque-Windows.zip; run38675129326; artifact11945697929; código f9f43c8c00b80d55416a8caa5bd599f0c809466d. 310 testes Windows aprovados sem falhas/erros/pulos, pacote/instalação/reinstalação/preservação dados aprovados. SHA256 igual ao GitHub, CRC e hashes executáveis/instalador conferidos. Evidências docs/evidencias-inicio-estoque/requested-package.json. Executar installer/DrHeekLab-2.9.1-Fase8-Setup.exe; preservar C:\DrHeekLab. Inclui novo Início, filtros de data local Financeiro/cartões, saldo por cliente e ocultação de baixadas no Estoque. Avaliação manual pendente. Futuras entregas ZIP só sob pedido explícito. Notas seguintes históricas.
