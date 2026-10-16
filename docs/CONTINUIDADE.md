@@ -1,6 +1,6 @@
 # Estado atual — Dr. Heek Lab 2.9.10 Beta
 
-Usuário definiu grande lançamento beta: versão técnica2.9.10, exibição2.9.10 Beta. Atualizadas UI título/lateral/Sobre, CLI, pyproject, Windows metadata/prerelease, Inno, build e workflow. Futuro Setup DrHeekLab-2.9.10-Beta-Setup.exe; artefatoDrHeekLab-Windows-2.9.10-Beta. AppId, pastas/atalhos, schema10 e históricos preservados. docs/versao-beta.md e tests/test_beta_version.py. Nenhum ZIP ou release pública gerado; somente sob pedido explícito. Notas seguintes históricas.
+Usuário definiu grande lançamento beta: versão técnica2.9.10, exibição2.9.10 Beta. Atualizadas UI título/lateral/Sobre, CLI, pyproject, Windows metadata/prerelease, Inno, build e workflow. Futuro Setup DrHeekLab-2.9.10-Beta-Setup.exe; artefatoDrHeekLab-Windows-2.9.10-Beta. AppId, pastas/atalhos, schema10 e históricos preservados. docs/versao-beta.md e tests/test_beta_version.py. 311 testes locais aprovados; suíte Windows aprovada no run38833805978 sobre2ba57d62df769965c551593a0fc1e24b9e5e7d41, pacote ignorado. Nenhum ZIP ou release pública gerado; somente sob pedido explícito. Notas seguintes históricas.
 
 # Estado atual — limpeza de código e consultas
 

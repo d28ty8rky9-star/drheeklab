@@ -9,3 +9,5 @@ Inclui todos os ajustes anteriores de produção, vendas, estoque, Financeiro, C
 Esta alteração define a identificação beta no código; não cria release pública, ZIP ou instalador. Empacotamento somente mediante pedido explícito. A nova instalação beta e avaliação prática do proprietário aguardam uma entrega solicitada.
 
 Validação local: 311 testes aprovados, zero falhas/erros/pulos.
+
+Suíte Windows aprovada no run38833805978 sobre2ba57d62df769965c551593a0fc1e24b9e5e7d41. Etapa de pacote ignorada; instalador Beta ainda não compilado.
