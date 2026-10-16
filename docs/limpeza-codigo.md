@@ -9,3 +9,5 @@ Testes antes vinculados a widgets ocultos agora verificam a tabela efetivamente 
 Experimento com os mesmos dados (4 peças e2 acessórios), comparando StockPage.refresh de ed651b8 com a nova implementação: 35→22 SELECTs, mesmos totais/listas, sem comparação de tempo prometida. A apresentação completa também deixa de reler totais já calculados. Evidências em evidencias-limpeza/. Código Python principal: 7.828→7.773 linhas, redução líquida55, incluindo linhas vazias/comentários. Não houve meta de reduzir linhas ou compactação da lógica para diminuir a contagem.
 
 Arquivos grandes de telas permanecem nesta etapa para evitar reorganização ampla sem necessidade funcional. Não foram alteradas fórmulas, regras de estoque/produção/vendas/segurança, versão2.9.1 ou schema10. ZIP/instalador somente sob pedido explícito; pacotes antigos não incluem esta limpeza.
+
+Validação Windows aprovada no run38832775408, código8ec528db44f5d0a596599a2c01698b28222c026d; etapa de pacote ignorada.

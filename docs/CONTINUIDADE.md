@@ -1,6 +1,6 @@
 # Estado atual — limpeza de código e consultas
 
-Limpeza solicitada: removidas interfaces ocultas Auxiliares/agregado de estoque, handlers inacessíveis, resumo oculto do Início/cálculo duplicado, imports sem uso e consultas desnecessárias. MaterialDialog/ConsumeMaterialDialog e domínio/dados financeiros preservados. stock_snapshot único para listas/totais; API stock_totals mantida. Testes ajustados para elementos visíveis sem remover casos. 310 testes locais passaram; consultas StockPage.refresh35→22 com mesmos dados; fonte Python7.828→7.773 linhas. docs/limpeza-codigo.md e evidencias-limpeza/. Versão2.9.1/schema10, nenhum ZIP solicitado. Notas seguintes históricas.
+Limpeza solicitada: removidas interfaces ocultas Auxiliares/agregado de estoque, handlers inacessíveis, resumo oculto do Início/cálculo duplicado, imports sem uso e consultas desnecessárias. MaterialDialog/ConsumeMaterialDialog e domínio/dados financeiros preservados. stock_snapshot único para listas/totais; API stock_totals mantida. Testes ajustados para elementos visíveis sem remover casos. 310 testes locais passaram; suíte Windows aprovada no run38832775408 sobre8ec528db44f5d0a596599a2c01698b28222c026d, pacote ignorado; consultas StockPage.refresh35→22 com mesmos dados; fonte Python7.828→7.773 linhas. docs/limpeza-codigo.md e evidencias-limpeza/. Versão2.9.1/schema10, nenhum ZIP solicitado. Notas seguintes históricas.
 
 # Última entrega — ZIP com Início Financeiro Clientes e Estoque atual
 
