@@ -1,3 +1,7 @@
+# Entrega Beta concluída
+
+ZIP completo dist/DrHeekLab-2.9.10-Beta-Windows.zip; run38835435300; artifact12019531319; código9d62ada69f4c1be609a054167f39a902a4553145. 311 testes Windows aprovados, pacote/instalação/reinstalação/backups/preservação/agendamento/desinstalação aprovados. Integridade e hashes conferidos, versão2.9.10 Beta confirmada no executável. Instalador installer/DrHeekLab-2.9.10-Beta-Setup.exe. Proteção de downgrade corrigida para derivar a versão do AppVersion. Avaliação manual pendente. Registros de preparação abaixo são históricos.
+
 # Dr. Heek Lab — versão 2.9.10 Beta
 
 Identificação da nova etapa beta definida pelo proprietário. Versão técnica 2.9.10, texto visível 2.9.10 Beta. Título/menu/Sobre/ajuda CLI, metadados Windows e identificação do instalador atualizados. FileVersion numérica2.9.10, ProductVersion2.9.10 Beta e flag prerelease Windows. pyproject mantém a versão numérica compatível com a ferramenta de compilação.

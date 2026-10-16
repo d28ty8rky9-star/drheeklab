@@ -1,0 +1,77 @@
+{
+  "run_id": 38835435300,
+  "artifact_id": 12019531319,
+  "code_sha": "9d62ada69f4c1be609a054167f39a902a4553145",
+  "status": "passed",
+  "version": "2.9.10 Beta",
+  "tests": 311,
+  "zip": "dist/DrHeekLab-2.9.10-Beta-Windows.zip",
+  "zip_sha256": "e6b9619d0b4c9e454c6eb5fcf4fc49ba80d6d88ebe660fa47d2ab72291ff7b6b",
+  "zip_digest_matches_github": true,
+  "crc_ok": true,
+  "executable_hashes_verified": true,
+  "beta_version_inside_executable_verified": true,
+  "installer_evidence": {
+    "installer-qa/installed-qa-1.json": {
+      "status": "passed",
+      "version": "2.9.10",
+      "checks": [
+        "auth",
+        "PNG/logo",
+        "quote/order",
+        "partial payments/fees",
+        "versioned PDFs",
+        "OP batch/time/consumption",
+        "3-photo individual inspection",
+        "stock delivery",
+        "payables/capital/cash/CPV reconciliation",
+        "CSV/Excel export",
+        "branded reports/catalog PDFs",
+        "notifications/trash",
+        "restart persistence",
+        "verified backup/transfer",
+        "encrypted backup/restore"
+      ],
+      "data": "temporary only"
+    },
+    "installer-qa/installed-qa-2.json": {
+      "status": "passed",
+      "version": "2.9.10",
+      "checks": [
+        "auth",
+        "PNG/logo",
+        "quote/order",
+        "partial payments/fees",
+        "versioned PDFs",
+        "OP batch/time/consumption",
+        "3-photo individual inspection",
+        "stock delivery",
+        "payables/capital/cash/CPV reconciliation",
+        "CSV/Excel export",
+        "branded reports/catalog PDFs",
+        "notifications/trash",
+        "restart persistence",
+        "verified backup/transfer",
+        "encrypted backup/restore"
+      ],
+      "data": "temporary only"
+    },
+    "installer-qa/result.json": {
+      "manual_homologation": "pending",
+      "checks": [
+        "install",
+        "reinstall",
+        "installed self-test",
+        "pre-update verified backup",
+        "database/media preserved",
+        "headless daily backup",
+        "task create/delete",
+        "uninstall"
+      ],
+      "status": "passed"
+    }
+  },
+  "initial_failed_run": 38834443314,
+  "installer_version_comparison_fixed": true,
+  "manual_homologation": "pending"
+}
