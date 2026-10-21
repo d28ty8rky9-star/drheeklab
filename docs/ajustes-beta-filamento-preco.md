@@ -1,3 +1,7 @@
+# ZIP atualizado entregue sob solicitação
+
+Pacote dist/DrHeekLab-2.9.10-Beta-Ajustes-Filamento-Preco-Windows.zip, run39534133352, artifact12317133513, código800ced6b3adc7b9d2ef80c94584ac6284ff4f7dc. 314 testes nativos Windows aprovados sem falhas/erros/pulos. Compilação/instalação/reinstalação/backup/preservação dados/agendamento/desinstalação aprovados; CRC e hashes do ZIP/executáveis conferidos. Fluxo de filamento usado, preço sugerido e acessórios sem margem confirmados nos módulos dentro do executável. Evidências evidencias-ajustes-beta/requested-package.json. Preparação abaixo é histórica.
+
 # Beta — filamento usado no cadastro e sugerido da Produção
 
 FilamentDialog libera Saldo desconhecido e Estado no cadastro inicial. Marcar usado/desconhecido seleciona Aberto; salva remaining_mg NULL, sem estimar o que resta ou exigir edição posterior. Pode também deixar peso inicial desconhecido. Filamento novo conhecido continua entrando com o peso integral e valor proporcional já existente; Aberto com saldo conhecido admite informar a quantidade restante. Edição preserva validação/auditoria anterior.

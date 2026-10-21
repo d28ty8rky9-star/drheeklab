@@ -1,0 +1,77 @@
+{
+  "run_id": 39534133352,
+  "artifact_id": 12317133513,
+  "code_sha": "800ced6b3adc7b9d2ef80c94584ac6284ff4f7dc",
+  "status": "passed",
+  "version": "2.9.10 Beta",
+  "tests": 314,
+  "zip": "dist/DrHeekLab-2.9.10-Beta-Ajustes-Filamento-Preco-Windows.zip",
+  "zip_sha256": "83c0cb9061e908460c6418c556157b97532f263b46a9b58d4dceef459009879d",
+  "zip_digest_matches_github": true,
+  "crc_ok": true,
+  "executable_hashes_verified": true,
+  "new_filament_unknown_flow_inside_executable": true,
+  "production_suggested_price_inside_executable": true,
+  "accessory_cost_without_markup_inside_executable": true,
+  "installer_evidence": {
+    "installer-qa/installed-qa-2.json": {
+      "status": "passed",
+      "version": "2.9.10",
+      "checks": [
+        "auth",
+        "PNG/logo",
+        "quote/order",
+        "partial payments/fees",
+        "versioned PDFs",
+        "OP batch/time/consumption",
+        "3-photo individual inspection",
+        "stock delivery",
+        "payables/capital/cash/CPV reconciliation",
+        "CSV/Excel export",
+        "branded reports/catalog PDFs",
+        "notifications/trash",
+        "restart persistence",
+        "verified backup/transfer",
+        "encrypted backup/restore"
+      ],
+      "data": "temporary only"
+    },
+    "installer-qa/installed-qa-1.json": {
+      "status": "passed",
+      "version": "2.9.10",
+      "checks": [
+        "auth",
+        "PNG/logo",
+        "quote/order",
+        "partial payments/fees",
+        "versioned PDFs",
+        "OP batch/time/consumption",
+        "3-photo individual inspection",
+        "stock delivery",
+        "payables/capital/cash/CPV reconciliation",
+        "CSV/Excel export",
+        "branded reports/catalog PDFs",
+        "notifications/trash",
+        "restart persistence",
+        "verified backup/transfer",
+        "encrypted backup/restore"
+      ],
+      "data": "temporary only"
+    },
+    "installer-qa/result.json": {
+      "status": "passed",
+      "manual_homologation": "pending",
+      "checks": [
+        "install",
+        "reinstall",
+        "installed self-test",
+        "pre-update verified backup",
+        "database/media preserved",
+        "headless daily backup",
+        "task create/delete",
+        "uninstall"
+      ]
+    }
+  },
+  "manual_homologation": "pending"
+}
