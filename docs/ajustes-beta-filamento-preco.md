@@ -9,3 +9,5 @@ Novas vendas usam a mesma regra para extras embutidos, pela receita congelada na
 Exemplo verificado: impressão3,10 + acessório10 = custo13,10; sugerido16,20; margem100% sobre3,10. Novo acessório separado5 leva o total para21,20. Capturas reais temporárias em capturas-ajustes-beta/.
 
 Validação: 314 testes locais aprovados, zero falhas/erros/pulos. Versão2.9.10 Beta e schema10 mantidos. Nenhum ZIP/instalador gerado; último pacote não contém estes ajustes. Avaliação manual no computador do proprietário pendente.
+
+Validação Windows aprovada no run39532755479, código427b78fe8424aac46bd3aaceb23545c59b606972; etapa de pacote ignorada.
