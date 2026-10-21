@@ -18,7 +18,7 @@ class StockSaleDialog(FormDialog):
             page=QWidget();layout=QVBoxLayout(page);search=QLineEdit();search.setPlaceholderText('Buscar nome, variante ou unidade...');layout.addWidget(search);layout.addWidget(listing)
             search.textChanged.connect(lambda text,t=listing:self.filter_stock(t,text))
             self.stock_tabs.addTab(page,label)
-        self.form.addRow(QLabel('Selecione uma ou mais unidades. Produzidas: custo + 100%. Compradas: custo + 30%. Acessórios: custo sem acréscimo.'))
+        self.form.addRow(QLabel('Selecione uma ou mais unidades. Produzidas: custo sem acessórios + 100%. Compradas: custo + 30%. Extras e acessórios: custo sem acréscimo.'))
         self.details=QTextEdit();self.details.setReadOnly(True);self.details.setMinimumHeight(150);self.form.addRow('Custos registrados',self.details)
         self.summary=QLabel();self.summary.setWordWrap(True);self.form.addRow(self.summary)
         self.line('actual_total','Valor total da venda (peças + acessórios, R$)','')
@@ -78,7 +78,7 @@ class StockSaleDialog(FormDialog):
     def update_actual_total(self,*args):
         from .pricing import cents
         try:
-            quote=self.quote();accessories=sum(p['unit_cost_cents'] for p in quote['items'] if p['kind']=='accessory')
+            quote=self.quote();accessories=sum(p['unit_cost_cents'] if p['kind']=='accessory' else p.get('embedded_accessory_cents',0) for p in quote['items'])
             total=cents(self.fields['actual_total'].text());base=quote['cost_cents']-accessories;profit=total-quote['cost_cents']
             percent=str((Decimal(profit)*100/base).quantize(Decimal('0.01'))).replace('.',',')+'%' if base else 'não calculável (custo das peças zero)'
             self.actual_summary.setText('Total vendido: '+brl(Decimal(total)/100)+' • '+('Lucro bruto: ' if profit>=0 else 'Prejuízo bruto: ')+brl(Decimal(abs(profit))/100)+' • Sobre o custo das peças: '+percent+' • Acessórios pelo custo: '+brl(Decimal(accessories)/100))

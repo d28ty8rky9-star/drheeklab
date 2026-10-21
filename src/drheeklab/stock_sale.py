@@ -14,7 +14,6 @@ class StockSales:
         purchased=bool(self.db.execute('SELECT 1 FROM purchased_products WHERE product_id=?',(product['id'],)).fetchone()) or (not linked and receipt['calculation_id'] is None)
         kind='accessory' if accessory else 'purchased' if purchased else 'produced'
         markup={'produced':100,'purchased':30,'accessory':0}[kind]
-        recommended=int((Decimal(piece['unit_cost_cents'])*(100+markup)/100).quantize(Decimal('1'),rounding=ROUND_HALF_UP))
         details={'receipt_source':receipt['source'],'op':None,'attempts':[],'extras':[]}
         if linked:
             details['op']=linked['code']
@@ -26,7 +25,9 @@ class StockSales:
             if saved:details['extras']=json.loads(saved[0])['data'].get('extras',[])
         elif receipt['cost_snapshot']:
             details['receipt_snapshot']=json.loads(receipt['cost_snapshot'])
-        return {**piece,'kind':kind,'markup_percent':markup,'suggested_cents':recommended,'details':details}
+        embedded=min(piece['unit_cost_cents'],sum(cents(e['total_cost']) for e in details['extras'])) if kind=='produced' else 0
+        recommended=int((Decimal(piece['unit_cost_cents']-embedded)*(100+markup)/100+embedded).quantize(Decimal('1'),rounding=ROUND_HALF_UP))
+        return {**piece,'kind':kind,'markup_percent':markup,'suggested_cents':recommended,'embedded_accessory_cents':embedded,'details':details}
 
     def stock_sale_quote(self,piece_ids,accessory_ids=(),*,resale_accessories='cost'):
         ids=list(piece_ids)+list(accessory_ids)
@@ -55,7 +56,7 @@ class StockSales:
             items=[{'variant_id':p['variant_id'],'quantity':1,'unit_price':str(Decimal(value)/100),'fulfillment':'stock','piece_ids':[p['id']]} for p,value in zip(quote['items'],allocation)]
             rows=self.prepare_items(items)
             for row,piece in zip(rows,quote['items']):
-                row['snapshot']['pricing']={'piece_id':piece['id'],'kind':piece['kind'],'markup_percent':piece['markup_percent'],'cost_cents':piece['unit_cost_cents'],'suggested_cents':piece['suggested_cents'],'resale_accessories':resale_accessories,'details':piece['details']}
+                row['snapshot']['pricing']={'piece_id':piece['id'],'kind':piece['kind'],'markup_percent':piece['markup_percent'],'cost_cents':piece['unit_cost_cents'],'suggested_cents':piece['suggested_cents'],'embedded_accessory_cents':piece.get('embedded_accessory_cents',0),'resale_accessories':resale_accessories,'details':piece['details']}
                 row['snapshot']['variant']['suggested_price_cents']=piece['suggested_cents']
             order=self._insert_order(self.active_client(client_id),rows,0,None,notes,None,operation_key or uuid.uuid4().hex,files)
             self.storage.audit('venda:estoque e preço',f'orders:{order}',None,{'suggested_cents':quote['suggested_cents'],'actual_cents':total,'piece_ids':list(piece_ids),'accessory_ids':list(accessory_ids)})

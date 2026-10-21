@@ -197,10 +197,11 @@ class ProductsPage(QWidget):
         self.gallery.clear()
         rows = self.products.search(self.search.text(), self.category.currentData(), self.trash.isChecked())
         for product in rows:
-            price = 'Preço não informado' if product['suggested_price_cents'] is None else brl(Decimal(product['suggested_price_cents']) / 100)
+            pricing=self.products.production_pricing(product['id'])
+            price = pricing['suggested_label'] or ('Preço não informado' if product['suggested_price_cents'] is None else brl(Decimal(product['suggested_price_cents']) / 100))
             photos = self.products.media(product['id'], 'photo')
             photo = next((p for p in photos if p['is_primary']), None)
-            item = QListWidgetItem(f"{product['code']} • {product['name']}\n{CATEGORIES.get(product['category'], product['category'])} • {price}\nValor de produção: {self.products.production_cost_label(product['id'])}" + ('\nSem foto principal' if not photo else ''))
+            item = QListWidgetItem(f"{product['code']} • {product['name']}\n{CATEGORIES.get(product['category'], product['category'])} • {price}\nValor de produção: {pricing['cost_label']}" + ('\nSem foto principal' if not photo else ''))
             if photo:
                 try:
                     item.setIcon(QIcon(str(self.products.media_path(photo['id'], 'photo', verify=False))))

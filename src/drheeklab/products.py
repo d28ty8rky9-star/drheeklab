@@ -58,14 +58,21 @@ class Products:
                 result.append(row)
         return result
 
-    def production_cost_label(self, product_id):
-        costs=[]
+    def production_pricing(self, product_id):
+        costs=[];suggestions=[]
+        from .production_extras import calculate_extras
         for row in self.db.execute('SELECT r.data FROM production_recipes r JOIN variants v ON v.id=r.variant_id WHERE v.product_id=? AND v.archived=0',(product_id,)):
-            estimate=json.loads(row[0])['estimate'];value=estimate.get('acquisition_production_cost')
-            costs.append(Decimal(value if value is not None else estimate['total_cost']))
-        if not costs:return 'Ficha não preenchida'
-        lower,upper=min(costs),max(costs)
-        return brl(lower) if lower==upper else brl(lower)+' a '+brl(upper)+' (variantes)'
+            data=json.loads(row[0]);estimate=data['estimate'];value=estimate.get('acquisition_production_cost')
+            cost=Decimal(value if value is not None else estimate['total_cost'])
+            extras=calculate_extras(data.get('extras',[]))[1]
+            costs.append(cost);suggestions.append(max(Decimal('0'),cost-extras)*2+extras)
+        def label(values):
+            lower,upper=min(values),max(values)
+            return brl(lower) if lower==upper else brl(lower)+' a '+brl(upper)+' (variantes)'
+        return {'cost_label':label(costs) if costs else 'Ficha não preenchida','suggested_label':label(suggestions) if suggestions else None}
+
+    def production_cost_label(self, product_id):
+        return self.production_pricing(product_id)['cost_label']
 
     def save(self, data, identifier=None):
         category = data.get('category', 'decorative')

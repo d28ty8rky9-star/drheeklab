@@ -190,19 +190,26 @@ class FilamentDialog(FormDialog):
         for key in ('purchase', 'initial_grams'):
             self.fields[key].textChanged.connect(self.update_acquisition)
         self.update_acquisition()
-        self.unknown = QCheckBox('Saldo desconhecido — usar sem exigir pesagem')
+        self.unknown = QCheckBox('Filamento já usado / saldo desconhecido — sem exigir pesagem')
         self.unknown.setChecked(identifier is not None and row['remaining_mg'] is None)
         self.form.addRow(self.unknown)
         self.remaining = self.line('remaining_grams', 'Saldo estimado restante (g)', grams(row.get('remaining_mg', 1000000)))
         self.remaining.setEnabled(not self.unknown.isChecked())
         self.unknown.toggled.connect(lambda checked: self.remaining.setEnabled(not checked))
         self.combo('state', 'Estado', FILAMENT_STATES, row.get('state', 'new'))
-        if identifier is None:
-            self.unknown.setEnabled(False);self.unknown.setToolTip('Filamento novo entra com o peso total; saldo desconhecido é mantido para cadastros antigos.')
-            self.remaining.setReadOnly(True);self.fields['state'].setEnabled(False)
-            self.fields['initial_grams'].textChanged.connect(self.remaining.setText)
+        self.unknown.toggled.connect(self.update_balance_fields)
+        self.fields['state'].currentIndexChanged.connect(self.update_balance_fields)
+        self.fields['initial_grams'].textChanged.connect(self.update_balance_fields)
+        self.update_balance_fields()
         self.line('reason', 'Justificativa de ajuste de saldo', '', 'Obrigatória em correção de saldo ou finalização')
         self.form.addRow(QLabel('Filamento gratuito: compra = 0; a referência de preço pode ser maior que zero.'))
+
+    def update_balance_fields(self,*args):
+        if self.unknown.isChecked() and self.fields['state'].currentData()=='new':
+            self.fields['state'].setCurrentIndex(self.fields['state'].findData('open'))
+        full=self.identifier is None and self.fields['state'].currentData()=='new' and not self.unknown.isChecked()
+        self.remaining.setReadOnly(full)
+        if full:self.remaining.setText(self.fields['initial_grams'].text())
 
     def acquisition_value(self):
         from .pricing import cost_per_gram
@@ -229,7 +236,7 @@ class FilamentDialog(FormDialog):
     def persist(self):
         values = self.values()
         values['purchased_on'] = date_iso(values['purchased_on'])
-        if self.identifier is None:
+        if self.identifier is None and values['state']=='new' and not self.unknown.isChecked():
             if not values['initial_grams']:raise ValueError('Informe o peso inicial do filamento novo.')
             values['remaining_grams']=values['initial_grams'];values['state']='new'
         if self.unknown.isChecked():
